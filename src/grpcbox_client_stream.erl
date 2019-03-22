@@ -13,6 +13,13 @@
 
 -include("grpcbox.hrl").
 
+-define(user_agent(),
+    begin
+        _ = application:load(grpcbox),
+        {ok, Version} = application:get_key(grpcbox, vsn),
+        erlang:iolist_to_binary(io_lib:format("grpc-erlang/~s", [Version]))
+    end).
+
 -define(headers(Scheme, Host, Path, Encoding, MessageType, MD), [{<<":method">>, <<"POST">>},
                                                                  {<<":path">>, Path},
                                                                  {<<":scheme">>, Scheme},
@@ -20,7 +27,7 @@
                                                                  {<<"grpc-encoding">>, Encoding},
                                                                  {<<"grpc-message-type">>, MessageType},
                                                                  {<<"content-type">>, <<"application/grpc+proto">>},
-                                                                 {<<"user-agent">>, <<"grpc-erlang/0.9.2">>},
+                                                                 {<<"user-agent">>, ?user_agent()},
                                                                  {<<"te">>, <<"trailers">>} | MD]).
 
 new_stream(Ctx, Channel, Path, Def=#grpcbox_def{service=Service,
