@@ -25,145 +25,145 @@
 
 %% @doc Unary RPC
 -spec empty_call(test_pb:empty()) ->
-    {ok, test_pb:empty(), grpcbox:metadata()} | grpcbox_stream:grpc_error_response().
+                        {ok, test_pb:empty(), grpcbox:metadata()} | grpcbox_stream:grpc_error_response().
 empty_call(Input) ->
     empty_call(ctx:new(), Input, #{}).
 
 -spec empty_call(ctx:t() | test_pb:empty(), test_pb:empty() | grpcbox_client:options()) ->
-    {ok, test_pb:empty(), grpcbox:metadata()} | grpcbox_stream:grpc_error_response().
+                        {ok, test_pb:empty(), grpcbox:metadata()} | grpcbox_stream:grpc_error_response().
 empty_call(Ctx, Input) when ?is_ctx(Ctx) ->
     empty_call(Ctx, Input, #{});
 empty_call(Input, Options) ->
     empty_call(ctx:new(), Input, Options).
 
 -spec empty_call(ctx:t(), test_pb:empty(), grpcbox_client:options()) ->
-    {ok, test_pb:empty(), grpcbox:metadata()} | grpcbox_stream:grpc_error_response().
+                        {ok, test_pb:empty(), grpcbox:metadata()} | grpcbox_stream:grpc_error_response().
 empty_call(Ctx, Input, Options) ->
     grpcbox_client:unary(Ctx, <<"/grpc.testing.TestService/EmptyCall">>, Input, ?DEF(empty, empty, <<"grpc.testing.Empty">>), Options).
 
 %% @doc Unary RPC
 -spec unary_call(test_pb:simple_request()) ->
-    {ok, test_pb:simple_response(), grpcbox:metadata()} | grpcbox_stream:grpc_error_response().
+                        {ok, test_pb:simple_response(), grpcbox:metadata()} | grpcbox_stream:grpc_error_response().
 unary_call(Input) ->
     unary_call(ctx:new(), Input, #{}).
 
 -spec unary_call(ctx:t() | test_pb:simple_request(), test_pb:simple_request() | grpcbox_client:options()) ->
-    {ok, test_pb:simple_response(), grpcbox:metadata()} | grpcbox_stream:grpc_error_response().
+                        {ok, test_pb:simple_response(), grpcbox:metadata()} | grpcbox_stream:grpc_error_response().
 unary_call(Ctx, Input) when ?is_ctx(Ctx) ->
     unary_call(Ctx, Input, #{});
 unary_call(Input, Options) ->
     unary_call(ctx:new(), Input, Options).
 
 -spec unary_call(ctx:t(), test_pb:simple_request(), grpcbox_client:options()) ->
-    {ok, test_pb:simple_response(), grpcbox:metadata()} | grpcbox_stream:grpc_error_response().
+                        {ok, test_pb:simple_response(), grpcbox:metadata()} | grpcbox_stream:grpc_error_response().
 unary_call(Ctx, Input, Options) ->
     grpcbox_client:unary(Ctx, <<"/grpc.testing.TestService/UnaryCall">>, Input, ?DEF(simple_request, simple_response, <<"grpc.testing.SimpleRequest">>), Options).
 
 %% @doc Unary RPC
 -spec cacheable_unary_call(test_pb:simple_request()) ->
-    {ok, test_pb:simple_response(), grpcbox:metadata()} | grpcbox_stream:grpc_error_response().
+                                  {ok, test_pb:simple_response(), grpcbox:metadata()} | grpcbox_stream:grpc_error_response().
 cacheable_unary_call(Input) ->
     cacheable_unary_call(ctx:new(), Input, #{}).
 
 -spec cacheable_unary_call(ctx:t() | test_pb:simple_request(), test_pb:simple_request() | grpcbox_client:options()) ->
-    {ok, test_pb:simple_response(), grpcbox:metadata()} | grpcbox_stream:grpc_error_response().
+                                  {ok, test_pb:simple_response(), grpcbox:metadata()} | grpcbox_stream:grpc_error_response().
 cacheable_unary_call(Ctx, Input) when ?is_ctx(Ctx) ->
     cacheable_unary_call(Ctx, Input, #{});
 cacheable_unary_call(Input, Options) ->
     cacheable_unary_call(ctx:new(), Input, Options).
 
 -spec cacheable_unary_call(ctx:t(), test_pb:simple_request(), grpcbox_client:options()) ->
-    {ok, test_pb:simple_response(), grpcbox:metadata()} | grpcbox_stream:grpc_error_response().
+                                  {ok, test_pb:simple_response(), grpcbox:metadata()} | grpcbox_stream:grpc_error_response().
 cacheable_unary_call(Ctx, Input, Options) ->
     grpcbox_client:unary(Ctx, <<"/grpc.testing.TestService/CacheableUnaryCall">>, Input, ?DEF(simple_request, simple_response, <<"grpc.testing.SimpleRequest">>), Options).
 
 %% @doc 
 -spec streaming_output_call(test_pb:streaming_output_call_request()) ->
-    {ok, grpcbox_client:stream()} | grpcbox_stream:grpc_error_response().
+                                   {ok, grpcbox_client:stream()} | grpcbox_stream:grpc_error_response().
 streaming_output_call(Input) ->
     streaming_output_call(ctx:new(), Input, #{}).
 
 -spec streaming_output_call(ctx:t() | test_pb:streaming_output_call_request(), test_pb:streaming_output_call_request() | grpcbox_client:options()) ->
-    {ok, grpcbox_client:stream()} | grpcbox_stream:grpc_error_response().
+                                   {ok, grpcbox_client:stream()} | grpcbox_stream:grpc_error_response().
 streaming_output_call(Ctx, Input) when ?is_ctx(Ctx) ->
     streaming_output_call(Ctx, Input, #{});
 streaming_output_call(Input, Options) ->
     streaming_output_call(ctx:new(), Input, Options).
 
 -spec streaming_output_call(ctx:t(), test_pb:streaming_output_call_request(), grpcbox_client:options()) ->
-    {ok, grpcbox_client:stream()} | grpcbox_stream:grpc_error_response().
+                                   {ok, grpcbox_client:stream()} | grpcbox_stream:grpc_error_response().
 streaming_output_call(Ctx, Input, Options) ->
     grpcbox_client:stream(Ctx, <<"/grpc.testing.TestService/StreamingOutputCall">>, Input, ?DEF(streaming_output_call_request, streaming_output_call_response, <<"grpc.testing.StreamingOutputCallRequest">>), Options).
 
 %% @doc 
 -spec streaming_input_call() ->
-    {ok, grpcbox_client:stream()} | grpcbox_stream:grpc_error_response().
+                                  {ok, grpcbox_client:stream()} | grpcbox_stream:grpc_error_response().
 streaming_input_call() ->
     streaming_input_call(ctx:new(), #{}).
 
 -spec streaming_input_call(ctx:t() | grpcbox_client:options()) ->
-    {ok, grpcbox_client:stream()} | grpcbox_stream:grpc_error_response().
+                                  {ok, grpcbox_client:stream()} | grpcbox_stream:grpc_error_response().
 streaming_input_call(Ctx) when ?is_ctx(Ctx) ->
     streaming_input_call(Ctx, #{});
 streaming_input_call(Options) ->
     streaming_input_call(ctx:new(), Options).
 
 -spec streaming_input_call(ctx:t(), grpcbox_client:options()) ->
-    {ok, grpcbox_client:stream()} | grpcbox_stream:grpc_error_response().
+                                  {ok, grpcbox_client:stream()} | grpcbox_stream:grpc_error_response().
 streaming_input_call(Ctx, Options) ->
     grpcbox_client:stream(Ctx, <<"/grpc.testing.TestService/StreamingInputCall">>, ?DEF(streaming_input_call_request, streaming_input_call_response, <<"grpc.testing.StreamingInputCallRequest">>), Options).
 
 %% @doc 
 -spec full_duplex_call() ->
-    {ok, grpcbox_client:stream()} | grpcbox_stream:grpc_error_response().
+                              {ok, grpcbox_client:stream()} | grpcbox_stream:grpc_error_response().
 full_duplex_call() ->
     full_duplex_call(ctx:new(), #{}).
 
 -spec full_duplex_call(ctx:t() | grpcbox_client:options()) ->
-    {ok, grpcbox_client:stream()} | grpcbox_stream:grpc_error_response().
+                              {ok, grpcbox_client:stream()} | grpcbox_stream:grpc_error_response().
 full_duplex_call(Ctx) when ?is_ctx(Ctx) ->
     full_duplex_call(Ctx, #{});
 full_duplex_call(Options) ->
     full_duplex_call(ctx:new(), Options).
 
 -spec full_duplex_call(ctx:t(), grpcbox_client:options()) ->
-    {ok, grpcbox_client:stream()} | grpcbox_stream:grpc_error_response().
+                              {ok, grpcbox_client:stream()} | grpcbox_stream:grpc_error_response().
 full_duplex_call(Ctx, Options) ->
     grpcbox_client:stream(Ctx, <<"/grpc.testing.TestService/FullDuplexCall">>, ?DEF(streaming_output_call_request, streaming_output_call_response, <<"grpc.testing.StreamingOutputCallRequest">>), Options).
 
 %% @doc 
 -spec half_duplex_call() ->
-    {ok, grpcbox_client:stream()} | grpcbox_stream:grpc_error_response().
+                              {ok, grpcbox_client:stream()} | grpcbox_stream:grpc_error_response().
 half_duplex_call() ->
     half_duplex_call(ctx:new(), #{}).
 
 -spec half_duplex_call(ctx:t() | grpcbox_client:options()) ->
-    {ok, grpcbox_client:stream()} | grpcbox_stream:grpc_error_response().
+                              {ok, grpcbox_client:stream()} | grpcbox_stream:grpc_error_response().
 half_duplex_call(Ctx) when ?is_ctx(Ctx) ->
     half_duplex_call(Ctx, #{});
 half_duplex_call(Options) ->
     half_duplex_call(ctx:new(), Options).
 
 -spec half_duplex_call(ctx:t(), grpcbox_client:options()) ->
-    {ok, grpcbox_client:stream()} | grpcbox_stream:grpc_error_response().
+                              {ok, grpcbox_client:stream()} | grpcbox_stream:grpc_error_response().
 half_duplex_call(Ctx, Options) ->
     grpcbox_client:stream(Ctx, <<"/grpc.testing.TestService/HalfDuplexCall">>, ?DEF(streaming_output_call_request, streaming_output_call_response, <<"grpc.testing.StreamingOutputCallRequest">>), Options).
 
 %% @doc Unary RPC
 -spec unimplemented_call(test_pb:empty()) ->
-    {ok, test_pb:empty(), grpcbox:metadata()} | grpcbox_stream:grpc_error_response().
+                                {ok, test_pb:empty(), grpcbox:metadata()} | grpcbox_stream:grpc_error_response().
 unimplemented_call(Input) ->
     unimplemented_call(ctx:new(), Input, #{}).
 
 -spec unimplemented_call(ctx:t() | test_pb:empty(), test_pb:empty() | grpcbox_client:options()) ->
-    {ok, test_pb:empty(), grpcbox:metadata()} | grpcbox_stream:grpc_error_response().
+                                {ok, test_pb:empty(), grpcbox:metadata()} | grpcbox_stream:grpc_error_response().
 unimplemented_call(Ctx, Input) when ?is_ctx(Ctx) ->
     unimplemented_call(Ctx, Input, #{});
 unimplemented_call(Input, Options) ->
     unimplemented_call(ctx:new(), Input, Options).
 
 -spec unimplemented_call(ctx:t(), test_pb:empty(), grpcbox_client:options()) ->
-    {ok, test_pb:empty(), grpcbox:metadata()} | grpcbox_stream:grpc_error_response().
+                                {ok, test_pb:empty(), grpcbox:metadata()} | grpcbox_stream:grpc_error_response().
 unimplemented_call(Ctx, Input, Options) ->
     grpcbox_client:unary(Ctx, <<"/grpc.testing.TestService/UnimplementedCall">>, Input, ?DEF(empty, empty, <<"grpc.testing.Empty">>), Options).
 

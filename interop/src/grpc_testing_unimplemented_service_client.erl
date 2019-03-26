@@ -25,19 +25,19 @@
 
 %% @doc Unary RPC
 -spec unimplemented_call(test_pb:empty()) ->
-    {ok, test_pb:empty(), grpcbox:metadata()} | grpcbox_stream:grpc_error_response().
+                                {ok, test_pb:empty(), grpcbox:metadata()} | grpcbox_stream:grpc_error_response().
 unimplemented_call(Input) ->
     unimplemented_call(ctx:new(), Input, #{}).
 
 -spec unimplemented_call(ctx:t() | test_pb:empty(), test_pb:empty() | grpcbox_client:options()) ->
-    {ok, test_pb:empty(), grpcbox:metadata()} | grpcbox_stream:grpc_error_response().
+                                {ok, test_pb:empty(), grpcbox:metadata()} | grpcbox_stream:grpc_error_response().
 unimplemented_call(Ctx, Input) when ?is_ctx(Ctx) ->
     unimplemented_call(Ctx, Input, #{});
 unimplemented_call(Input, Options) ->
     unimplemented_call(ctx:new(), Input, Options).
 
 -spec unimplemented_call(ctx:t(), test_pb:empty(), grpcbox_client:options()) ->
-    {ok, test_pb:empty(), grpcbox:metadata()} | grpcbox_stream:grpc_error_response().
+                                {ok, test_pb:empty(), grpcbox:metadata()} | grpcbox_stream:grpc_error_response().
 unimplemented_call(Ctx, Input, Options) ->
     grpcbox_client:unary(Ctx, <<"/grpc.testing.UnimplementedService/UnimplementedCall">>, Input, ?DEF(empty, empty, <<"grpc.testing.Empty">>), Options).
 

@@ -53,74 +53,74 @@
 
 %% message types
 -type empty() ::
-      #{
-       }.
+        #{
+         }.
 
 -type bool_value() ::
-      #{value                   => boolean() | 0 | 1 % = 1
-       }.
+        #{value                   => boolean() | 0 | 1 % = 1
+         }.
 
 -type payload() ::
-      #{type                    => 'COMPRESSABLE' | integer(), % = 1, enum grpc.testing.PayloadType
-        body                    => iodata()         % = 2
-       }.
+        #{type                    => 'COMPRESSABLE' | integer(), % = 1, enum grpc.testing.PayloadType
+          body                    => iodata()         % = 2
+         }.
 
 -type echo_status() ::
-      #{code                    => integer(),       % = 1, 32 bits
-        message                 => iodata()         % = 2
-       }.
+        #{code                    => integer(),       % = 1, 32 bits
+          message                 => iodata()         % = 2
+         }.
 
 -type simple_request() ::
-      #{response_type           => 'COMPRESSABLE' | integer(), % = 1, enum grpc.testing.PayloadType
-        response_size           => integer(),       % = 2, 32 bits
-        payload                 => payload(),       % = 3
-        fill_username           => boolean() | 0 | 1, % = 4
-        fill_oauth_scope        => boolean() | 0 | 1, % = 5
-        response_compressed     => bool_value(),    % = 6
-        response_status         => echo_status(),   % = 7
-        expect_compressed       => bool_value()     % = 8
-       }.
+        #{response_type           => 'COMPRESSABLE' | integer(), % = 1, enum grpc.testing.PayloadType
+          response_size           => integer(),       % = 2, 32 bits
+          payload                 => payload(),       % = 3
+          fill_username           => boolean() | 0 | 1, % = 4
+          fill_oauth_scope        => boolean() | 0 | 1, % = 5
+          response_compressed     => bool_value(),    % = 6
+          response_status         => echo_status(),   % = 7
+          expect_compressed       => bool_value()     % = 8
+         }.
 
 -type simple_response() ::
-      #{payload                 => payload(),       % = 1
-        username                => iodata(),        % = 2
-        oauth_scope             => iodata()         % = 3
-       }.
+        #{payload                 => payload(),       % = 1
+          username                => iodata(),        % = 2
+          oauth_scope             => iodata()         % = 3
+         }.
 
 -type streaming_input_call_request() ::
-      #{payload                 => payload(),       % = 1
-        expect_compressed       => bool_value()     % = 2
-       }.
+        #{payload                 => payload(),       % = 1
+          expect_compressed       => bool_value()     % = 2
+         }.
 
 -type streaming_input_call_response() ::
-      #{aggregated_payload_size => integer()        % = 1, 32 bits
-       }.
+        #{aggregated_payload_size => integer()        % = 1, 32 bits
+         }.
 
 -type response_parameters() ::
-      #{size                    => integer(),       % = 1, 32 bits
-        interval_us             => integer(),       % = 2, 32 bits
-        compressed              => bool_value()     % = 3
-       }.
+        #{size                    => integer(),       % = 1, 32 bits
+          interval_us             => integer(),       % = 2, 32 bits
+          compressed              => bool_value()     % = 3
+         }.
 
 -type streaming_output_call_request() ::
-      #{response_type           => 'COMPRESSABLE' | integer(), % = 1, enum grpc.testing.PayloadType
-        response_parameters     => [response_parameters()], % = 2
-        payload                 => payload(),       % = 3
-        response_status         => echo_status()    % = 7
-       }.
+        #{response_type           => 'COMPRESSABLE' | integer(), % = 1, enum grpc.testing.PayloadType
+          response_parameters     => [response_parameters()], % = 2
+          payload                 => payload(),       % = 3
+          response_status         => echo_status()    % = 7
+         }.
 
 -type streaming_output_call_response() ::
-      #{payload                 => payload()        % = 1
-       }.
+        #{payload                 => payload()        % = 1
+         }.
 
 -type reconnect_params() ::
-      #{max_reconnect_backoff_ms => integer()       % = 1, 32 bits
-       }.
+        #{max_reconnect_backoff_ms => integer()       % = 1, 32 bits
+         }.
 
 -type reconnect_info() ::
-      #{passed                  => boolean() | 0 | 1, % = 1
-        backoff_ms              => [integer()]      % = 2, 32 bits
-       }.
+        #{passed                  => boolean() | 0 | 1, % = 1
+          backoff_ms              => [integer()]      % = 2, 32 bits
+         }.
 
 -export_type(['empty'/0, 'bool_value'/0, 'payload'/0, 'echo_status'/0, 'simple_request'/0, 'simple_response'/0, 'streaming_input_call_request'/0, 'streaming_input_call_response'/0, 'response_parameters'/0, 'streaming_output_call_request'/0, 'streaming_output_call_response'/0, 'reconnect_params'/0, 'reconnect_info'/0]).
 
@@ -131,50 +131,50 @@ encode_msg(Msg, MsgName) when is_atom(MsgName) ->
 -spec encode_msg(empty() | bool_value() | payload() | echo_status() | simple_request() | simple_response() | streaming_input_call_request() | streaming_input_call_response() | response_parameters() | streaming_output_call_request() | streaming_output_call_response() | reconnect_params() | reconnect_info(), atom(), list()) -> binary().
 encode_msg(Msg, MsgName, Opts) ->
     case proplists:get_bool(verify, Opts) of
-      true -> verify_msg(Msg, MsgName, Opts);
-      false -> ok
+        true -> verify_msg(Msg, MsgName, Opts);
+        false -> ok
     end,
     TrUserData = proplists:get_value(user_data, Opts),
     case MsgName of
-      empty ->
-	  encode_msg_empty(id(Msg, TrUserData), TrUserData);
-      bool_value ->
-	  encode_msg_bool_value(id(Msg, TrUserData), TrUserData);
-      payload ->
-	  encode_msg_payload(id(Msg, TrUserData), TrUserData);
-      echo_status ->
-	  encode_msg_echo_status(id(Msg, TrUserData), TrUserData);
-      simple_request ->
-	  encode_msg_simple_request(id(Msg, TrUserData),
-				    TrUserData);
-      simple_response ->
-	  encode_msg_simple_response(id(Msg, TrUserData),
-				     TrUserData);
-      streaming_input_call_request ->
-	  encode_msg_streaming_input_call_request(id(Msg,
-						     TrUserData),
-						  TrUserData);
-      streaming_input_call_response ->
-	  encode_msg_streaming_input_call_response(id(Msg,
-						      TrUserData),
-						   TrUserData);
-      response_parameters ->
-	  encode_msg_response_parameters(id(Msg, TrUserData),
-					 TrUserData);
-      streaming_output_call_request ->
-	  encode_msg_streaming_output_call_request(id(Msg,
-						      TrUserData),
-						   TrUserData);
-      streaming_output_call_response ->
-	  encode_msg_streaming_output_call_response(id(Msg,
-						       TrUserData),
-						    TrUserData);
-      reconnect_params ->
-	  encode_msg_reconnect_params(id(Msg, TrUserData),
-				      TrUserData);
-      reconnect_info ->
-	  encode_msg_reconnect_info(id(Msg, TrUserData),
-				    TrUserData)
+        empty ->
+            encode_msg_empty(id(Msg, TrUserData), TrUserData);
+        bool_value ->
+            encode_msg_bool_value(id(Msg, TrUserData), TrUserData);
+        payload ->
+            encode_msg_payload(id(Msg, TrUserData), TrUserData);
+        echo_status ->
+            encode_msg_echo_status(id(Msg, TrUserData), TrUserData);
+        simple_request ->
+            encode_msg_simple_request(id(Msg, TrUserData),
+                                      TrUserData);
+        simple_response ->
+            encode_msg_simple_response(id(Msg, TrUserData),
+                                       TrUserData);
+        streaming_input_call_request ->
+            encode_msg_streaming_input_call_request(id(Msg,
+                                                       TrUserData),
+                                                    TrUserData);
+        streaming_input_call_response ->
+            encode_msg_streaming_input_call_response(id(Msg,
+                                                        TrUserData),
+                                                     TrUserData);
+        response_parameters ->
+            encode_msg_response_parameters(id(Msg, TrUserData),
+                                           TrUserData);
+        streaming_output_call_request ->
+            encode_msg_streaming_output_call_request(id(Msg,
+                                                        TrUserData),
+                                                     TrUserData);
+        streaming_output_call_response ->
+            encode_msg_streaming_output_call_response(id(Msg,
+                                                         TrUserData),
+                                                      TrUserData);
+        reconnect_params ->
+            encode_msg_reconnect_params(id(Msg, TrUserData),
+                                        TrUserData);
+        reconnect_info ->
+            encode_msg_reconnect_info(id(Msg, TrUserData),
+                                      TrUserData)
     end.
 
 
@@ -186,14 +186,14 @@ encode_msg_bool_value(Msg, TrUserData) ->
 
 encode_msg_bool_value(#{} = M, Bin, TrUserData) ->
     case M of
-      #{value := F1} ->
-	  begin
-	    TrF1 = id(F1, TrUserData),
-	    if TrF1 =:= false -> Bin;
-	       true -> e_type_bool(TrF1, <<Bin/binary, 8>>, TrUserData)
-	    end
-	  end;
-      _ -> Bin
+        #{value := F1} ->
+            begin
+                TrF1 = id(F1, TrUserData),
+                if TrF1 =:= false -> Bin;
+                   true -> e_type_bool(TrF1, <<Bin/binary, 8>>, TrUserData)
+                end
+            end;
+        _ -> Bin
     end.
 
 encode_msg_payload(Msg, TrUserData) ->
@@ -202,28 +202,28 @@ encode_msg_payload(Msg, TrUserData) ->
 
 encode_msg_payload(#{} = M, Bin, TrUserData) ->
     B1 = case M of
-	   #{type := F1} ->
-	       begin
-		 TrF1 = id(F1, TrUserData),
-		 if TrF1 =:= 'COMPRESSABLE'; TrF1 =:= 0 -> Bin;
-		    true ->
-			'e_enum_grpc.testing.PayloadType'(TrF1,
-							  <<Bin/binary, 8>>,
-							  'MaybeTrUserData')
-		 end
-	       end;
-	   _ -> Bin
-	 end,
+             #{type := F1} ->
+                 begin
+                     TrF1 = id(F1, TrUserData),
+                     if TrF1 =:= 'COMPRESSABLE'; TrF1 =:= 0 -> Bin;
+                        true ->
+                             'e_enum_grpc.testing.PayloadType'(TrF1,
+                                                               <<Bin/binary, 8>>,
+                                                               'MaybeTrUserData')
+                     end
+                 end;
+             _ -> Bin
+         end,
     case M of
-      #{body := F2} ->
-	  begin
-	    TrF2 = id(F2, TrUserData),
-	    case iolist_size(TrF2) of
-	      0 -> B1;
-	      _ -> e_type_bytes(TrF2, <<B1/binary, 18>>, TrUserData)
-	    end
-	  end;
-      _ -> B1
+        #{body := F2} ->
+            begin
+                TrF2 = id(F2, TrUserData),
+                case iolist_size(TrF2) of
+                    0 -> B1;
+                    _ -> e_type_bytes(TrF2, <<B1/binary, 18>>, TrUserData)
+                end
+            end;
+        _ -> B1
     end.
 
 encode_msg_echo_status(Msg, TrUserData) ->
@@ -232,27 +232,27 @@ encode_msg_echo_status(Msg, TrUserData) ->
 
 encode_msg_echo_status(#{} = M, Bin, TrUserData) ->
     B1 = case M of
-	   #{code := F1} ->
-	       begin
-		 TrF1 = id(F1, TrUserData),
-		 if TrF1 =:= 0 -> Bin;
-		    true ->
-			e_type_int32(TrF1, <<Bin/binary, 8>>, TrUserData)
-		 end
-	       end;
-	   _ -> Bin
-	 end,
+             #{code := F1} ->
+                 begin
+                     TrF1 = id(F1, TrUserData),
+                     if TrF1 =:= 0 -> Bin;
+                        true ->
+                             e_type_int32(TrF1, <<Bin/binary, 8>>, TrUserData)
+                     end
+                 end;
+             _ -> Bin
+         end,
     case M of
-      #{message := F2} ->
-	  begin
-	    TrF2 = id(F2, TrUserData),
-	    case is_empty_string(TrF2) of
-	      true -> B1;
-	      false ->
-		  e_type_string(TrF2, <<B1/binary, 18>>, TrUserData)
-	    end
-	  end;
-      _ -> B1
+        #{message := F2} ->
+            begin
+                TrF2 = id(F2, TrUserData),
+                case is_empty_string(TrF2) of
+                    true -> B1;
+                    false ->
+                        e_type_string(TrF2, <<B1/binary, 18>>, TrUserData)
+                end
+            end;
+        _ -> B1
     end.
 
 encode_msg_simple_request(Msg, TrUserData) ->
@@ -261,101 +261,101 @@ encode_msg_simple_request(Msg, TrUserData) ->
 
 encode_msg_simple_request(#{} = M, Bin, TrUserData) ->
     B1 = case M of
-	   #{response_type := F1} ->
-	       begin
-		 TrF1 = id(F1, TrUserData),
-		 if TrF1 =:= 'COMPRESSABLE'; TrF1 =:= 0 -> Bin;
-		    true ->
-			'e_enum_grpc.testing.PayloadType'(TrF1,
-							  <<Bin/binary, 8>>,
-							  'MaybeTrUserData')
-		 end
-	       end;
-	   _ -> Bin
-	 end,
+             #{response_type := F1} ->
+                 begin
+                     TrF1 = id(F1, TrUserData),
+                     if TrF1 =:= 'COMPRESSABLE'; TrF1 =:= 0 -> Bin;
+                        true ->
+                             'e_enum_grpc.testing.PayloadType'(TrF1,
+                                                               <<Bin/binary, 8>>,
+                                                               'MaybeTrUserData')
+                     end
+                 end;
+             _ -> Bin
+         end,
     B2 = case M of
-	   #{response_size := F2} ->
-	       begin
-		 TrF2 = id(F2, TrUserData),
-		 if TrF2 =:= 0 -> B1;
-		    true ->
-			e_type_int32(TrF2, <<B1/binary, 16>>, TrUserData)
-		 end
-	       end;
-	   _ -> B1
-	 end,
+             #{response_size := F2} ->
+                 begin
+                     TrF2 = id(F2, TrUserData),
+                     if TrF2 =:= 0 -> B1;
+                        true ->
+                             e_type_int32(TrF2, <<B1/binary, 16>>, TrUserData)
+                     end
+                 end;
+             _ -> B1
+         end,
     B3 = case M of
-	   #{payload := F3} ->
-	       begin
-		 TrF3 = id(F3, TrUserData),
-		 if TrF3 =:= undefined -> B2;
-		    true ->
-			e_mfield_simple_request_payload(TrF3, <<B2/binary, 26>>,
-							TrUserData)
-		 end
-	       end;
-	   _ -> B2
-	 end,
+             #{payload := F3} ->
+                 begin
+                     TrF3 = id(F3, TrUserData),
+                     if TrF3 =:= undefined -> B2;
+                        true ->
+                             e_mfield_simple_request_payload(TrF3, <<B2/binary, 26>>,
+                                                             TrUserData)
+                     end
+                 end;
+             _ -> B2
+         end,
     B4 = case M of
-	   #{fill_username := F4} ->
-	       begin
-		 TrF4 = id(F4, TrUserData),
-		 if TrF4 =:= false -> B3;
-		    true -> e_type_bool(TrF4, <<B3/binary, 32>>, TrUserData)
-		 end
-	       end;
-	   _ -> B3
-	 end,
+             #{fill_username := F4} ->
+                 begin
+                     TrF4 = id(F4, TrUserData),
+                     if TrF4 =:= false -> B3;
+                        true -> e_type_bool(TrF4, <<B3/binary, 32>>, TrUserData)
+                     end
+                 end;
+             _ -> B3
+         end,
     B5 = case M of
-	   #{fill_oauth_scope := F5} ->
-	       begin
-		 TrF5 = id(F5, TrUserData),
-		 if TrF5 =:= false -> B4;
-		    true -> e_type_bool(TrF5, <<B4/binary, 40>>, TrUserData)
-		 end
-	       end;
-	   _ -> B4
-	 end,
+             #{fill_oauth_scope := F5} ->
+                 begin
+                     TrF5 = id(F5, TrUserData),
+                     if TrF5 =:= false -> B4;
+                        true -> e_type_bool(TrF5, <<B4/binary, 40>>, TrUserData)
+                     end
+                 end;
+             _ -> B4
+         end,
     B6 = case M of
-	   #{response_compressed := F6} ->
-	       begin
-		 TrF6 = id(F6, TrUserData),
-		 if TrF6 =:= undefined -> B5;
-		    true ->
-			e_mfield_simple_request_response_compressed(TrF6,
-								    <<B5/binary,
-								      50>>,
-								    TrUserData)
-		 end
-	       end;
-	   _ -> B5
-	 end,
+             #{response_compressed := F6} ->
+                 begin
+                     TrF6 = id(F6, TrUserData),
+                     if TrF6 =:= undefined -> B5;
+                        true ->
+                             e_mfield_simple_request_response_compressed(TrF6,
+                                                                         <<B5/binary,
+                                                                           50>>,
+                                                                         TrUserData)
+                     end
+                 end;
+             _ -> B5
+         end,
     B7 = case M of
-	   #{response_status := F7} ->
-	       begin
-		 TrF7 = id(F7, TrUserData),
-		 if TrF7 =:= undefined -> B6;
-		    true ->
-			e_mfield_simple_request_response_status(TrF7,
-								<<B6/binary,
-								  58>>,
-								TrUserData)
-		 end
-	       end;
-	   _ -> B6
-	 end,
+             #{response_status := F7} ->
+                 begin
+                     TrF7 = id(F7, TrUserData),
+                     if TrF7 =:= undefined -> B6;
+                        true ->
+                             e_mfield_simple_request_response_status(TrF7,
+                                                                     <<B6/binary,
+                                                                       58>>,
+                                                                     TrUserData)
+                     end
+                 end;
+             _ -> B6
+         end,
     case M of
-      #{expect_compressed := F8} ->
-	  begin
-	    TrF8 = id(F8, TrUserData),
-	    if TrF8 =:= undefined -> B7;
-	       true ->
-		   e_mfield_simple_request_expect_compressed(TrF8,
-							     <<B7/binary, 66>>,
-							     TrUserData)
-	    end
-	  end;
-      _ -> B7
+        #{expect_compressed := F8} ->
+            begin
+                TrF8 = id(F8, TrUserData),
+                if TrF8 =:= undefined -> B7;
+                   true ->
+                        e_mfield_simple_request_expect_compressed(TrF8,
+                                                                  <<B7/binary, 66>>,
+                                                                  TrUserData)
+                end
+            end;
+        _ -> B7
     end.
 
 encode_msg_simple_response(Msg, TrUserData) ->
@@ -364,98 +364,98 @@ encode_msg_simple_response(Msg, TrUserData) ->
 
 encode_msg_simple_response(#{} = M, Bin, TrUserData) ->
     B1 = case M of
-	   #{payload := F1} ->
-	       begin
-		 TrF1 = id(F1, TrUserData),
-		 if TrF1 =:= undefined -> Bin;
-		    true ->
-			e_mfield_simple_response_payload(TrF1,
-							 <<Bin/binary, 10>>,
-							 TrUserData)
-		 end
-	       end;
-	   _ -> Bin
-	 end,
+             #{payload := F1} ->
+                 begin
+                     TrF1 = id(F1, TrUserData),
+                     if TrF1 =:= undefined -> Bin;
+                        true ->
+                             e_mfield_simple_response_payload(TrF1,
+                                                              <<Bin/binary, 10>>,
+                                                              TrUserData)
+                     end
+                 end;
+             _ -> Bin
+         end,
     B2 = case M of
-	   #{username := F2} ->
-	       begin
-		 TrF2 = id(F2, TrUserData),
-		 case is_empty_string(TrF2) of
-		   true -> B1;
-		   false ->
-		       e_type_string(TrF2, <<B1/binary, 18>>, TrUserData)
-		 end
-	       end;
-	   _ -> B1
-	 end,
+             #{username := F2} ->
+                 begin
+                     TrF2 = id(F2, TrUserData),
+                     case is_empty_string(TrF2) of
+                         true -> B1;
+                         false ->
+                             e_type_string(TrF2, <<B1/binary, 18>>, TrUserData)
+                     end
+                 end;
+             _ -> B1
+         end,
     case M of
-      #{oauth_scope := F3} ->
-	  begin
-	    TrF3 = id(F3, TrUserData),
-	    case is_empty_string(TrF3) of
-	      true -> B2;
-	      false ->
-		  e_type_string(TrF3, <<B2/binary, 26>>, TrUserData)
-	    end
-	  end;
-      _ -> B2
+        #{oauth_scope := F3} ->
+            begin
+                TrF3 = id(F3, TrUserData),
+                case is_empty_string(TrF3) of
+                    true -> B2;
+                    false ->
+                        e_type_string(TrF3, <<B2/binary, 26>>, TrUserData)
+                end
+            end;
+        _ -> B2
     end.
 
 encode_msg_streaming_input_call_request(Msg,
-					TrUserData) ->
+                                        TrUserData) ->
     encode_msg_streaming_input_call_request(Msg, <<>>,
-					    TrUserData).
+                                            TrUserData).
 
 
 encode_msg_streaming_input_call_request(#{} = M, Bin,
-					TrUserData) ->
+                                        TrUserData) ->
     B1 = case M of
-	   #{payload := F1} ->
-	       begin
-		 TrF1 = id(F1, TrUserData),
-		 if TrF1 =:= undefined -> Bin;
-		    true ->
-			e_mfield_streaming_input_call_request_payload(TrF1,
-								      <<Bin/binary,
-									10>>,
-								      TrUserData)
-		 end
-	       end;
-	   _ -> Bin
-	 end,
+             #{payload := F1} ->
+                 begin
+                     TrF1 = id(F1, TrUserData),
+                     if TrF1 =:= undefined -> Bin;
+                        true ->
+                             e_mfield_streaming_input_call_request_payload(TrF1,
+                                                                           <<Bin/binary,
+                                                                             10>>,
+                                                                           TrUserData)
+                     end
+                 end;
+             _ -> Bin
+         end,
     case M of
-      #{expect_compressed := F2} ->
-	  begin
-	    TrF2 = id(F2, TrUserData),
-	    if TrF2 =:= undefined -> B1;
-	       true ->
-		   e_mfield_streaming_input_call_request_expect_compressed(TrF2,
-									   <<B1/binary,
-									     18>>,
-									   TrUserData)
-	    end
-	  end;
-      _ -> B1
+        #{expect_compressed := F2} ->
+            begin
+                TrF2 = id(F2, TrUserData),
+                if TrF2 =:= undefined -> B1;
+                   true ->
+                        e_mfield_streaming_input_call_request_expect_compressed(TrF2,
+                                                                                <<B1/binary,
+                                                                                  18>>,
+                                                                                TrUserData)
+                end
+            end;
+        _ -> B1
     end.
 
 encode_msg_streaming_input_call_response(Msg,
-					 TrUserData) ->
+                                         TrUserData) ->
     encode_msg_streaming_input_call_response(Msg, <<>>,
-					     TrUserData).
+                                             TrUserData).
 
 
 encode_msg_streaming_input_call_response(#{} = M, Bin,
-					 TrUserData) ->
+                                         TrUserData) ->
     case M of
-      #{aggregated_payload_size := F1} ->
-	  begin
-	    TrF1 = id(F1, TrUserData),
-	    if TrF1 =:= 0 -> Bin;
-	       true ->
-		   e_type_int32(TrF1, <<Bin/binary, 8>>, TrUserData)
-	    end
-	  end;
-      _ -> Bin
+        #{aggregated_payload_size := F1} ->
+            begin
+                TrF1 = id(F1, TrUserData),
+                if TrF1 =:= 0 -> Bin;
+                   true ->
+                        e_type_int32(TrF1, <<Bin/binary, 8>>, TrUserData)
+                end
+            end;
+        _ -> Bin
     end.
 
 encode_msg_response_parameters(Msg, TrUserData) ->
@@ -463,125 +463,125 @@ encode_msg_response_parameters(Msg, TrUserData) ->
 
 
 encode_msg_response_parameters(#{} = M, Bin,
-			       TrUserData) ->
+                               TrUserData) ->
     B1 = case M of
-	   #{size := F1} ->
-	       begin
-		 TrF1 = id(F1, TrUserData),
-		 if TrF1 =:= 0 -> Bin;
-		    true ->
-			e_type_int32(TrF1, <<Bin/binary, 8>>, TrUserData)
-		 end
-	       end;
-	   _ -> Bin
-	 end,
+             #{size := F1} ->
+                 begin
+                     TrF1 = id(F1, TrUserData),
+                     if TrF1 =:= 0 -> Bin;
+                        true ->
+                             e_type_int32(TrF1, <<Bin/binary, 8>>, TrUserData)
+                     end
+                 end;
+             _ -> Bin
+         end,
     B2 = case M of
-	   #{interval_us := F2} ->
-	       begin
-		 TrF2 = id(F2, TrUserData),
-		 if TrF2 =:= 0 -> B1;
-		    true ->
-			e_type_int32(TrF2, <<B1/binary, 16>>, TrUserData)
-		 end
-	       end;
-	   _ -> B1
-	 end,
+             #{interval_us := F2} ->
+                 begin
+                     TrF2 = id(F2, TrUserData),
+                     if TrF2 =:= 0 -> B1;
+                        true ->
+                             e_type_int32(TrF2, <<B1/binary, 16>>, TrUserData)
+                     end
+                 end;
+             _ -> B1
+         end,
     case M of
-      #{compressed := F3} ->
-	  begin
-	    TrF3 = id(F3, TrUserData),
-	    if TrF3 =:= undefined -> B2;
-	       true ->
-		   e_mfield_response_parameters_compressed(TrF3,
-							   <<B2/binary, 26>>,
-							   TrUserData)
-	    end
-	  end;
-      _ -> B2
+        #{compressed := F3} ->
+            begin
+                TrF3 = id(F3, TrUserData),
+                if TrF3 =:= undefined -> B2;
+                   true ->
+                        e_mfield_response_parameters_compressed(TrF3,
+                                                                <<B2/binary, 26>>,
+                                                                TrUserData)
+                end
+            end;
+        _ -> B2
     end.
 
 encode_msg_streaming_output_call_request(Msg,
-					 TrUserData) ->
+                                         TrUserData) ->
     encode_msg_streaming_output_call_request(Msg, <<>>,
-					     TrUserData).
+                                             TrUserData).
 
 
 encode_msg_streaming_output_call_request(#{} = M, Bin,
-					 TrUserData) ->
+                                         TrUserData) ->
     B1 = case M of
-	   #{response_type := F1} ->
-	       begin
-		 TrF1 = id(F1, TrUserData),
-		 if TrF1 =:= 'COMPRESSABLE'; TrF1 =:= 0 -> Bin;
-		    true ->
-			'e_enum_grpc.testing.PayloadType'(TrF1,
-							  <<Bin/binary, 8>>,
-							  'MaybeTrUserData')
-		 end
-	       end;
-	   _ -> Bin
-	 end,
+             #{response_type := F1} ->
+                 begin
+                     TrF1 = id(F1, TrUserData),
+                     if TrF1 =:= 'COMPRESSABLE'; TrF1 =:= 0 -> Bin;
+                        true ->
+                             'e_enum_grpc.testing.PayloadType'(TrF1,
+                                                               <<Bin/binary, 8>>,
+                                                               'MaybeTrUserData')
+                     end
+                 end;
+             _ -> Bin
+         end,
     B2 = case M of
-	   #{response_parameters := F2} ->
-	       TrF2 = id(F2, TrUserData),
-	       if TrF2 == [] -> B1;
-		  true ->
-		      e_field_streaming_output_call_request_response_parameters(TrF2,
-										B1,
-										TrUserData)
-	       end;
-	   _ -> B1
-	 end,
+             #{response_parameters := F2} ->
+                 TrF2 = id(F2, TrUserData),
+                 if TrF2 == [] -> B1;
+                    true ->
+                         e_field_streaming_output_call_request_response_parameters(TrF2,
+                                                                                   B1,
+                                                                                   TrUserData)
+                 end;
+             _ -> B1
+         end,
     B3 = case M of
-	   #{payload := F3} ->
-	       begin
-		 TrF3 = id(F3, TrUserData),
-		 if TrF3 =:= undefined -> B2;
-		    true ->
-			e_mfield_streaming_output_call_request_payload(TrF3,
-								       <<B2/binary,
-									 26>>,
-								       TrUserData)
-		 end
-	       end;
-	   _ -> B2
-	 end,
+             #{payload := F3} ->
+                 begin
+                     TrF3 = id(F3, TrUserData),
+                     if TrF3 =:= undefined -> B2;
+                        true ->
+                             e_mfield_streaming_output_call_request_payload(TrF3,
+                                                                            <<B2/binary,
+                                                                              26>>,
+                                                                            TrUserData)
+                     end
+                 end;
+             _ -> B2
+         end,
     case M of
-      #{response_status := F4} ->
-	  begin
-	    TrF4 = id(F4, TrUserData),
-	    if TrF4 =:= undefined -> B3;
-	       true ->
-		   e_mfield_streaming_output_call_request_response_status(TrF4,
-									  <<B3/binary,
-									    58>>,
-									  TrUserData)
-	    end
-	  end;
-      _ -> B3
+        #{response_status := F4} ->
+            begin
+                TrF4 = id(F4, TrUserData),
+                if TrF4 =:= undefined -> B3;
+                   true ->
+                        e_mfield_streaming_output_call_request_response_status(TrF4,
+                                                                               <<B3/binary,
+                                                                                 58>>,
+                                                                               TrUserData)
+                end
+            end;
+        _ -> B3
     end.
 
 encode_msg_streaming_output_call_response(Msg,
-					  TrUserData) ->
+                                          TrUserData) ->
     encode_msg_streaming_output_call_response(Msg, <<>>,
-					      TrUserData).
+                                              TrUserData).
 
 
 encode_msg_streaming_output_call_response(#{} = M, Bin,
-					  TrUserData) ->
+                                          TrUserData) ->
     case M of
-      #{payload := F1} ->
-	  begin
-	    TrF1 = id(F1, TrUserData),
-	    if TrF1 =:= undefined -> Bin;
-	       true ->
-		   e_mfield_streaming_output_call_response_payload(TrF1,
-								   <<Bin/binary,
-								     10>>,
-								   TrUserData)
-	    end
-	  end;
-      _ -> Bin
+        #{payload := F1} ->
+            begin
+                TrF1 = id(F1, TrUserData),
+                if TrF1 =:= undefined -> Bin;
+                   true ->
+                        e_mfield_streaming_output_call_response_payload(TrF1,
+                                                                        <<Bin/binary,
+                                                                          10>>,
+                                                                        TrUserData)
+                end
+            end;
+        _ -> Bin
     end.
 
 encode_msg_reconnect_params(Msg, TrUserData) ->
@@ -590,15 +590,15 @@ encode_msg_reconnect_params(Msg, TrUserData) ->
 
 encode_msg_reconnect_params(#{} = M, Bin, TrUserData) ->
     case M of
-      #{max_reconnect_backoff_ms := F1} ->
-	  begin
-	    TrF1 = id(F1, TrUserData),
-	    if TrF1 =:= 0 -> Bin;
-	       true ->
-		   e_type_int32(TrF1, <<Bin/binary, 8>>, TrUserData)
-	    end
-	  end;
-      _ -> Bin
+        #{max_reconnect_backoff_ms := F1} ->
+            begin
+                TrF1 = id(F1, TrUserData),
+                if TrF1 =:= 0 -> Bin;
+                   true ->
+                        e_type_int32(TrF1, <<Bin/binary, 8>>, TrUserData)
+                end
+            end;
+        _ -> Bin
     end.
 
 encode_msg_reconnect_info(Msg, TrUserData) ->
@@ -607,23 +607,23 @@ encode_msg_reconnect_info(Msg, TrUserData) ->
 
 encode_msg_reconnect_info(#{} = M, Bin, TrUserData) ->
     B1 = case M of
-	   #{passed := F1} ->
-	       begin
-		 TrF1 = id(F1, TrUserData),
-		 if TrF1 =:= false -> Bin;
-		    true -> e_type_bool(TrF1, <<Bin/binary, 8>>, TrUserData)
-		 end
-	       end;
-	   _ -> Bin
-	 end,
+             #{passed := F1} ->
+                 begin
+                     TrF1 = id(F1, TrUserData),
+                     if TrF1 =:= false -> Bin;
+                        true -> e_type_bool(TrF1, <<Bin/binary, 8>>, TrUserData)
+                     end
+                 end;
+             _ -> Bin
+         end,
     case M of
-      #{backoff_ms := F2} ->
-	  TrF2 = id(F2, TrUserData),
-	  if TrF2 == [] -> B1;
-	     true ->
-		 e_field_reconnect_info_backoff_ms(TrF2, B1, TrUserData)
-	  end;
-      _ -> B1
+        #{backoff_ms := F2} ->
+            TrF2 = id(F2, TrUserData),
+            if TrF2 == [] -> B1;
+               true ->
+                    e_field_reconnect_info_backoff_ms(TrF2, B1, TrUserData)
+            end;
+        _ -> B1
     end.
 
 e_mfield_simple_request_payload(Msg, Bin, TrUserData) ->
@@ -632,114 +632,114 @@ e_mfield_simple_request_payload(Msg, Bin, TrUserData) ->
     <<Bin2/binary, SubBin/binary>>.
 
 e_mfield_simple_request_response_compressed(Msg, Bin,
-					    TrUserData) ->
+                                            TrUserData) ->
     SubBin = encode_msg_bool_value(Msg, <<>>, TrUserData),
     Bin2 = e_varint(byte_size(SubBin), Bin),
     <<Bin2/binary, SubBin/binary>>.
 
 e_mfield_simple_request_response_status(Msg, Bin,
-					TrUserData) ->
+                                        TrUserData) ->
     SubBin = encode_msg_echo_status(Msg, <<>>, TrUserData),
     Bin2 = e_varint(byte_size(SubBin), Bin),
     <<Bin2/binary, SubBin/binary>>.
 
 e_mfield_simple_request_expect_compressed(Msg, Bin,
-					  TrUserData) ->
+                                          TrUserData) ->
     SubBin = encode_msg_bool_value(Msg, <<>>, TrUserData),
     Bin2 = e_varint(byte_size(SubBin), Bin),
     <<Bin2/binary, SubBin/binary>>.
 
 e_mfield_simple_response_payload(Msg, Bin,
-				 TrUserData) ->
+                                 TrUserData) ->
     SubBin = encode_msg_payload(Msg, <<>>, TrUserData),
     Bin2 = e_varint(byte_size(SubBin), Bin),
     <<Bin2/binary, SubBin/binary>>.
 
 e_mfield_streaming_input_call_request_payload(Msg, Bin,
-					      TrUserData) ->
+                                              TrUserData) ->
     SubBin = encode_msg_payload(Msg, <<>>, TrUserData),
     Bin2 = e_varint(byte_size(SubBin), Bin),
     <<Bin2/binary, SubBin/binary>>.
 
 e_mfield_streaming_input_call_request_expect_compressed(Msg,
-							Bin, TrUserData) ->
+                                                        Bin, TrUserData) ->
     SubBin = encode_msg_bool_value(Msg, <<>>, TrUserData),
     Bin2 = e_varint(byte_size(SubBin), Bin),
     <<Bin2/binary, SubBin/binary>>.
 
 e_mfield_response_parameters_compressed(Msg, Bin,
-					TrUserData) ->
+                                        TrUserData) ->
     SubBin = encode_msg_bool_value(Msg, <<>>, TrUserData),
     Bin2 = e_varint(byte_size(SubBin), Bin),
     <<Bin2/binary, SubBin/binary>>.
 
 e_mfield_streaming_output_call_request_response_parameters(Msg,
-							   Bin, TrUserData) ->
+                                                           Bin, TrUserData) ->
     SubBin = encode_msg_response_parameters(Msg, <<>>,
-					    TrUserData),
+                                            TrUserData),
     Bin2 = e_varint(byte_size(SubBin), Bin),
     <<Bin2/binary, SubBin/binary>>.
 
 e_field_streaming_output_call_request_response_parameters([Elem
-							   | Rest],
-							  Bin, TrUserData) ->
+                                                           | Rest],
+                                                          Bin, TrUserData) ->
     Bin2 = <<Bin/binary, 18>>,
     Bin3 =
-	e_mfield_streaming_output_call_request_response_parameters(id(Elem,
-								      TrUserData),
-								   Bin2,
-								   TrUserData),
+        e_mfield_streaming_output_call_request_response_parameters(id(Elem,
+                                                                      TrUserData),
+                                                                   Bin2,
+                                                                   TrUserData),
     e_field_streaming_output_call_request_response_parameters(Rest,
-							      Bin3, TrUserData);
+                                                              Bin3, TrUserData);
 e_field_streaming_output_call_request_response_parameters([],
-							  Bin, _TrUserData) ->
+                                                          Bin, _TrUserData) ->
     Bin.
 
 e_mfield_streaming_output_call_request_payload(Msg, Bin,
-					       TrUserData) ->
+                                               TrUserData) ->
     SubBin = encode_msg_payload(Msg, <<>>, TrUserData),
     Bin2 = e_varint(byte_size(SubBin), Bin),
     <<Bin2/binary, SubBin/binary>>.
 
 e_mfield_streaming_output_call_request_response_status(Msg,
-						       Bin, TrUserData) ->
+                                                       Bin, TrUserData) ->
     SubBin = encode_msg_echo_status(Msg, <<>>, TrUserData),
     Bin2 = e_varint(byte_size(SubBin), Bin),
     <<Bin2/binary, SubBin/binary>>.
 
 e_mfield_streaming_output_call_response_payload(Msg,
-						Bin, TrUserData) ->
+                                                Bin, TrUserData) ->
     SubBin = encode_msg_payload(Msg, <<>>, TrUserData),
     Bin2 = e_varint(byte_size(SubBin), Bin),
     <<Bin2/binary, SubBin/binary>>.
 
 e_field_reconnect_info_backoff_ms(Elems, Bin,
-				  TrUserData)
-    when Elems =/= [] ->
+                                  TrUserData)
+  when Elems =/= [] ->
     SubBin = e_pfield_reconnect_info_backoff_ms(Elems, <<>>,
-						TrUserData),
+                                                TrUserData),
     Bin2 = <<Bin/binary, 18>>,
     Bin3 = e_varint(byte_size(SubBin), Bin2),
     <<Bin3/binary, SubBin/binary>>;
 e_field_reconnect_info_backoff_ms([], Bin,
-				  _TrUserData) ->
+                                  _TrUserData) ->
     Bin.
 
 e_pfield_reconnect_info_backoff_ms([Value | Rest], Bin,
-				   TrUserData) ->
+                                   TrUserData) ->
     Bin2 = e_type_int32(id(Value, TrUserData), Bin,
-			TrUserData),
+                        TrUserData),
     e_pfield_reconnect_info_backoff_ms(Rest, Bin2,
-				       TrUserData);
+                                       TrUserData);
 e_pfield_reconnect_info_backoff_ms([], Bin,
-				   _TrUserData) ->
+                                   _TrUserData) ->
     Bin.
 
 'e_enum_grpc.testing.PayloadType'('COMPRESSABLE', Bin,
-				  _TrUserData) ->
+                                  _TrUserData) ->
     <<Bin/binary, 0>>;
 'e_enum_grpc.testing.PayloadType'(V, Bin,
-				  _TrUserData) ->
+                                  _TrUserData) ->
     e_varint(V, Bin).
 
 -compile({nowarn_unused_function,e_type_sint/3}).
@@ -750,7 +750,7 @@ e_type_sint(Value, Bin, _TrUserData) ->
 
 -compile({nowarn_unused_function,e_type_int32/3}).
 e_type_int32(Value, Bin, _TrUserData)
-    when 0 =< Value, Value =< 127 ->
+  when 0 =< Value, Value =< 127 ->
     <<Bin/binary, Value>>;
 e_type_int32(Value, Bin, _TrUserData) ->
     <<N:64/unsigned-native>> = <<Value:64/signed-native>>,
@@ -758,7 +758,7 @@ e_type_int32(Value, Bin, _TrUserData) ->
 
 -compile({nowarn_unused_function,e_type_int64/3}).
 e_type_int64(Value, Bin, _TrUserData)
-    when 0 =< Value, Value =< 127 ->
+  when 0 =< Value, Value =< 127 ->
     <<Bin/binary, Value>>;
 e_type_int64(Value, Bin, _TrUserData) ->
     <<N:64/unsigned-native>> = <<Value:64/signed-native>>,
@@ -780,11 +780,11 @@ e_type_string(S, Bin, _TrUserData) ->
 
 -compile({nowarn_unused_function,e_type_bytes/3}).
 e_type_bytes(Bytes, Bin, _TrUserData)
-    when is_binary(Bytes) ->
+  when is_binary(Bytes) ->
     Bin2 = e_varint(byte_size(Bytes), Bin),
     <<Bin2/binary, Bytes/binary>>;
 e_type_bytes(Bytes, Bin, _TrUserData)
-    when is_list(Bytes) ->
+  when is_list(Bytes) ->
     BytesBin = iolist_to_binary(Bytes),
     Bin2 = e_varint(byte_size(BytesBin), Bin),
     <<Bin2/binary, BytesBin/binary>>.
@@ -843,11 +843,11 @@ is_empty_string(B) when is_binary(B) -> false.
 string_has_chars([C | _]) when is_integer(C) -> true;
 string_has_chars([H | T]) ->
     case string_has_chars(H) of
-      true -> true;
-      false -> string_has_chars(T)
+        true -> true;
+        false -> string_has_chars(T)
     end;
 string_has_chars(B)
-    when is_binary(B), byte_size(B) =/= 0 ->
+  when is_binary(B), byte_size(B) =/= 0 ->
     true;
 string_has_chars(C) when is_integer(C) -> true;
 string_has_chars(<<>>) -> false;
@@ -870,8 +870,8 @@ decode_msg_1_catch(Bin, MsgName, TrUserData) ->
 decode_msg_1_catch(Bin, MsgName, TrUserData) ->
     try decode_msg_2_doit(MsgName, Bin, TrUserData)
     catch Class:Reason ->
-        StackTrace = erlang:get_stacktrace(),
-        error({gpb_error,{decoding_failure, {Bin, MsgName, {Class, Reason, StackTrace}}}})
+            StackTrace = erlang:get_stacktrace(),
+            error({gpb_error,{decoding_failure, {Bin, MsgName, {Class, Reason, StackTrace}}}})
     end.
 -endif.
 
@@ -890,28 +890,28 @@ decode_msg_2_doit(simple_response, Bin, TrUserData) ->
     id(decode_msg_simple_response(Bin, TrUserData),
        TrUserData);
 decode_msg_2_doit(streaming_input_call_request, Bin,
-		  TrUserData) ->
+                  TrUserData) ->
     id(decode_msg_streaming_input_call_request(Bin,
-					       TrUserData),
+                                               TrUserData),
        TrUserData);
 decode_msg_2_doit(streaming_input_call_response, Bin,
-		  TrUserData) ->
+                  TrUserData) ->
     id(decode_msg_streaming_input_call_response(Bin,
-						TrUserData),
+                                                TrUserData),
        TrUserData);
 decode_msg_2_doit(response_parameters, Bin,
-		  TrUserData) ->
+                  TrUserData) ->
     id(decode_msg_response_parameters(Bin, TrUserData),
        TrUserData);
 decode_msg_2_doit(streaming_output_call_request, Bin,
-		  TrUserData) ->
+                  TrUserData) ->
     id(decode_msg_streaming_output_call_request(Bin,
-						TrUserData),
+                                                TrUserData),
        TrUserData);
 decode_msg_2_doit(streaming_output_call_response, Bin,
-		  TrUserData) ->
+                  TrUserData) ->
     id(decode_msg_streaming_output_call_response(Bin,
-						 TrUserData),
+                                                 TrUserData),
        TrUserData);
 decode_msg_2_doit(reconnect_params, Bin, TrUserData) ->
     id(decode_msg_reconnect_params(Bin, TrUserData),
@@ -930,37 +930,37 @@ dfp_read_field_def_empty(Other, Z1, Z2, TrUserData) ->
     dg_read_field_def_empty(Other, Z1, Z2, TrUserData).
 
 dg_read_field_def_empty(<<1:1, X:7, Rest/binary>>, N,
-			Acc, TrUserData)
-    when N < 32 - 7 ->
+                        Acc, TrUserData)
+  when N < 32 - 7 ->
     dg_read_field_def_empty(Rest, N + 7, X bsl N + Acc,
-			    TrUserData);
+                            TrUserData);
 dg_read_field_def_empty(<<0:1, X:7, Rest/binary>>, N,
-			Acc, TrUserData) ->
+                        Acc, TrUserData) ->
     Key = X bsl N + Acc,
     case Key band 7 of
-      0 -> skip_varint_empty(Rest, 0, 0, TrUserData);
-      1 -> skip_64_empty(Rest, 0, 0, TrUserData);
-      2 ->
-	  skip_length_delimited_empty(Rest, 0, 0, TrUserData);
-      3 -> skip_group_empty(Rest, Key bsr 3, 0, TrUserData);
-      5 -> skip_32_empty(Rest, 0, 0, TrUserData)
+        0 -> skip_varint_empty(Rest, 0, 0, TrUserData);
+        1 -> skip_64_empty(Rest, 0, 0, TrUserData);
+        2 ->
+            skip_length_delimited_empty(Rest, 0, 0, TrUserData);
+        3 -> skip_group_empty(Rest, Key bsr 3, 0, TrUserData);
+        5 -> skip_32_empty(Rest, 0, 0, TrUserData)
     end;
 dg_read_field_def_empty(<<>>, 0, 0, _) -> #{}.
 
 skip_varint_empty(<<1:1, _:7, Rest/binary>>, Z1, Z2,
-		  TrUserData) ->
+                  TrUserData) ->
     skip_varint_empty(Rest, Z1, Z2, TrUserData);
 skip_varint_empty(<<0:1, _:7, Rest/binary>>, Z1, Z2,
-		  TrUserData) ->
+                  TrUserData) ->
     dfp_read_field_def_empty(Rest, Z1, Z2, TrUserData).
 
 skip_length_delimited_empty(<<1:1, X:7, Rest/binary>>,
-			    N, Acc, TrUserData)
-    when N < 57 ->
+                            N, Acc, TrUserData)
+  when N < 57 ->
     skip_length_delimited_empty(Rest, N + 7, X bsl N + Acc,
-				TrUserData);
+                                TrUserData);
 skip_length_delimited_empty(<<0:1, X:7, Rest/binary>>,
-			    N, Acc, TrUserData) ->
+                            N, Acc, TrUserData) ->
     Length = X bsl N + Acc,
     <<_:Length/binary, Rest2/binary>> = Rest,
     dfp_read_field_def_empty(Rest2, 0, 0, TrUserData).
@@ -970,2224 +970,2224 @@ skip_group_empty(Bin, FNum, Z2, TrUserData) ->
     dfp_read_field_def_empty(Rest, 0, Z2, TrUserData).
 
 skip_32_empty(<<_:32, Rest/binary>>, Z1, Z2,
-	      TrUserData) ->
+              TrUserData) ->
     dfp_read_field_def_empty(Rest, Z1, Z2, TrUserData).
 
 skip_64_empty(<<_:64, Rest/binary>>, Z1, Z2,
-	      TrUserData) ->
+              TrUserData) ->
     dfp_read_field_def_empty(Rest, Z1, Z2, TrUserData).
 
 decode_msg_bool_value(Bin, TrUserData) ->
     dfp_read_field_def_bool_value(Bin, 0, 0,
-				  id(false, TrUserData), TrUserData).
+                                  id(false, TrUserData), TrUserData).
 
 dfp_read_field_def_bool_value(<<8, Rest/binary>>, Z1,
-			      Z2, F@_1, TrUserData) ->
+                              Z2, F@_1, TrUserData) ->
     d_field_bool_value_value(Rest, Z1, Z2, F@_1,
-			     TrUserData);
+                             TrUserData);
 dfp_read_field_def_bool_value(<<>>, 0, 0, F@_1, _) ->
     #{value => F@_1};
 dfp_read_field_def_bool_value(Other, Z1, Z2, F@_1,
-			      TrUserData) ->
+                              TrUserData) ->
     dg_read_field_def_bool_value(Other, Z1, Z2, F@_1,
-				 TrUserData).
+                                 TrUserData).
 
 dg_read_field_def_bool_value(<<1:1, X:7, Rest/binary>>,
-			     N, Acc, F@_1, TrUserData)
-    when N < 32 - 7 ->
+                             N, Acc, F@_1, TrUserData)
+  when N < 32 - 7 ->
     dg_read_field_def_bool_value(Rest, N + 7, X bsl N + Acc,
-				 F@_1, TrUserData);
+                                 F@_1, TrUserData);
 dg_read_field_def_bool_value(<<0:1, X:7, Rest/binary>>,
-			     N, Acc, F@_1, TrUserData) ->
+                             N, Acc, F@_1, TrUserData) ->
     Key = X bsl N + Acc,
     case Key of
-      8 ->
-	  d_field_bool_value_value(Rest, 0, 0, F@_1, TrUserData);
-      _ ->
-	  case Key band 7 of
-	    0 ->
-		skip_varint_bool_value(Rest, 0, 0, F@_1, TrUserData);
-	    1 -> skip_64_bool_value(Rest, 0, 0, F@_1, TrUserData);
-	    2 ->
-		skip_length_delimited_bool_value(Rest, 0, 0, F@_1,
-						 TrUserData);
-	    3 ->
-		skip_group_bool_value(Rest, Key bsr 3, 0, F@_1,
-				      TrUserData);
-	    5 -> skip_32_bool_value(Rest, 0, 0, F@_1, TrUserData)
-	  end
+        8 ->
+            d_field_bool_value_value(Rest, 0, 0, F@_1, TrUserData);
+        _ ->
+            case Key band 7 of
+                0 ->
+                    skip_varint_bool_value(Rest, 0, 0, F@_1, TrUserData);
+                1 -> skip_64_bool_value(Rest, 0, 0, F@_1, TrUserData);
+                2 ->
+                    skip_length_delimited_bool_value(Rest, 0, 0, F@_1,
+                                                     TrUserData);
+                3 ->
+                    skip_group_bool_value(Rest, Key bsr 3, 0, F@_1,
+                                          TrUserData);
+                5 -> skip_32_bool_value(Rest, 0, 0, F@_1, TrUserData)
+            end
     end;
 dg_read_field_def_bool_value(<<>>, 0, 0, F@_1, _) ->
     #{value => F@_1}.
 
 d_field_bool_value_value(<<1:1, X:7, Rest/binary>>, N,
-			 Acc, F@_1, TrUserData)
-    when N < 57 ->
+                         Acc, F@_1, TrUserData)
+  when N < 57 ->
     d_field_bool_value_value(Rest, N + 7, X bsl N + Acc,
-			     F@_1, TrUserData);
+                             F@_1, TrUserData);
 d_field_bool_value_value(<<0:1, X:7, Rest/binary>>, N,
-			 Acc, _, TrUserData) ->
+                         Acc, _, TrUserData) ->
     {NewFValue, RestF} = {id(X bsl N + Acc =/= 0,
-			     TrUserData),
-			  Rest},
+                             TrUserData),
+                          Rest},
     dfp_read_field_def_bool_value(RestF, 0, 0, NewFValue,
-				  TrUserData).
+                                  TrUserData).
 
 skip_varint_bool_value(<<1:1, _:7, Rest/binary>>, Z1,
-		       Z2, F@_1, TrUserData) ->
+                       Z2, F@_1, TrUserData) ->
     skip_varint_bool_value(Rest, Z1, Z2, F@_1, TrUserData);
 skip_varint_bool_value(<<0:1, _:7, Rest/binary>>, Z1,
-		       Z2, F@_1, TrUserData) ->
+                       Z2, F@_1, TrUserData) ->
     dfp_read_field_def_bool_value(Rest, Z1, Z2, F@_1,
-				  TrUserData).
+                                  TrUserData).
 
 skip_length_delimited_bool_value(<<1:1, X:7,
-				   Rest/binary>>,
-				 N, Acc, F@_1, TrUserData)
-    when N < 57 ->
+                                   Rest/binary>>,
+                                 N, Acc, F@_1, TrUserData)
+  when N < 57 ->
     skip_length_delimited_bool_value(Rest, N + 7,
-				     X bsl N + Acc, F@_1, TrUserData);
+                                     X bsl N + Acc, F@_1, TrUserData);
 skip_length_delimited_bool_value(<<0:1, X:7,
-				   Rest/binary>>,
-				 N, Acc, F@_1, TrUserData) ->
+                                   Rest/binary>>,
+                                 N, Acc, F@_1, TrUserData) ->
     Length = X bsl N + Acc,
     <<_:Length/binary, Rest2/binary>> = Rest,
     dfp_read_field_def_bool_value(Rest2, 0, 0, F@_1,
-				  TrUserData).
+                                  TrUserData).
 
 skip_group_bool_value(Bin, FNum, Z2, F@_1,
-		      TrUserData) ->
+                      TrUserData) ->
     {_, Rest} = read_group(Bin, FNum),
     dfp_read_field_def_bool_value(Rest, 0, Z2, F@_1,
-				  TrUserData).
+                                  TrUserData).
 
 skip_32_bool_value(<<_:32, Rest/binary>>, Z1, Z2, F@_1,
-		   TrUserData) ->
+                   TrUserData) ->
     dfp_read_field_def_bool_value(Rest, Z1, Z2, F@_1,
-				  TrUserData).
+                                  TrUserData).
 
 skip_64_bool_value(<<_:64, Rest/binary>>, Z1, Z2, F@_1,
-		   TrUserData) ->
+                   TrUserData) ->
     dfp_read_field_def_bool_value(Rest, Z1, Z2, F@_1,
-				  TrUserData).
+                                  TrUserData).
 
 decode_msg_payload(Bin, TrUserData) ->
     dfp_read_field_def_payload(Bin, 0, 0,
-			       id('COMPRESSABLE', TrUserData),
-			       id(<<>>, TrUserData), TrUserData).
+                               id('COMPRESSABLE', TrUserData),
+                               id(<<>>, TrUserData), TrUserData).
 
 dfp_read_field_def_payload(<<8, Rest/binary>>, Z1, Z2,
-			   F@_1, F@_2, TrUserData) ->
+                           F@_1, F@_2, TrUserData) ->
     d_field_payload_type(Rest, Z1, Z2, F@_1, F@_2,
-			 TrUserData);
+                         TrUserData);
 dfp_read_field_def_payload(<<18, Rest/binary>>, Z1, Z2,
-			   F@_1, F@_2, TrUserData) ->
+                           F@_1, F@_2, TrUserData) ->
     d_field_payload_body(Rest, Z1, Z2, F@_1, F@_2,
-			 TrUserData);
+                         TrUserData);
 dfp_read_field_def_payload(<<>>, 0, 0, F@_1, F@_2, _) ->
     #{type => F@_1, body => F@_2};
 dfp_read_field_def_payload(Other, Z1, Z2, F@_1, F@_2,
-			   TrUserData) ->
+                           TrUserData) ->
     dg_read_field_def_payload(Other, Z1, Z2, F@_1, F@_2,
-			      TrUserData).
+                              TrUserData).
 
 dg_read_field_def_payload(<<1:1, X:7, Rest/binary>>, N,
-			  Acc, F@_1, F@_2, TrUserData)
-    when N < 32 - 7 ->
+                          Acc, F@_1, F@_2, TrUserData)
+  when N < 32 - 7 ->
     dg_read_field_def_payload(Rest, N + 7, X bsl N + Acc,
-			      F@_1, F@_2, TrUserData);
+                              F@_1, F@_2, TrUserData);
 dg_read_field_def_payload(<<0:1, X:7, Rest/binary>>, N,
-			  Acc, F@_1, F@_2, TrUserData) ->
+                          Acc, F@_1, F@_2, TrUserData) ->
     Key = X bsl N + Acc,
     case Key of
-      8 ->
-	  d_field_payload_type(Rest, 0, 0, F@_1, F@_2,
-			       TrUserData);
-      18 ->
-	  d_field_payload_body(Rest, 0, 0, F@_1, F@_2,
-			       TrUserData);
-      _ ->
-	  case Key band 7 of
-	    0 ->
-		skip_varint_payload(Rest, 0, 0, F@_1, F@_2, TrUserData);
-	    1 ->
-		skip_64_payload(Rest, 0, 0, F@_1, F@_2, TrUserData);
-	    2 ->
-		skip_length_delimited_payload(Rest, 0, 0, F@_1, F@_2,
-					      TrUserData);
-	    3 ->
-		skip_group_payload(Rest, Key bsr 3, 0, F@_1, F@_2,
-				   TrUserData);
-	    5 -> skip_32_payload(Rest, 0, 0, F@_1, F@_2, TrUserData)
-	  end
+        8 ->
+            d_field_payload_type(Rest, 0, 0, F@_1, F@_2,
+                                 TrUserData);
+        18 ->
+            d_field_payload_body(Rest, 0, 0, F@_1, F@_2,
+                                 TrUserData);
+        _ ->
+            case Key band 7 of
+                0 ->
+                    skip_varint_payload(Rest, 0, 0, F@_1, F@_2, TrUserData);
+                1 ->
+                    skip_64_payload(Rest, 0, 0, F@_1, F@_2, TrUserData);
+                2 ->
+                    skip_length_delimited_payload(Rest, 0, 0, F@_1, F@_2,
+                                                  TrUserData);
+                3 ->
+                    skip_group_payload(Rest, Key bsr 3, 0, F@_1, F@_2,
+                                       TrUserData);
+                5 -> skip_32_payload(Rest, 0, 0, F@_1, F@_2, TrUserData)
+            end
     end;
 dg_read_field_def_payload(<<>>, 0, 0, F@_1, F@_2, _) ->
     #{type => F@_1, body => F@_2}.
 
 d_field_payload_type(<<1:1, X:7, Rest/binary>>, N, Acc,
-		     F@_1, F@_2, TrUserData)
-    when N < 57 ->
+                     F@_1, F@_2, TrUserData)
+  when N < 57 ->
     d_field_payload_type(Rest, N + 7, X bsl N + Acc, F@_1,
-			 F@_2, TrUserData);
+                         F@_2, TrUserData);
 d_field_payload_type(<<0:1, X:7, Rest/binary>>, N, Acc,
-		     _, F@_2, TrUserData) ->
+                     _, F@_2, TrUserData) ->
     {NewFValue, RestF} =
-	{id('d_enum_grpc.testing.PayloadType'(begin
-						<<Res:32/signed-native>> = <<(X
-										bsl
-										N
-										+
-										Acc):32/unsigned-native>>,
-						id(Res, TrUserData)
-					      end),
-	    TrUserData),
-	 Rest},
+        {id('d_enum_grpc.testing.PayloadType'(begin
+                                                  <<Res:32/signed-native>> = <<(X
+                                                                                    bsl
+                                                                                    N
+                                                                                +
+                                                                                    Acc):32/unsigned-native>>,
+                                                  id(Res, TrUserData)
+                                              end),
+            TrUserData),
+         Rest},
     dfp_read_field_def_payload(RestF, 0, 0, NewFValue, F@_2,
-			       TrUserData).
+                               TrUserData).
 
 d_field_payload_body(<<1:1, X:7, Rest/binary>>, N, Acc,
-		     F@_1, F@_2, TrUserData)
-    when N < 57 ->
+                     F@_1, F@_2, TrUserData)
+  when N < 57 ->
     d_field_payload_body(Rest, N + 7, X bsl N + Acc, F@_1,
-			 F@_2, TrUserData);
+                         F@_2, TrUserData);
 d_field_payload_body(<<0:1, X:7, Rest/binary>>, N, Acc,
-		     F@_1, _, TrUserData) ->
+                     F@_1, _, TrUserData) ->
     {NewFValue, RestF} = begin
-			   Len = X bsl N + Acc,
-			   <<Bytes:Len/binary, Rest2/binary>> = Rest,
-			   {id(binary:copy(Bytes), TrUserData), Rest2}
-			 end,
+                             Len = X bsl N + Acc,
+                             <<Bytes:Len/binary, Rest2/binary>> = Rest,
+                             {id(binary:copy(Bytes), TrUserData), Rest2}
+                         end,
     dfp_read_field_def_payload(RestF, 0, 0, F@_1, NewFValue,
-			       TrUserData).
+                               TrUserData).
 
 skip_varint_payload(<<1:1, _:7, Rest/binary>>, Z1, Z2,
-		    F@_1, F@_2, TrUserData) ->
+                    F@_1, F@_2, TrUserData) ->
     skip_varint_payload(Rest, Z1, Z2, F@_1, F@_2,
-			TrUserData);
+                        TrUserData);
 skip_varint_payload(<<0:1, _:7, Rest/binary>>, Z1, Z2,
-		    F@_1, F@_2, TrUserData) ->
+                    F@_1, F@_2, TrUserData) ->
     dfp_read_field_def_payload(Rest, Z1, Z2, F@_1, F@_2,
-			       TrUserData).
+                               TrUserData).
 
 skip_length_delimited_payload(<<1:1, X:7, Rest/binary>>,
-			      N, Acc, F@_1, F@_2, TrUserData)
-    when N < 57 ->
+                              N, Acc, F@_1, F@_2, TrUserData)
+  when N < 57 ->
     skip_length_delimited_payload(Rest, N + 7,
-				  X bsl N + Acc, F@_1, F@_2, TrUserData);
+                                  X bsl N + Acc, F@_1, F@_2, TrUserData);
 skip_length_delimited_payload(<<0:1, X:7, Rest/binary>>,
-			      N, Acc, F@_1, F@_2, TrUserData) ->
+                              N, Acc, F@_1, F@_2, TrUserData) ->
     Length = X bsl N + Acc,
     <<_:Length/binary, Rest2/binary>> = Rest,
     dfp_read_field_def_payload(Rest2, 0, 0, F@_1, F@_2,
-			       TrUserData).
+                               TrUserData).
 
 skip_group_payload(Bin, FNum, Z2, F@_1, F@_2,
-		   TrUserData) ->
+                   TrUserData) ->
     {_, Rest} = read_group(Bin, FNum),
     dfp_read_field_def_payload(Rest, 0, Z2, F@_1, F@_2,
-			       TrUserData).
+                               TrUserData).
 
 skip_32_payload(<<_:32, Rest/binary>>, Z1, Z2, F@_1,
-		F@_2, TrUserData) ->
+                F@_2, TrUserData) ->
     dfp_read_field_def_payload(Rest, Z1, Z2, F@_1, F@_2,
-			       TrUserData).
+                               TrUserData).
 
 skip_64_payload(<<_:64, Rest/binary>>, Z1, Z2, F@_1,
-		F@_2, TrUserData) ->
+                F@_2, TrUserData) ->
     dfp_read_field_def_payload(Rest, Z1, Z2, F@_1, F@_2,
-			       TrUserData).
+                               TrUserData).
 
 decode_msg_echo_status(Bin, TrUserData) ->
     dfp_read_field_def_echo_status(Bin, 0, 0,
-				   id(0, TrUserData), id(<<>>, TrUserData),
-				   TrUserData).
+                                   id(0, TrUserData), id(<<>>, TrUserData),
+                                   TrUserData).
 
 dfp_read_field_def_echo_status(<<8, Rest/binary>>, Z1,
-			       Z2, F@_1, F@_2, TrUserData) ->
+                               Z2, F@_1, F@_2, TrUserData) ->
     d_field_echo_status_code(Rest, Z1, Z2, F@_1, F@_2,
-			     TrUserData);
+                             TrUserData);
 dfp_read_field_def_echo_status(<<18, Rest/binary>>, Z1,
-			       Z2, F@_1, F@_2, TrUserData) ->
+                               Z2, F@_1, F@_2, TrUserData) ->
     d_field_echo_status_message(Rest, Z1, Z2, F@_1, F@_2,
-				TrUserData);
+                                TrUserData);
 dfp_read_field_def_echo_status(<<>>, 0, 0, F@_1, F@_2,
-			       _) ->
+                               _) ->
     #{code => F@_1, message => F@_2};
 dfp_read_field_def_echo_status(Other, Z1, Z2, F@_1,
-			       F@_2, TrUserData) ->
+                               F@_2, TrUserData) ->
     dg_read_field_def_echo_status(Other, Z1, Z2, F@_1, F@_2,
-				  TrUserData).
+                                  TrUserData).
 
 dg_read_field_def_echo_status(<<1:1, X:7, Rest/binary>>,
-			      N, Acc, F@_1, F@_2, TrUserData)
-    when N < 32 - 7 ->
+                              N, Acc, F@_1, F@_2, TrUserData)
+  when N < 32 - 7 ->
     dg_read_field_def_echo_status(Rest, N + 7,
-				  X bsl N + Acc, F@_1, F@_2, TrUserData);
+                                  X bsl N + Acc, F@_1, F@_2, TrUserData);
 dg_read_field_def_echo_status(<<0:1, X:7, Rest/binary>>,
-			      N, Acc, F@_1, F@_2, TrUserData) ->
+                              N, Acc, F@_1, F@_2, TrUserData) ->
     Key = X bsl N + Acc,
     case Key of
-      8 ->
-	  d_field_echo_status_code(Rest, 0, 0, F@_1, F@_2,
-				   TrUserData);
-      18 ->
-	  d_field_echo_status_message(Rest, 0, 0, F@_1, F@_2,
-				      TrUserData);
-      _ ->
-	  case Key band 7 of
-	    0 ->
-		skip_varint_echo_status(Rest, 0, 0, F@_1, F@_2,
-					TrUserData);
-	    1 ->
-		skip_64_echo_status(Rest, 0, 0, F@_1, F@_2, TrUserData);
-	    2 ->
-		skip_length_delimited_echo_status(Rest, 0, 0, F@_1,
-						  F@_2, TrUserData);
-	    3 ->
-		skip_group_echo_status(Rest, Key bsr 3, 0, F@_1, F@_2,
-				       TrUserData);
-	    5 ->
-		skip_32_echo_status(Rest, 0, 0, F@_1, F@_2, TrUserData)
-	  end
+        8 ->
+            d_field_echo_status_code(Rest, 0, 0, F@_1, F@_2,
+                                     TrUserData);
+        18 ->
+            d_field_echo_status_message(Rest, 0, 0, F@_1, F@_2,
+                                        TrUserData);
+        _ ->
+            case Key band 7 of
+                0 ->
+                    skip_varint_echo_status(Rest, 0, 0, F@_1, F@_2,
+                                            TrUserData);
+                1 ->
+                    skip_64_echo_status(Rest, 0, 0, F@_1, F@_2, TrUserData);
+                2 ->
+                    skip_length_delimited_echo_status(Rest, 0, 0, F@_1,
+                                                      F@_2, TrUserData);
+                3 ->
+                    skip_group_echo_status(Rest, Key bsr 3, 0, F@_1, F@_2,
+                                           TrUserData);
+                5 ->
+                    skip_32_echo_status(Rest, 0, 0, F@_1, F@_2, TrUserData)
+            end
     end;
 dg_read_field_def_echo_status(<<>>, 0, 0, F@_1, F@_2,
-			      _) ->
+                              _) ->
     #{code => F@_1, message => F@_2}.
 
 d_field_echo_status_code(<<1:1, X:7, Rest/binary>>, N,
-			 Acc, F@_1, F@_2, TrUserData)
-    when N < 57 ->
+                         Acc, F@_1, F@_2, TrUserData)
+  when N < 57 ->
     d_field_echo_status_code(Rest, N + 7, X bsl N + Acc,
-			     F@_1, F@_2, TrUserData);
+                             F@_1, F@_2, TrUserData);
 d_field_echo_status_code(<<0:1, X:7, Rest/binary>>, N,
-			 Acc, _, F@_2, TrUserData) ->
+                         Acc, _, F@_2, TrUserData) ->
     {NewFValue, RestF} = {begin
-			    <<Res:32/signed-native>> = <<(X bsl N +
-							    Acc):32/unsigned-native>>,
-			    id(Res, TrUserData)
-			  end,
-			  Rest},
+                              <<Res:32/signed-native>> = <<(X bsl N +
+                                                                Acc):32/unsigned-native>>,
+                              id(Res, TrUserData)
+                          end,
+                          Rest},
     dfp_read_field_def_echo_status(RestF, 0, 0, NewFValue,
-				   F@_2, TrUserData).
+                                   F@_2, TrUserData).
 
 d_field_echo_status_message(<<1:1, X:7, Rest/binary>>,
-			    N, Acc, F@_1, F@_2, TrUserData)
-    when N < 57 ->
+                            N, Acc, F@_1, F@_2, TrUserData)
+  when N < 57 ->
     d_field_echo_status_message(Rest, N + 7, X bsl N + Acc,
-				F@_1, F@_2, TrUserData);
+                                F@_1, F@_2, TrUserData);
 d_field_echo_status_message(<<0:1, X:7, Rest/binary>>,
-			    N, Acc, F@_1, _, TrUserData) ->
+                            N, Acc, F@_1, _, TrUserData) ->
     {NewFValue, RestF} = begin
-			   Len = X bsl N + Acc,
-			   <<Bytes:Len/binary, Rest2/binary>> = Rest,
-			   {id(binary:copy(Bytes), TrUserData), Rest2}
-			 end,
+                             Len = X bsl N + Acc,
+                             <<Bytes:Len/binary, Rest2/binary>> = Rest,
+                             {id(binary:copy(Bytes), TrUserData), Rest2}
+                         end,
     dfp_read_field_def_echo_status(RestF, 0, 0, F@_1,
-				   NewFValue, TrUserData).
+                                   NewFValue, TrUserData).
 
 skip_varint_echo_status(<<1:1, _:7, Rest/binary>>, Z1,
-			Z2, F@_1, F@_2, TrUserData) ->
+                        Z2, F@_1, F@_2, TrUserData) ->
     skip_varint_echo_status(Rest, Z1, Z2, F@_1, F@_2,
-			    TrUserData);
+                            TrUserData);
 skip_varint_echo_status(<<0:1, _:7, Rest/binary>>, Z1,
-			Z2, F@_1, F@_2, TrUserData) ->
+                        Z2, F@_1, F@_2, TrUserData) ->
     dfp_read_field_def_echo_status(Rest, Z1, Z2, F@_1, F@_2,
-				   TrUserData).
+                                   TrUserData).
 
 skip_length_delimited_echo_status(<<1:1, X:7,
-				    Rest/binary>>,
-				  N, Acc, F@_1, F@_2, TrUserData)
-    when N < 57 ->
+                                    Rest/binary>>,
+                                  N, Acc, F@_1, F@_2, TrUserData)
+  when N < 57 ->
     skip_length_delimited_echo_status(Rest, N + 7,
-				      X bsl N + Acc, F@_1, F@_2, TrUserData);
+                                      X bsl N + Acc, F@_1, F@_2, TrUserData);
 skip_length_delimited_echo_status(<<0:1, X:7,
-				    Rest/binary>>,
-				  N, Acc, F@_1, F@_2, TrUserData) ->
+                                    Rest/binary>>,
+                                  N, Acc, F@_1, F@_2, TrUserData) ->
     Length = X bsl N + Acc,
     <<_:Length/binary, Rest2/binary>> = Rest,
     dfp_read_field_def_echo_status(Rest2, 0, 0, F@_1, F@_2,
-				   TrUserData).
+                                   TrUserData).
 
 skip_group_echo_status(Bin, FNum, Z2, F@_1, F@_2,
-		       TrUserData) ->
+                       TrUserData) ->
     {_, Rest} = read_group(Bin, FNum),
     dfp_read_field_def_echo_status(Rest, 0, Z2, F@_1, F@_2,
-				   TrUserData).
+                                   TrUserData).
 
 skip_32_echo_status(<<_:32, Rest/binary>>, Z1, Z2, F@_1,
-		    F@_2, TrUserData) ->
+                    F@_2, TrUserData) ->
     dfp_read_field_def_echo_status(Rest, Z1, Z2, F@_1, F@_2,
-				   TrUserData).
+                                   TrUserData).
 
 skip_64_echo_status(<<_:64, Rest/binary>>, Z1, Z2, F@_1,
-		    F@_2, TrUserData) ->
+                    F@_2, TrUserData) ->
     dfp_read_field_def_echo_status(Rest, Z1, Z2, F@_1, F@_2,
-				   TrUserData).
+                                   TrUserData).
 
 decode_msg_simple_request(Bin, TrUserData) ->
     dfp_read_field_def_simple_request(Bin, 0, 0,
-				      id('COMPRESSABLE', TrUserData),
-				      id(0, TrUserData),
-				      id('$undef', TrUserData),
-				      id(false, TrUserData),
-				      id(false, TrUserData),
-				      id('$undef', TrUserData),
-				      id('$undef', TrUserData),
-				      id('$undef', TrUserData), TrUserData).
+                                      id('COMPRESSABLE', TrUserData),
+                                      id(0, TrUserData),
+                                      id('$undef', TrUserData),
+                                      id(false, TrUserData),
+                                      id(false, TrUserData),
+                                      id('$undef', TrUserData),
+                                      id('$undef', TrUserData),
+                                      id('$undef', TrUserData), TrUserData).
 
 dfp_read_field_def_simple_request(<<8, Rest/binary>>,
-				  Z1, Z2, F@_1, F@_2, F@_3, F@_4, F@_5, F@_6,
-				  F@_7, F@_8, TrUserData) ->
+                                  Z1, Z2, F@_1, F@_2, F@_3, F@_4, F@_5, F@_6,
+                                  F@_7, F@_8, TrUserData) ->
     d_field_simple_request_response_type(Rest, Z1, Z2, F@_1,
-					 F@_2, F@_3, F@_4, F@_5, F@_6, F@_7,
-					 F@_8, TrUserData);
+                                         F@_2, F@_3, F@_4, F@_5, F@_6, F@_7,
+                                         F@_8, TrUserData);
 dfp_read_field_def_simple_request(<<16, Rest/binary>>,
-				  Z1, Z2, F@_1, F@_2, F@_3, F@_4, F@_5, F@_6,
-				  F@_7, F@_8, TrUserData) ->
+                                  Z1, Z2, F@_1, F@_2, F@_3, F@_4, F@_5, F@_6,
+                                  F@_7, F@_8, TrUserData) ->
     d_field_simple_request_response_size(Rest, Z1, Z2, F@_1,
-					 F@_2, F@_3, F@_4, F@_5, F@_6, F@_7,
-					 F@_8, TrUserData);
+                                         F@_2, F@_3, F@_4, F@_5, F@_6, F@_7,
+                                         F@_8, TrUserData);
 dfp_read_field_def_simple_request(<<26, Rest/binary>>,
-				  Z1, Z2, F@_1, F@_2, F@_3, F@_4, F@_5, F@_6,
-				  F@_7, F@_8, TrUserData) ->
+                                  Z1, Z2, F@_1, F@_2, F@_3, F@_4, F@_5, F@_6,
+                                  F@_7, F@_8, TrUserData) ->
     d_field_simple_request_payload(Rest, Z1, Z2, F@_1, F@_2,
-				   F@_3, F@_4, F@_5, F@_6, F@_7, F@_8,
-				   TrUserData);
+                                   F@_3, F@_4, F@_5, F@_6, F@_7, F@_8,
+                                   TrUserData);
 dfp_read_field_def_simple_request(<<32, Rest/binary>>,
-				  Z1, Z2, F@_1, F@_2, F@_3, F@_4, F@_5, F@_6,
-				  F@_7, F@_8, TrUserData) ->
+                                  Z1, Z2, F@_1, F@_2, F@_3, F@_4, F@_5, F@_6,
+                                  F@_7, F@_8, TrUserData) ->
     d_field_simple_request_fill_username(Rest, Z1, Z2, F@_1,
-					 F@_2, F@_3, F@_4, F@_5, F@_6, F@_7,
-					 F@_8, TrUserData);
+                                         F@_2, F@_3, F@_4, F@_5, F@_6, F@_7,
+                                         F@_8, TrUserData);
 dfp_read_field_def_simple_request(<<40, Rest/binary>>,
-				  Z1, Z2, F@_1, F@_2, F@_3, F@_4, F@_5, F@_6,
-				  F@_7, F@_8, TrUserData) ->
+                                  Z1, Z2, F@_1, F@_2, F@_3, F@_4, F@_5, F@_6,
+                                  F@_7, F@_8, TrUserData) ->
     d_field_simple_request_fill_oauth_scope(Rest, Z1, Z2,
-					    F@_1, F@_2, F@_3, F@_4, F@_5, F@_6,
-					    F@_7, F@_8, TrUserData);
+                                            F@_1, F@_2, F@_3, F@_4, F@_5, F@_6,
+                                            F@_7, F@_8, TrUserData);
 dfp_read_field_def_simple_request(<<50, Rest/binary>>,
-				  Z1, Z2, F@_1, F@_2, F@_3, F@_4, F@_5, F@_6,
-				  F@_7, F@_8, TrUserData) ->
+                                  Z1, Z2, F@_1, F@_2, F@_3, F@_4, F@_5, F@_6,
+                                  F@_7, F@_8, TrUserData) ->
     d_field_simple_request_response_compressed(Rest, Z1, Z2,
-					       F@_1, F@_2, F@_3, F@_4, F@_5,
-					       F@_6, F@_7, F@_8, TrUserData);
+                                               F@_1, F@_2, F@_3, F@_4, F@_5,
+                                               F@_6, F@_7, F@_8, TrUserData);
 dfp_read_field_def_simple_request(<<58, Rest/binary>>,
-				  Z1, Z2, F@_1, F@_2, F@_3, F@_4, F@_5, F@_6,
-				  F@_7, F@_8, TrUserData) ->
+                                  Z1, Z2, F@_1, F@_2, F@_3, F@_4, F@_5, F@_6,
+                                  F@_7, F@_8, TrUserData) ->
     d_field_simple_request_response_status(Rest, Z1, Z2,
-					   F@_1, F@_2, F@_3, F@_4, F@_5, F@_6,
-					   F@_7, F@_8, TrUserData);
+                                           F@_1, F@_2, F@_3, F@_4, F@_5, F@_6,
+                                           F@_7, F@_8, TrUserData);
 dfp_read_field_def_simple_request(<<66, Rest/binary>>,
-				  Z1, Z2, F@_1, F@_2, F@_3, F@_4, F@_5, F@_6,
-				  F@_7, F@_8, TrUserData) ->
+                                  Z1, Z2, F@_1, F@_2, F@_3, F@_4, F@_5, F@_6,
+                                  F@_7, F@_8, TrUserData) ->
     d_field_simple_request_expect_compressed(Rest, Z1, Z2,
-					     F@_1, F@_2, F@_3, F@_4, F@_5, F@_6,
-					     F@_7, F@_8, TrUserData);
+                                             F@_1, F@_2, F@_3, F@_4, F@_5, F@_6,
+                                             F@_7, F@_8, TrUserData);
 dfp_read_field_def_simple_request(<<>>, 0, 0, F@_1,
-				  F@_2, F@_3, F@_4, F@_5, F@_6, F@_7, F@_8,
-				  _) ->
+                                  F@_2, F@_3, F@_4, F@_5, F@_6, F@_7, F@_8,
+                                  _) ->
     S1 = #{response_type => F@_1, response_size => F@_2,
-	   fill_username => F@_4, fill_oauth_scope => F@_5},
+           fill_username => F@_4, fill_oauth_scope => F@_5},
     S2 = if F@_3 == '$undef' -> S1;
-	    true -> S1#{payload => F@_3}
-	 end,
+            true -> S1#{payload => F@_3}
+         end,
     S3 = if F@_6 == '$undef' -> S2;
-	    true -> S2#{response_compressed => F@_6}
-	 end,
+            true -> S2#{response_compressed => F@_6}
+         end,
     S4 = if F@_7 == '$undef' -> S3;
-	    true -> S3#{response_status => F@_7}
-	 end,
+            true -> S3#{response_status => F@_7}
+         end,
     if F@_8 == '$undef' -> S4;
        true -> S4#{expect_compressed => F@_8}
     end;
 dfp_read_field_def_simple_request(Other, Z1, Z2, F@_1,
-				  F@_2, F@_3, F@_4, F@_5, F@_6, F@_7, F@_8,
-				  TrUserData) ->
+                                  F@_2, F@_3, F@_4, F@_5, F@_6, F@_7, F@_8,
+                                  TrUserData) ->
     dg_read_field_def_simple_request(Other, Z1, Z2, F@_1,
-				     F@_2, F@_3, F@_4, F@_5, F@_6, F@_7, F@_8,
-				     TrUserData).
+                                     F@_2, F@_3, F@_4, F@_5, F@_6, F@_7, F@_8,
+                                     TrUserData).
 
 dg_read_field_def_simple_request(<<1:1, X:7,
-				   Rest/binary>>,
-				 N, Acc, F@_1, F@_2, F@_3, F@_4, F@_5, F@_6,
-				 F@_7, F@_8, TrUserData)
-    when N < 32 - 7 ->
+                                   Rest/binary>>,
+                                 N, Acc, F@_1, F@_2, F@_3, F@_4, F@_5, F@_6,
+                                 F@_7, F@_8, TrUserData)
+  when N < 32 - 7 ->
     dg_read_field_def_simple_request(Rest, N + 7,
-				     X bsl N + Acc, F@_1, F@_2, F@_3, F@_4,
-				     F@_5, F@_6, F@_7, F@_8, TrUserData);
+                                     X bsl N + Acc, F@_1, F@_2, F@_3, F@_4,
+                                     F@_5, F@_6, F@_7, F@_8, TrUserData);
 dg_read_field_def_simple_request(<<0:1, X:7,
-				   Rest/binary>>,
-				 N, Acc, F@_1, F@_2, F@_3, F@_4, F@_5, F@_6,
-				 F@_7, F@_8, TrUserData) ->
+                                   Rest/binary>>,
+                                 N, Acc, F@_1, F@_2, F@_3, F@_4, F@_5, F@_6,
+                                 F@_7, F@_8, TrUserData) ->
     Key = X bsl N + Acc,
     case Key of
-      8 ->
-	  d_field_simple_request_response_type(Rest, 0, 0, F@_1,
-					       F@_2, F@_3, F@_4, F@_5, F@_6,
-					       F@_7, F@_8, TrUserData);
-      16 ->
-	  d_field_simple_request_response_size(Rest, 0, 0, F@_1,
-					       F@_2, F@_3, F@_4, F@_5, F@_6,
-					       F@_7, F@_8, TrUserData);
-      26 ->
-	  d_field_simple_request_payload(Rest, 0, 0, F@_1, F@_2,
-					 F@_3, F@_4, F@_5, F@_6, F@_7, F@_8,
-					 TrUserData);
-      32 ->
-	  d_field_simple_request_fill_username(Rest, 0, 0, F@_1,
-					       F@_2, F@_3, F@_4, F@_5, F@_6,
-					       F@_7, F@_8, TrUserData);
-      40 ->
-	  d_field_simple_request_fill_oauth_scope(Rest, 0, 0,
-						  F@_1, F@_2, F@_3, F@_4, F@_5,
-						  F@_6, F@_7, F@_8, TrUserData);
-      50 ->
-	  d_field_simple_request_response_compressed(Rest, 0, 0,
-						     F@_1, F@_2, F@_3, F@_4,
-						     F@_5, F@_6, F@_7, F@_8,
-						     TrUserData);
-      58 ->
-	  d_field_simple_request_response_status(Rest, 0, 0, F@_1,
-						 F@_2, F@_3, F@_4, F@_5, F@_6,
-						 F@_7, F@_8, TrUserData);
-      66 ->
-	  d_field_simple_request_expect_compressed(Rest, 0, 0,
-						   F@_1, F@_2, F@_3, F@_4, F@_5,
-						   F@_6, F@_7, F@_8,
-						   TrUserData);
-      _ ->
-	  case Key band 7 of
-	    0 ->
-		skip_varint_simple_request(Rest, 0, 0, F@_1, F@_2, F@_3,
-					   F@_4, F@_5, F@_6, F@_7, F@_8,
-					   TrUserData);
-	    1 ->
-		skip_64_simple_request(Rest, 0, 0, F@_1, F@_2, F@_3,
-				       F@_4, F@_5, F@_6, F@_7, F@_8,
-				       TrUserData);
-	    2 ->
-		skip_length_delimited_simple_request(Rest, 0, 0, F@_1,
-						     F@_2, F@_3, F@_4, F@_5,
-						     F@_6, F@_7, F@_8,
-						     TrUserData);
-	    3 ->
-		skip_group_simple_request(Rest, Key bsr 3, 0, F@_1,
-					  F@_2, F@_3, F@_4, F@_5, F@_6, F@_7,
-					  F@_8, TrUserData);
-	    5 ->
-		skip_32_simple_request(Rest, 0, 0, F@_1, F@_2, F@_3,
-				       F@_4, F@_5, F@_6, F@_7, F@_8, TrUserData)
-	  end
+        8 ->
+            d_field_simple_request_response_type(Rest, 0, 0, F@_1,
+                                                 F@_2, F@_3, F@_4, F@_5, F@_6,
+                                                 F@_7, F@_8, TrUserData);
+        16 ->
+            d_field_simple_request_response_size(Rest, 0, 0, F@_1,
+                                                 F@_2, F@_3, F@_4, F@_5, F@_6,
+                                                 F@_7, F@_8, TrUserData);
+        26 ->
+            d_field_simple_request_payload(Rest, 0, 0, F@_1, F@_2,
+                                           F@_3, F@_4, F@_5, F@_6, F@_7, F@_8,
+                                           TrUserData);
+        32 ->
+            d_field_simple_request_fill_username(Rest, 0, 0, F@_1,
+                                                 F@_2, F@_3, F@_4, F@_5, F@_6,
+                                                 F@_7, F@_8, TrUserData);
+        40 ->
+            d_field_simple_request_fill_oauth_scope(Rest, 0, 0,
+                                                    F@_1, F@_2, F@_3, F@_4, F@_5,
+                                                    F@_6, F@_7, F@_8, TrUserData);
+        50 ->
+            d_field_simple_request_response_compressed(Rest, 0, 0,
+                                                       F@_1, F@_2, F@_3, F@_4,
+                                                       F@_5, F@_6, F@_7, F@_8,
+                                                       TrUserData);
+        58 ->
+            d_field_simple_request_response_status(Rest, 0, 0, F@_1,
+                                                   F@_2, F@_3, F@_4, F@_5, F@_6,
+                                                   F@_7, F@_8, TrUserData);
+        66 ->
+            d_field_simple_request_expect_compressed(Rest, 0, 0,
+                                                     F@_1, F@_2, F@_3, F@_4, F@_5,
+                                                     F@_6, F@_7, F@_8,
+                                                     TrUserData);
+        _ ->
+            case Key band 7 of
+                0 ->
+                    skip_varint_simple_request(Rest, 0, 0, F@_1, F@_2, F@_3,
+                                               F@_4, F@_5, F@_6, F@_7, F@_8,
+                                               TrUserData);
+                1 ->
+                    skip_64_simple_request(Rest, 0, 0, F@_1, F@_2, F@_3,
+                                           F@_4, F@_5, F@_6, F@_7, F@_8,
+                                           TrUserData);
+                2 ->
+                    skip_length_delimited_simple_request(Rest, 0, 0, F@_1,
+                                                         F@_2, F@_3, F@_4, F@_5,
+                                                         F@_6, F@_7, F@_8,
+                                                         TrUserData);
+                3 ->
+                    skip_group_simple_request(Rest, Key bsr 3, 0, F@_1,
+                                              F@_2, F@_3, F@_4, F@_5, F@_6, F@_7,
+                                              F@_8, TrUserData);
+                5 ->
+                    skip_32_simple_request(Rest, 0, 0, F@_1, F@_2, F@_3,
+                                           F@_4, F@_5, F@_6, F@_7, F@_8, TrUserData)
+            end
     end;
 dg_read_field_def_simple_request(<<>>, 0, 0, F@_1, F@_2,
-				 F@_3, F@_4, F@_5, F@_6, F@_7, F@_8, _) ->
+                                 F@_3, F@_4, F@_5, F@_6, F@_7, F@_8, _) ->
     S1 = #{response_type => F@_1, response_size => F@_2,
-	   fill_username => F@_4, fill_oauth_scope => F@_5},
+           fill_username => F@_4, fill_oauth_scope => F@_5},
     S2 = if F@_3 == '$undef' -> S1;
-	    true -> S1#{payload => F@_3}
-	 end,
+            true -> S1#{payload => F@_3}
+         end,
     S3 = if F@_6 == '$undef' -> S2;
-	    true -> S2#{response_compressed => F@_6}
-	 end,
+            true -> S2#{response_compressed => F@_6}
+         end,
     S4 = if F@_7 == '$undef' -> S3;
-	    true -> S3#{response_status => F@_7}
-	 end,
+            true -> S3#{response_status => F@_7}
+         end,
     if F@_8 == '$undef' -> S4;
        true -> S4#{expect_compressed => F@_8}
     end.
 
 d_field_simple_request_response_type(<<1:1, X:7,
-				       Rest/binary>>,
-				     N, Acc, F@_1, F@_2, F@_3, F@_4, F@_5, F@_6,
-				     F@_7, F@_8, TrUserData)
-    when N < 57 ->
+                                       Rest/binary>>,
+                                     N, Acc, F@_1, F@_2, F@_3, F@_4, F@_5, F@_6,
+                                     F@_7, F@_8, TrUserData)
+  when N < 57 ->
     d_field_simple_request_response_type(Rest, N + 7,
-					 X bsl N + Acc, F@_1, F@_2, F@_3, F@_4,
-					 F@_5, F@_6, F@_7, F@_8, TrUserData);
+                                         X bsl N + Acc, F@_1, F@_2, F@_3, F@_4,
+                                         F@_5, F@_6, F@_7, F@_8, TrUserData);
 d_field_simple_request_response_type(<<0:1, X:7,
-				       Rest/binary>>,
-				     N, Acc, _, F@_2, F@_3, F@_4, F@_5, F@_6,
-				     F@_7, F@_8, TrUserData) ->
+                                       Rest/binary>>,
+                                     N, Acc, _, F@_2, F@_3, F@_4, F@_5, F@_6,
+                                     F@_7, F@_8, TrUserData) ->
     {NewFValue, RestF} =
-	{id('d_enum_grpc.testing.PayloadType'(begin
-						<<Res:32/signed-native>> = <<(X
-										bsl
-										N
-										+
-										Acc):32/unsigned-native>>,
-						id(Res, TrUserData)
-					      end),
-	    TrUserData),
-	 Rest},
+        {id('d_enum_grpc.testing.PayloadType'(begin
+                                                  <<Res:32/signed-native>> = <<(X
+                                                                                    bsl
+                                                                                    N
+                                                                                +
+                                                                                    Acc):32/unsigned-native>>,
+                                                  id(Res, TrUserData)
+                                              end),
+            TrUserData),
+         Rest},
     dfp_read_field_def_simple_request(RestF, 0, 0,
-				      NewFValue, F@_2, F@_3, F@_4, F@_5, F@_6,
-				      F@_7, F@_8, TrUserData).
+                                      NewFValue, F@_2, F@_3, F@_4, F@_5, F@_6,
+                                      F@_7, F@_8, TrUserData).
 
 d_field_simple_request_response_size(<<1:1, X:7,
-				       Rest/binary>>,
-				     N, Acc, F@_1, F@_2, F@_3, F@_4, F@_5, F@_6,
-				     F@_7, F@_8, TrUserData)
-    when N < 57 ->
+                                       Rest/binary>>,
+                                     N, Acc, F@_1, F@_2, F@_3, F@_4, F@_5, F@_6,
+                                     F@_7, F@_8, TrUserData)
+  when N < 57 ->
     d_field_simple_request_response_size(Rest, N + 7,
-					 X bsl N + Acc, F@_1, F@_2, F@_3, F@_4,
-					 F@_5, F@_6, F@_7, F@_8, TrUserData);
+                                         X bsl N + Acc, F@_1, F@_2, F@_3, F@_4,
+                                         F@_5, F@_6, F@_7, F@_8, TrUserData);
 d_field_simple_request_response_size(<<0:1, X:7,
-				       Rest/binary>>,
-				     N, Acc, F@_1, _, F@_3, F@_4, F@_5, F@_6,
-				     F@_7, F@_8, TrUserData) ->
+                                       Rest/binary>>,
+                                     N, Acc, F@_1, _, F@_3, F@_4, F@_5, F@_6,
+                                     F@_7, F@_8, TrUserData) ->
     {NewFValue, RestF} = {begin
-			    <<Res:32/signed-native>> = <<(X bsl N +
-							    Acc):32/unsigned-native>>,
-			    id(Res, TrUserData)
-			  end,
-			  Rest},
+                              <<Res:32/signed-native>> = <<(X bsl N +
+                                                                Acc):32/unsigned-native>>,
+                              id(Res, TrUserData)
+                          end,
+                          Rest},
     dfp_read_field_def_simple_request(RestF, 0, 0, F@_1,
-				      NewFValue, F@_3, F@_4, F@_5, F@_6, F@_7,
-				      F@_8, TrUserData).
+                                      NewFValue, F@_3, F@_4, F@_5, F@_6, F@_7,
+                                      F@_8, TrUserData).
 
 d_field_simple_request_payload(<<1:1, X:7,
-				 Rest/binary>>,
-			       N, Acc, F@_1, F@_2, F@_3, F@_4, F@_5, F@_6, F@_7,
-			       F@_8, TrUserData)
-    when N < 57 ->
+                                 Rest/binary>>,
+                               N, Acc, F@_1, F@_2, F@_3, F@_4, F@_5, F@_6, F@_7,
+                               F@_8, TrUserData)
+  when N < 57 ->
     d_field_simple_request_payload(Rest, N + 7,
-				   X bsl N + Acc, F@_1, F@_2, F@_3, F@_4, F@_5,
-				   F@_6, F@_7, F@_8, TrUserData);
+                                   X bsl N + Acc, F@_1, F@_2, F@_3, F@_4, F@_5,
+                                   F@_6, F@_7, F@_8, TrUserData);
 d_field_simple_request_payload(<<0:1, X:7,
-				 Rest/binary>>,
-			       N, Acc, F@_1, F@_2, Prev, F@_4, F@_5, F@_6, F@_7,
-			       F@_8, TrUserData) ->
+                                 Rest/binary>>,
+                               N, Acc, F@_1, F@_2, Prev, F@_4, F@_5, F@_6, F@_7,
+                               F@_8, TrUserData) ->
     {NewFValue, RestF} = begin
-			   Len = X bsl N + Acc,
-			   <<Bs:Len/binary, Rest2/binary>> = Rest,
-			   {id(decode_msg_payload(Bs, TrUserData), TrUserData),
-			    Rest2}
-			 end,
+                             Len = X bsl N + Acc,
+                             <<Bs:Len/binary, Rest2/binary>> = Rest,
+                             {id(decode_msg_payload(Bs, TrUserData), TrUserData),
+                              Rest2}
+                         end,
     dfp_read_field_def_simple_request(RestF, 0, 0, F@_1,
-				      F@_2,
-				      if Prev == '$undef' -> NewFValue;
-					 true ->
-					     merge_msg_payload(Prev, NewFValue,
-							       TrUserData)
-				      end,
-				      F@_4, F@_5, F@_6, F@_7, F@_8, TrUserData).
+                                      F@_2,
+                                      if Prev == '$undef' -> NewFValue;
+                                         true ->
+                                              merge_msg_payload(Prev, NewFValue,
+                                                                TrUserData)
+                                      end,
+                                      F@_4, F@_5, F@_6, F@_7, F@_8, TrUserData).
 
 d_field_simple_request_fill_username(<<1:1, X:7,
-				       Rest/binary>>,
-				     N, Acc, F@_1, F@_2, F@_3, F@_4, F@_5, F@_6,
-				     F@_7, F@_8, TrUserData)
-    when N < 57 ->
+                                       Rest/binary>>,
+                                     N, Acc, F@_1, F@_2, F@_3, F@_4, F@_5, F@_6,
+                                     F@_7, F@_8, TrUserData)
+  when N < 57 ->
     d_field_simple_request_fill_username(Rest, N + 7,
-					 X bsl N + Acc, F@_1, F@_2, F@_3, F@_4,
-					 F@_5, F@_6, F@_7, F@_8, TrUserData);
+                                         X bsl N + Acc, F@_1, F@_2, F@_3, F@_4,
+                                         F@_5, F@_6, F@_7, F@_8, TrUserData);
 d_field_simple_request_fill_username(<<0:1, X:7,
-				       Rest/binary>>,
-				     N, Acc, F@_1, F@_2, F@_3, _, F@_5, F@_6,
-				     F@_7, F@_8, TrUserData) ->
+                                       Rest/binary>>,
+                                     N, Acc, F@_1, F@_2, F@_3, _, F@_5, F@_6,
+                                     F@_7, F@_8, TrUserData) ->
     {NewFValue, RestF} = {id(X bsl N + Acc =/= 0,
-			     TrUserData),
-			  Rest},
+                             TrUserData),
+                          Rest},
     dfp_read_field_def_simple_request(RestF, 0, 0, F@_1,
-				      F@_2, F@_3, NewFValue, F@_5, F@_6, F@_7,
-				      F@_8, TrUserData).
+                                      F@_2, F@_3, NewFValue, F@_5, F@_6, F@_7,
+                                      F@_8, TrUserData).
 
 d_field_simple_request_fill_oauth_scope(<<1:1, X:7,
-					  Rest/binary>>,
-					N, Acc, F@_1, F@_2, F@_3, F@_4, F@_5,
-					F@_6, F@_7, F@_8, TrUserData)
-    when N < 57 ->
+                                          Rest/binary>>,
+                                        N, Acc, F@_1, F@_2, F@_3, F@_4, F@_5,
+                                        F@_6, F@_7, F@_8, TrUserData)
+  when N < 57 ->
     d_field_simple_request_fill_oauth_scope(Rest, N + 7,
-					    X bsl N + Acc, F@_1, F@_2, F@_3,
-					    F@_4, F@_5, F@_6, F@_7, F@_8,
-					    TrUserData);
+                                            X bsl N + Acc, F@_1, F@_2, F@_3,
+                                            F@_4, F@_5, F@_6, F@_7, F@_8,
+                                            TrUserData);
 d_field_simple_request_fill_oauth_scope(<<0:1, X:7,
-					  Rest/binary>>,
-					N, Acc, F@_1, F@_2, F@_3, F@_4, _, F@_6,
-					F@_7, F@_8, TrUserData) ->
+                                          Rest/binary>>,
+                                        N, Acc, F@_1, F@_2, F@_3, F@_4, _, F@_6,
+                                        F@_7, F@_8, TrUserData) ->
     {NewFValue, RestF} = {id(X bsl N + Acc =/= 0,
-			     TrUserData),
-			  Rest},
+                             TrUserData),
+                          Rest},
     dfp_read_field_def_simple_request(RestF, 0, 0, F@_1,
-				      F@_2, F@_3, F@_4, NewFValue, F@_6, F@_7,
-				      F@_8, TrUserData).
+                                      F@_2, F@_3, F@_4, NewFValue, F@_6, F@_7,
+                                      F@_8, TrUserData).
 
 d_field_simple_request_response_compressed(<<1:1, X:7,
-					     Rest/binary>>,
-					   N, Acc, F@_1, F@_2, F@_3, F@_4, F@_5,
-					   F@_6, F@_7, F@_8, TrUserData)
-    when N < 57 ->
+                                             Rest/binary>>,
+                                           N, Acc, F@_1, F@_2, F@_3, F@_4, F@_5,
+                                           F@_6, F@_7, F@_8, TrUserData)
+  when N < 57 ->
     d_field_simple_request_response_compressed(Rest, N + 7,
-					       X bsl N + Acc, F@_1, F@_2, F@_3,
-					       F@_4, F@_5, F@_6, F@_7, F@_8,
-					       TrUserData);
+                                               X bsl N + Acc, F@_1, F@_2, F@_3,
+                                               F@_4, F@_5, F@_6, F@_7, F@_8,
+                                               TrUserData);
 d_field_simple_request_response_compressed(<<0:1, X:7,
-					     Rest/binary>>,
-					   N, Acc, F@_1, F@_2, F@_3, F@_4, F@_5,
-					   Prev, F@_7, F@_8, TrUserData) ->
+                                             Rest/binary>>,
+                                           N, Acc, F@_1, F@_2, F@_3, F@_4, F@_5,
+                                           Prev, F@_7, F@_8, TrUserData) ->
     {NewFValue, RestF} = begin
-			   Len = X bsl N + Acc,
-			   <<Bs:Len/binary, Rest2/binary>> = Rest,
-			   {id(decode_msg_bool_value(Bs, TrUserData),
-			       TrUserData),
-			    Rest2}
-			 end,
+                             Len = X bsl N + Acc,
+                             <<Bs:Len/binary, Rest2/binary>> = Rest,
+                             {id(decode_msg_bool_value(Bs, TrUserData),
+                                 TrUserData),
+                              Rest2}
+                         end,
     dfp_read_field_def_simple_request(RestF, 0, 0, F@_1,
-				      F@_2, F@_3, F@_4, F@_5,
-				      if Prev == '$undef' -> NewFValue;
-					 true ->
-					     merge_msg_bool_value(Prev,
-								  NewFValue,
-								  TrUserData)
-				      end,
-				      F@_7, F@_8, TrUserData).
+                                      F@_2, F@_3, F@_4, F@_5,
+                                      if Prev == '$undef' -> NewFValue;
+                                         true ->
+                                              merge_msg_bool_value(Prev,
+                                                                   NewFValue,
+                                                                   TrUserData)
+                                      end,
+                                      F@_7, F@_8, TrUserData).
 
 d_field_simple_request_response_status(<<1:1, X:7,
-					 Rest/binary>>,
-				       N, Acc, F@_1, F@_2, F@_3, F@_4, F@_5,
-				       F@_6, F@_7, F@_8, TrUserData)
-    when N < 57 ->
+                                         Rest/binary>>,
+                                       N, Acc, F@_1, F@_2, F@_3, F@_4, F@_5,
+                                       F@_6, F@_7, F@_8, TrUserData)
+  when N < 57 ->
     d_field_simple_request_response_status(Rest, N + 7,
-					   X bsl N + Acc, F@_1, F@_2, F@_3,
-					   F@_4, F@_5, F@_6, F@_7, F@_8,
-					   TrUserData);
+                                           X bsl N + Acc, F@_1, F@_2, F@_3,
+                                           F@_4, F@_5, F@_6, F@_7, F@_8,
+                                           TrUserData);
 d_field_simple_request_response_status(<<0:1, X:7,
-					 Rest/binary>>,
-				       N, Acc, F@_1, F@_2, F@_3, F@_4, F@_5,
-				       F@_6, Prev, F@_8, TrUserData) ->
+                                         Rest/binary>>,
+                                       N, Acc, F@_1, F@_2, F@_3, F@_4, F@_5,
+                                       F@_6, Prev, F@_8, TrUserData) ->
     {NewFValue, RestF} = begin
-			   Len = X bsl N + Acc,
-			   <<Bs:Len/binary, Rest2/binary>> = Rest,
-			   {id(decode_msg_echo_status(Bs, TrUserData),
-			       TrUserData),
-			    Rest2}
-			 end,
+                             Len = X bsl N + Acc,
+                             <<Bs:Len/binary, Rest2/binary>> = Rest,
+                             {id(decode_msg_echo_status(Bs, TrUserData),
+                                 TrUserData),
+                              Rest2}
+                         end,
     dfp_read_field_def_simple_request(RestF, 0, 0, F@_1,
-				      F@_2, F@_3, F@_4, F@_5, F@_6,
-				      if Prev == '$undef' -> NewFValue;
-					 true ->
-					     merge_msg_echo_status(Prev,
-								   NewFValue,
-								   TrUserData)
-				      end,
-				      F@_8, TrUserData).
+                                      F@_2, F@_3, F@_4, F@_5, F@_6,
+                                      if Prev == '$undef' -> NewFValue;
+                                         true ->
+                                              merge_msg_echo_status(Prev,
+                                                                    NewFValue,
+                                                                    TrUserData)
+                                      end,
+                                      F@_8, TrUserData).
 
 d_field_simple_request_expect_compressed(<<1:1, X:7,
-					   Rest/binary>>,
-					 N, Acc, F@_1, F@_2, F@_3, F@_4, F@_5,
-					 F@_6, F@_7, F@_8, TrUserData)
-    when N < 57 ->
+                                           Rest/binary>>,
+                                         N, Acc, F@_1, F@_2, F@_3, F@_4, F@_5,
+                                         F@_6, F@_7, F@_8, TrUserData)
+  when N < 57 ->
     d_field_simple_request_expect_compressed(Rest, N + 7,
-					     X bsl N + Acc, F@_1, F@_2, F@_3,
-					     F@_4, F@_5, F@_6, F@_7, F@_8,
-					     TrUserData);
+                                             X bsl N + Acc, F@_1, F@_2, F@_3,
+                                             F@_4, F@_5, F@_6, F@_7, F@_8,
+                                             TrUserData);
 d_field_simple_request_expect_compressed(<<0:1, X:7,
-					   Rest/binary>>,
-					 N, Acc, F@_1, F@_2, F@_3, F@_4, F@_5,
-					 F@_6, F@_7, Prev, TrUserData) ->
+                                           Rest/binary>>,
+                                         N, Acc, F@_1, F@_2, F@_3, F@_4, F@_5,
+                                         F@_6, F@_7, Prev, TrUserData) ->
     {NewFValue, RestF} = begin
-			   Len = X bsl N + Acc,
-			   <<Bs:Len/binary, Rest2/binary>> = Rest,
-			   {id(decode_msg_bool_value(Bs, TrUserData),
-			       TrUserData),
-			    Rest2}
-			 end,
+                             Len = X bsl N + Acc,
+                             <<Bs:Len/binary, Rest2/binary>> = Rest,
+                             {id(decode_msg_bool_value(Bs, TrUserData),
+                                 TrUserData),
+                              Rest2}
+                         end,
     dfp_read_field_def_simple_request(RestF, 0, 0, F@_1,
-				      F@_2, F@_3, F@_4, F@_5, F@_6, F@_7,
-				      if Prev == '$undef' -> NewFValue;
-					 true ->
-					     merge_msg_bool_value(Prev,
-								  NewFValue,
-								  TrUserData)
-				      end,
-				      TrUserData).
+                                      F@_2, F@_3, F@_4, F@_5, F@_6, F@_7,
+                                      if Prev == '$undef' -> NewFValue;
+                                         true ->
+                                              merge_msg_bool_value(Prev,
+                                                                   NewFValue,
+                                                                   TrUserData)
+                                      end,
+                                      TrUserData).
 
 skip_varint_simple_request(<<1:1, _:7, Rest/binary>>,
-			   Z1, Z2, F@_1, F@_2, F@_3, F@_4, F@_5, F@_6, F@_7,
-			   F@_8, TrUserData) ->
+                           Z1, Z2, F@_1, F@_2, F@_3, F@_4, F@_5, F@_6, F@_7,
+                           F@_8, TrUserData) ->
     skip_varint_simple_request(Rest, Z1, Z2, F@_1, F@_2,
-			       F@_3, F@_4, F@_5, F@_6, F@_7, F@_8, TrUserData);
+                               F@_3, F@_4, F@_5, F@_6, F@_7, F@_8, TrUserData);
 skip_varint_simple_request(<<0:1, _:7, Rest/binary>>,
-			   Z1, Z2, F@_1, F@_2, F@_3, F@_4, F@_5, F@_6, F@_7,
-			   F@_8, TrUserData) ->
+                           Z1, Z2, F@_1, F@_2, F@_3, F@_4, F@_5, F@_6, F@_7,
+                           F@_8, TrUserData) ->
     dfp_read_field_def_simple_request(Rest, Z1, Z2, F@_1,
-				      F@_2, F@_3, F@_4, F@_5, F@_6, F@_7, F@_8,
-				      TrUserData).
+                                      F@_2, F@_3, F@_4, F@_5, F@_6, F@_7, F@_8,
+                                      TrUserData).
 
 skip_length_delimited_simple_request(<<1:1, X:7,
-				       Rest/binary>>,
-				     N, Acc, F@_1, F@_2, F@_3, F@_4, F@_5, F@_6,
-				     F@_7, F@_8, TrUserData)
-    when N < 57 ->
+                                       Rest/binary>>,
+                                     N, Acc, F@_1, F@_2, F@_3, F@_4, F@_5, F@_6,
+                                     F@_7, F@_8, TrUserData)
+  when N < 57 ->
     skip_length_delimited_simple_request(Rest, N + 7,
-					 X bsl N + Acc, F@_1, F@_2, F@_3, F@_4,
-					 F@_5, F@_6, F@_7, F@_8, TrUserData);
+                                         X bsl N + Acc, F@_1, F@_2, F@_3, F@_4,
+                                         F@_5, F@_6, F@_7, F@_8, TrUserData);
 skip_length_delimited_simple_request(<<0:1, X:7,
-				       Rest/binary>>,
-				     N, Acc, F@_1, F@_2, F@_3, F@_4, F@_5, F@_6,
-				     F@_7, F@_8, TrUserData) ->
+                                       Rest/binary>>,
+                                     N, Acc, F@_1, F@_2, F@_3, F@_4, F@_5, F@_6,
+                                     F@_7, F@_8, TrUserData) ->
     Length = X bsl N + Acc,
     <<_:Length/binary, Rest2/binary>> = Rest,
     dfp_read_field_def_simple_request(Rest2, 0, 0, F@_1,
-				      F@_2, F@_3, F@_4, F@_5, F@_6, F@_7, F@_8,
-				      TrUserData).
+                                      F@_2, F@_3, F@_4, F@_5, F@_6, F@_7, F@_8,
+                                      TrUserData).
 
 skip_group_simple_request(Bin, FNum, Z2, F@_1, F@_2,
-			  F@_3, F@_4, F@_5, F@_6, F@_7, F@_8, TrUserData) ->
+                          F@_3, F@_4, F@_5, F@_6, F@_7, F@_8, TrUserData) ->
     {_, Rest} = read_group(Bin, FNum),
     dfp_read_field_def_simple_request(Rest, 0, Z2, F@_1,
-				      F@_2, F@_3, F@_4, F@_5, F@_6, F@_7, F@_8,
-				      TrUserData).
+                                      F@_2, F@_3, F@_4, F@_5, F@_6, F@_7, F@_8,
+                                      TrUserData).
 
 skip_32_simple_request(<<_:32, Rest/binary>>, Z1, Z2,
-		       F@_1, F@_2, F@_3, F@_4, F@_5, F@_6, F@_7, F@_8,
-		       TrUserData) ->
+                       F@_1, F@_2, F@_3, F@_4, F@_5, F@_6, F@_7, F@_8,
+                       TrUserData) ->
     dfp_read_field_def_simple_request(Rest, Z1, Z2, F@_1,
-				      F@_2, F@_3, F@_4, F@_5, F@_6, F@_7, F@_8,
-				      TrUserData).
+                                      F@_2, F@_3, F@_4, F@_5, F@_6, F@_7, F@_8,
+                                      TrUserData).
 
 skip_64_simple_request(<<_:64, Rest/binary>>, Z1, Z2,
-		       F@_1, F@_2, F@_3, F@_4, F@_5, F@_6, F@_7, F@_8,
-		       TrUserData) ->
+                       F@_1, F@_2, F@_3, F@_4, F@_5, F@_6, F@_7, F@_8,
+                       TrUserData) ->
     dfp_read_field_def_simple_request(Rest, Z1, Z2, F@_1,
-				      F@_2, F@_3, F@_4, F@_5, F@_6, F@_7, F@_8,
-				      TrUserData).
+                                      F@_2, F@_3, F@_4, F@_5, F@_6, F@_7, F@_8,
+                                      TrUserData).
 
 decode_msg_simple_response(Bin, TrUserData) ->
     dfp_read_field_def_simple_response(Bin, 0, 0,
-				       id('$undef', TrUserData),
-				       id(<<>>, TrUserData),
-				       id(<<>>, TrUserData), TrUserData).
+                                       id('$undef', TrUserData),
+                                       id(<<>>, TrUserData),
+                                       id(<<>>, TrUserData), TrUserData).
 
 dfp_read_field_def_simple_response(<<10, Rest/binary>>,
-				   Z1, Z2, F@_1, F@_2, F@_3, TrUserData) ->
+                                   Z1, Z2, F@_1, F@_2, F@_3, TrUserData) ->
     d_field_simple_response_payload(Rest, Z1, Z2, F@_1,
-				    F@_2, F@_3, TrUserData);
+                                    F@_2, F@_3, TrUserData);
 dfp_read_field_def_simple_response(<<18, Rest/binary>>,
-				   Z1, Z2, F@_1, F@_2, F@_3, TrUserData) ->
+                                   Z1, Z2, F@_1, F@_2, F@_3, TrUserData) ->
     d_field_simple_response_username(Rest, Z1, Z2, F@_1,
-				     F@_2, F@_3, TrUserData);
+                                     F@_2, F@_3, TrUserData);
 dfp_read_field_def_simple_response(<<26, Rest/binary>>,
-				   Z1, Z2, F@_1, F@_2, F@_3, TrUserData) ->
+                                   Z1, Z2, F@_1, F@_2, F@_3, TrUserData) ->
     d_field_simple_response_oauth_scope(Rest, Z1, Z2, F@_1,
-					F@_2, F@_3, TrUserData);
+                                        F@_2, F@_3, TrUserData);
 dfp_read_field_def_simple_response(<<>>, 0, 0, F@_1,
-				   F@_2, F@_3, _) ->
+                                   F@_2, F@_3, _) ->
     S1 = #{username => F@_2, oauth_scope => F@_3},
     if F@_1 == '$undef' -> S1;
        true -> S1#{payload => F@_1}
     end;
 dfp_read_field_def_simple_response(Other, Z1, Z2, F@_1,
-				   F@_2, F@_3, TrUserData) ->
+                                   F@_2, F@_3, TrUserData) ->
     dg_read_field_def_simple_response(Other, Z1, Z2, F@_1,
-				      F@_2, F@_3, TrUserData).
+                                      F@_2, F@_3, TrUserData).
 
 dg_read_field_def_simple_response(<<1:1, X:7,
-				    Rest/binary>>,
-				  N, Acc, F@_1, F@_2, F@_3, TrUserData)
-    when N < 32 - 7 ->
+                                    Rest/binary>>,
+                                  N, Acc, F@_1, F@_2, F@_3, TrUserData)
+  when N < 32 - 7 ->
     dg_read_field_def_simple_response(Rest, N + 7,
-				      X bsl N + Acc, F@_1, F@_2, F@_3,
-				      TrUserData);
+                                      X bsl N + Acc, F@_1, F@_2, F@_3,
+                                      TrUserData);
 dg_read_field_def_simple_response(<<0:1, X:7,
-				    Rest/binary>>,
-				  N, Acc, F@_1, F@_2, F@_3, TrUserData) ->
+                                    Rest/binary>>,
+                                  N, Acc, F@_1, F@_2, F@_3, TrUserData) ->
     Key = X bsl N + Acc,
     case Key of
-      10 ->
-	  d_field_simple_response_payload(Rest, 0, 0, F@_1, F@_2,
-					  F@_3, TrUserData);
-      18 ->
-	  d_field_simple_response_username(Rest, 0, 0, F@_1, F@_2,
-					   F@_3, TrUserData);
-      26 ->
-	  d_field_simple_response_oauth_scope(Rest, 0, 0, F@_1,
-					      F@_2, F@_3, TrUserData);
-      _ ->
-	  case Key band 7 of
-	    0 ->
-		skip_varint_simple_response(Rest, 0, 0, F@_1, F@_2,
-					    F@_3, TrUserData);
-	    1 ->
-		skip_64_simple_response(Rest, 0, 0, F@_1, F@_2, F@_3,
-					TrUserData);
-	    2 ->
-		skip_length_delimited_simple_response(Rest, 0, 0, F@_1,
-						      F@_2, F@_3, TrUserData);
-	    3 ->
-		skip_group_simple_response(Rest, Key bsr 3, 0, F@_1,
-					   F@_2, F@_3, TrUserData);
-	    5 ->
-		skip_32_simple_response(Rest, 0, 0, F@_1, F@_2, F@_3,
-					TrUserData)
-	  end
+        10 ->
+            d_field_simple_response_payload(Rest, 0, 0, F@_1, F@_2,
+                                            F@_3, TrUserData);
+        18 ->
+            d_field_simple_response_username(Rest, 0, 0, F@_1, F@_2,
+                                             F@_3, TrUserData);
+        26 ->
+            d_field_simple_response_oauth_scope(Rest, 0, 0, F@_1,
+                                                F@_2, F@_3, TrUserData);
+        _ ->
+            case Key band 7 of
+                0 ->
+                    skip_varint_simple_response(Rest, 0, 0, F@_1, F@_2,
+                                                F@_3, TrUserData);
+                1 ->
+                    skip_64_simple_response(Rest, 0, 0, F@_1, F@_2, F@_3,
+                                            TrUserData);
+                2 ->
+                    skip_length_delimited_simple_response(Rest, 0, 0, F@_1,
+                                                          F@_2, F@_3, TrUserData);
+                3 ->
+                    skip_group_simple_response(Rest, Key bsr 3, 0, F@_1,
+                                               F@_2, F@_3, TrUserData);
+                5 ->
+                    skip_32_simple_response(Rest, 0, 0, F@_1, F@_2, F@_3,
+                                            TrUserData)
+            end
     end;
 dg_read_field_def_simple_response(<<>>, 0, 0, F@_1,
-				  F@_2, F@_3, _) ->
+                                  F@_2, F@_3, _) ->
     S1 = #{username => F@_2, oauth_scope => F@_3},
     if F@_1 == '$undef' -> S1;
        true -> S1#{payload => F@_1}
     end.
 
 d_field_simple_response_payload(<<1:1, X:7,
-				  Rest/binary>>,
-				N, Acc, F@_1, F@_2, F@_3, TrUserData)
-    when N < 57 ->
+                                  Rest/binary>>,
+                                N, Acc, F@_1, F@_2, F@_3, TrUserData)
+  when N < 57 ->
     d_field_simple_response_payload(Rest, N + 7,
-				    X bsl N + Acc, F@_1, F@_2, F@_3,
-				    TrUserData);
+                                    X bsl N + Acc, F@_1, F@_2, F@_3,
+                                    TrUserData);
 d_field_simple_response_payload(<<0:1, X:7,
-				  Rest/binary>>,
-				N, Acc, Prev, F@_2, F@_3, TrUserData) ->
+                                  Rest/binary>>,
+                                N, Acc, Prev, F@_2, F@_3, TrUserData) ->
     {NewFValue, RestF} = begin
-			   Len = X bsl N + Acc,
-			   <<Bs:Len/binary, Rest2/binary>> = Rest,
-			   {id(decode_msg_payload(Bs, TrUserData), TrUserData),
-			    Rest2}
-			 end,
+                             Len = X bsl N + Acc,
+                             <<Bs:Len/binary, Rest2/binary>> = Rest,
+                             {id(decode_msg_payload(Bs, TrUserData), TrUserData),
+                              Rest2}
+                         end,
     dfp_read_field_def_simple_response(RestF, 0, 0,
-				       if Prev == '$undef' -> NewFValue;
-					  true ->
-					      merge_msg_payload(Prev, NewFValue,
-								TrUserData)
-				       end,
-				       F@_2, F@_3, TrUserData).
+                                       if Prev == '$undef' -> NewFValue;
+                                          true ->
+                                               merge_msg_payload(Prev, NewFValue,
+                                                                 TrUserData)
+                                       end,
+                                       F@_2, F@_3, TrUserData).
 
 d_field_simple_response_username(<<1:1, X:7,
-				   Rest/binary>>,
-				 N, Acc, F@_1, F@_2, F@_3, TrUserData)
-    when N < 57 ->
+                                   Rest/binary>>,
+                                 N, Acc, F@_1, F@_2, F@_3, TrUserData)
+  when N < 57 ->
     d_field_simple_response_username(Rest, N + 7,
-				     X bsl N + Acc, F@_1, F@_2, F@_3,
-				     TrUserData);
+                                     X bsl N + Acc, F@_1, F@_2, F@_3,
+                                     TrUserData);
 d_field_simple_response_username(<<0:1, X:7,
-				   Rest/binary>>,
-				 N, Acc, F@_1, _, F@_3, TrUserData) ->
+                                   Rest/binary>>,
+                                 N, Acc, F@_1, _, F@_3, TrUserData) ->
     {NewFValue, RestF} = begin
-			   Len = X bsl N + Acc,
-			   <<Bytes:Len/binary, Rest2/binary>> = Rest,
-			   {id(binary:copy(Bytes), TrUserData), Rest2}
-			 end,
+                             Len = X bsl N + Acc,
+                             <<Bytes:Len/binary, Rest2/binary>> = Rest,
+                             {id(binary:copy(Bytes), TrUserData), Rest2}
+                         end,
     dfp_read_field_def_simple_response(RestF, 0, 0, F@_1,
-				       NewFValue, F@_3, TrUserData).
+                                       NewFValue, F@_3, TrUserData).
 
 d_field_simple_response_oauth_scope(<<1:1, X:7,
-				      Rest/binary>>,
-				    N, Acc, F@_1, F@_2, F@_3, TrUserData)
-    when N < 57 ->
+                                      Rest/binary>>,
+                                    N, Acc, F@_1, F@_2, F@_3, TrUserData)
+  when N < 57 ->
     d_field_simple_response_oauth_scope(Rest, N + 7,
-					X bsl N + Acc, F@_1, F@_2, F@_3,
-					TrUserData);
+                                        X bsl N + Acc, F@_1, F@_2, F@_3,
+                                        TrUserData);
 d_field_simple_response_oauth_scope(<<0:1, X:7,
-				      Rest/binary>>,
-				    N, Acc, F@_1, F@_2, _, TrUserData) ->
+                                      Rest/binary>>,
+                                    N, Acc, F@_1, F@_2, _, TrUserData) ->
     {NewFValue, RestF} = begin
-			   Len = X bsl N + Acc,
-			   <<Bytes:Len/binary, Rest2/binary>> = Rest,
-			   {id(binary:copy(Bytes), TrUserData), Rest2}
-			 end,
+                             Len = X bsl N + Acc,
+                             <<Bytes:Len/binary, Rest2/binary>> = Rest,
+                             {id(binary:copy(Bytes), TrUserData), Rest2}
+                         end,
     dfp_read_field_def_simple_response(RestF, 0, 0, F@_1,
-				       F@_2, NewFValue, TrUserData).
+                                       F@_2, NewFValue, TrUserData).
 
 skip_varint_simple_response(<<1:1, _:7, Rest/binary>>,
-			    Z1, Z2, F@_1, F@_2, F@_3, TrUserData) ->
+                            Z1, Z2, F@_1, F@_2, F@_3, TrUserData) ->
     skip_varint_simple_response(Rest, Z1, Z2, F@_1, F@_2,
-				F@_3, TrUserData);
+                                F@_3, TrUserData);
 skip_varint_simple_response(<<0:1, _:7, Rest/binary>>,
-			    Z1, Z2, F@_1, F@_2, F@_3, TrUserData) ->
+                            Z1, Z2, F@_1, F@_2, F@_3, TrUserData) ->
     dfp_read_field_def_simple_response(Rest, Z1, Z2, F@_1,
-				       F@_2, F@_3, TrUserData).
+                                       F@_2, F@_3, TrUserData).
 
 skip_length_delimited_simple_response(<<1:1, X:7,
-					Rest/binary>>,
-				      N, Acc, F@_1, F@_2, F@_3, TrUserData)
-    when N < 57 ->
+                                        Rest/binary>>,
+                                      N, Acc, F@_1, F@_2, F@_3, TrUserData)
+  when N < 57 ->
     skip_length_delimited_simple_response(Rest, N + 7,
-					  X bsl N + Acc, F@_1, F@_2, F@_3,
-					  TrUserData);
+                                          X bsl N + Acc, F@_1, F@_2, F@_3,
+                                          TrUserData);
 skip_length_delimited_simple_response(<<0:1, X:7,
-					Rest/binary>>,
-				      N, Acc, F@_1, F@_2, F@_3, TrUserData) ->
+                                        Rest/binary>>,
+                                      N, Acc, F@_1, F@_2, F@_3, TrUserData) ->
     Length = X bsl N + Acc,
     <<_:Length/binary, Rest2/binary>> = Rest,
     dfp_read_field_def_simple_response(Rest2, 0, 0, F@_1,
-				       F@_2, F@_3, TrUserData).
+                                       F@_2, F@_3, TrUserData).
 
 skip_group_simple_response(Bin, FNum, Z2, F@_1, F@_2,
-			   F@_3, TrUserData) ->
+                           F@_3, TrUserData) ->
     {_, Rest} = read_group(Bin, FNum),
     dfp_read_field_def_simple_response(Rest, 0, Z2, F@_1,
-				       F@_2, F@_3, TrUserData).
+                                       F@_2, F@_3, TrUserData).
 
 skip_32_simple_response(<<_:32, Rest/binary>>, Z1, Z2,
-			F@_1, F@_2, F@_3, TrUserData) ->
+                        F@_1, F@_2, F@_3, TrUserData) ->
     dfp_read_field_def_simple_response(Rest, Z1, Z2, F@_1,
-				       F@_2, F@_3, TrUserData).
+                                       F@_2, F@_3, TrUserData).
 
 skip_64_simple_response(<<_:64, Rest/binary>>, Z1, Z2,
-			F@_1, F@_2, F@_3, TrUserData) ->
+                        F@_1, F@_2, F@_3, TrUserData) ->
     dfp_read_field_def_simple_response(Rest, Z1, Z2, F@_1,
-				       F@_2, F@_3, TrUserData).
+                                       F@_2, F@_3, TrUserData).
 
 decode_msg_streaming_input_call_request(Bin,
-					TrUserData) ->
+                                        TrUserData) ->
     dfp_read_field_def_streaming_input_call_request(Bin, 0,
-						    0, id('$undef', TrUserData),
-						    id('$undef', TrUserData),
-						    TrUserData).
+                                                    0, id('$undef', TrUserData),
+                                                    id('$undef', TrUserData),
+                                                    TrUserData).
 
 dfp_read_field_def_streaming_input_call_request(<<10,
-						  Rest/binary>>,
-						Z1, Z2, F@_1, F@_2,
-						TrUserData) ->
+                                                  Rest/binary>>,
+                                                Z1, Z2, F@_1, F@_2,
+                                                TrUserData) ->
     d_field_streaming_input_call_request_payload(Rest, Z1,
-						 Z2, F@_1, F@_2, TrUserData);
+                                                 Z2, F@_1, F@_2, TrUserData);
 dfp_read_field_def_streaming_input_call_request(<<18,
-						  Rest/binary>>,
-						Z1, Z2, F@_1, F@_2,
-						TrUserData) ->
+                                                  Rest/binary>>,
+                                                Z1, Z2, F@_1, F@_2,
+                                                TrUserData) ->
     d_field_streaming_input_call_request_expect_compressed(Rest,
-							   Z1, Z2, F@_1, F@_2,
-							   TrUserData);
+                                                           Z1, Z2, F@_1, F@_2,
+                                                           TrUserData);
 dfp_read_field_def_streaming_input_call_request(<<>>, 0,
-						0, F@_1, F@_2, _) ->
+                                                0, F@_1, F@_2, _) ->
     S1 = #{},
     S2 = if F@_1 == '$undef' -> S1;
-	    true -> S1#{payload => F@_1}
-	 end,
+            true -> S1#{payload => F@_1}
+         end,
     if F@_2 == '$undef' -> S2;
        true -> S2#{expect_compressed => F@_2}
     end;
 dfp_read_field_def_streaming_input_call_request(Other,
-						Z1, Z2, F@_1, F@_2,
-						TrUserData) ->
+                                                Z1, Z2, F@_1, F@_2,
+                                                TrUserData) ->
     dg_read_field_def_streaming_input_call_request(Other,
-						   Z1, Z2, F@_1, F@_2,
-						   TrUserData).
+                                                   Z1, Z2, F@_1, F@_2,
+                                                   TrUserData).
 
 dg_read_field_def_streaming_input_call_request(<<1:1,
-						 X:7, Rest/binary>>,
-					       N, Acc, F@_1, F@_2, TrUserData)
-    when N < 32 - 7 ->
+                                                 X:7, Rest/binary>>,
+                                               N, Acc, F@_1, F@_2, TrUserData)
+  when N < 32 - 7 ->
     dg_read_field_def_streaming_input_call_request(Rest,
-						   N + 7, X bsl N + Acc, F@_1,
-						   F@_2, TrUserData);
+                                                   N + 7, X bsl N + Acc, F@_1,
+                                                   F@_2, TrUserData);
 dg_read_field_def_streaming_input_call_request(<<0:1,
-						 X:7, Rest/binary>>,
-					       N, Acc, F@_1, F@_2,
-					       TrUserData) ->
+                                                 X:7, Rest/binary>>,
+                                               N, Acc, F@_1, F@_2,
+                                               TrUserData) ->
     Key = X bsl N + Acc,
     case Key of
-      10 ->
-	  d_field_streaming_input_call_request_payload(Rest, 0, 0,
-						       F@_1, F@_2, TrUserData);
-      18 ->
-	  d_field_streaming_input_call_request_expect_compressed(Rest,
-								 0, 0, F@_1,
-								 F@_2,
-								 TrUserData);
-      _ ->
-	  case Key band 7 of
-	    0 ->
-		skip_varint_streaming_input_call_request(Rest, 0, 0,
-							 F@_1, F@_2,
-							 TrUserData);
-	    1 ->
-		skip_64_streaming_input_call_request(Rest, 0, 0, F@_1,
-						     F@_2, TrUserData);
-	    2 ->
-		skip_length_delimited_streaming_input_call_request(Rest,
-								   0, 0, F@_1,
-								   F@_2,
-								   TrUserData);
-	    3 ->
-		skip_group_streaming_input_call_request(Rest, Key bsr 3,
-							0, F@_1, F@_2,
-							TrUserData);
-	    5 ->
-		skip_32_streaming_input_call_request(Rest, 0, 0, F@_1,
-						     F@_2, TrUserData)
-	  end
+        10 ->
+            d_field_streaming_input_call_request_payload(Rest, 0, 0,
+                                                         F@_1, F@_2, TrUserData);
+        18 ->
+            d_field_streaming_input_call_request_expect_compressed(Rest,
+                                                                   0, 0, F@_1,
+                                                                   F@_2,
+                                                                   TrUserData);
+        _ ->
+            case Key band 7 of
+                0 ->
+                    skip_varint_streaming_input_call_request(Rest, 0, 0,
+                                                             F@_1, F@_2,
+                                                             TrUserData);
+                1 ->
+                    skip_64_streaming_input_call_request(Rest, 0, 0, F@_1,
+                                                         F@_2, TrUserData);
+                2 ->
+                    skip_length_delimited_streaming_input_call_request(Rest,
+                                                                       0, 0, F@_1,
+                                                                       F@_2,
+                                                                       TrUserData);
+                3 ->
+                    skip_group_streaming_input_call_request(Rest, Key bsr 3,
+                                                            0, F@_1, F@_2,
+                                                            TrUserData);
+                5 ->
+                    skip_32_streaming_input_call_request(Rest, 0, 0, F@_1,
+                                                         F@_2, TrUserData)
+            end
     end;
 dg_read_field_def_streaming_input_call_request(<<>>, 0,
-					       0, F@_1, F@_2, _) ->
+                                               0, F@_1, F@_2, _) ->
     S1 = #{},
     S2 = if F@_1 == '$undef' -> S1;
-	    true -> S1#{payload => F@_1}
-	 end,
+            true -> S1#{payload => F@_1}
+         end,
     if F@_2 == '$undef' -> S2;
        true -> S2#{expect_compressed => F@_2}
     end.
 
 d_field_streaming_input_call_request_payload(<<1:1, X:7,
-					       Rest/binary>>,
-					     N, Acc, F@_1, F@_2, TrUserData)
-    when N < 57 ->
+                                               Rest/binary>>,
+                                             N, Acc, F@_1, F@_2, TrUserData)
+  when N < 57 ->
     d_field_streaming_input_call_request_payload(Rest,
-						 N + 7, X bsl N + Acc, F@_1,
-						 F@_2, TrUserData);
+                                                 N + 7, X bsl N + Acc, F@_1,
+                                                 F@_2, TrUserData);
 d_field_streaming_input_call_request_payload(<<0:1, X:7,
-					       Rest/binary>>,
-					     N, Acc, Prev, F@_2, TrUserData) ->
+                                               Rest/binary>>,
+                                             N, Acc, Prev, F@_2, TrUserData) ->
     {NewFValue, RestF} = begin
-			   Len = X bsl N + Acc,
-			   <<Bs:Len/binary, Rest2/binary>> = Rest,
-			   {id(decode_msg_payload(Bs, TrUserData), TrUserData),
-			    Rest2}
-			 end,
+                             Len = X bsl N + Acc,
+                             <<Bs:Len/binary, Rest2/binary>> = Rest,
+                             {id(decode_msg_payload(Bs, TrUserData), TrUserData),
+                              Rest2}
+                         end,
     dfp_read_field_def_streaming_input_call_request(RestF,
-						    0, 0,
-						    if Prev == '$undef' ->
-							   NewFValue;
-						       true ->
-							   merge_msg_payload(Prev,
-									     NewFValue,
-									     TrUserData)
-						    end,
-						    F@_2, TrUserData).
+                                                    0, 0,
+                                                    if Prev == '$undef' ->
+                                                            NewFValue;
+                                                       true ->
+                                                            merge_msg_payload(Prev,
+                                                                              NewFValue,
+                                                                              TrUserData)
+                                                    end,
+                                                    F@_2, TrUserData).
 
 d_field_streaming_input_call_request_expect_compressed(<<1:1,
-							 X:7, Rest/binary>>,
-						       N, Acc, F@_1, F@_2,
-						       TrUserData)
-    when N < 57 ->
+                                                         X:7, Rest/binary>>,
+                                                       N, Acc, F@_1, F@_2,
+                                                       TrUserData)
+  when N < 57 ->
     d_field_streaming_input_call_request_expect_compressed(Rest,
-							   N + 7, X bsl N + Acc,
-							   F@_1, F@_2,
-							   TrUserData);
+                                                           N + 7, X bsl N + Acc,
+                                                           F@_1, F@_2,
+                                                           TrUserData);
 d_field_streaming_input_call_request_expect_compressed(<<0:1,
-							 X:7, Rest/binary>>,
-						       N, Acc, F@_1, Prev,
-						       TrUserData) ->
+                                                         X:7, Rest/binary>>,
+                                                       N, Acc, F@_1, Prev,
+                                                       TrUserData) ->
     {NewFValue, RestF} = begin
-			   Len = X bsl N + Acc,
-			   <<Bs:Len/binary, Rest2/binary>> = Rest,
-			   {id(decode_msg_bool_value(Bs, TrUserData),
-			       TrUserData),
-			    Rest2}
-			 end,
+                             Len = X bsl N + Acc,
+                             <<Bs:Len/binary, Rest2/binary>> = Rest,
+                             {id(decode_msg_bool_value(Bs, TrUserData),
+                                 TrUserData),
+                              Rest2}
+                         end,
     dfp_read_field_def_streaming_input_call_request(RestF,
-						    0, 0, F@_1,
-						    if Prev == '$undef' ->
-							   NewFValue;
-						       true ->
-							   merge_msg_bool_value(Prev,
-										NewFValue,
-										TrUserData)
-						    end,
-						    TrUserData).
+                                                    0, 0, F@_1,
+                                                    if Prev == '$undef' ->
+                                                            NewFValue;
+                                                       true ->
+                                                            merge_msg_bool_value(Prev,
+                                                                                 NewFValue,
+                                                                                 TrUserData)
+                                                    end,
+                                                    TrUserData).
 
 skip_varint_streaming_input_call_request(<<1:1, _:7,
-					   Rest/binary>>,
-					 Z1, Z2, F@_1, F@_2, TrUserData) ->
+                                           Rest/binary>>,
+                                         Z1, Z2, F@_1, F@_2, TrUserData) ->
     skip_varint_streaming_input_call_request(Rest, Z1, Z2,
-					     F@_1, F@_2, TrUserData);
+                                             F@_1, F@_2, TrUserData);
 skip_varint_streaming_input_call_request(<<0:1, _:7,
-					   Rest/binary>>,
-					 Z1, Z2, F@_1, F@_2, TrUserData) ->
+                                           Rest/binary>>,
+                                         Z1, Z2, F@_1, F@_2, TrUserData) ->
     dfp_read_field_def_streaming_input_call_request(Rest,
-						    Z1, Z2, F@_1, F@_2,
-						    TrUserData).
+                                                    Z1, Z2, F@_1, F@_2,
+                                                    TrUserData).
 
 skip_length_delimited_streaming_input_call_request(<<1:1,
-						     X:7, Rest/binary>>,
-						   N, Acc, F@_1, F@_2,
-						   TrUserData)
-    when N < 57 ->
+                                                     X:7, Rest/binary>>,
+                                                   N, Acc, F@_1, F@_2,
+                                                   TrUserData)
+  when N < 57 ->
     skip_length_delimited_streaming_input_call_request(Rest,
-						       N + 7, X bsl N + Acc,
-						       F@_1, F@_2, TrUserData);
+                                                       N + 7, X bsl N + Acc,
+                                                       F@_1, F@_2, TrUserData);
 skip_length_delimited_streaming_input_call_request(<<0:1,
-						     X:7, Rest/binary>>,
-						   N, Acc, F@_1, F@_2,
-						   TrUserData) ->
+                                                     X:7, Rest/binary>>,
+                                                   N, Acc, F@_1, F@_2,
+                                                   TrUserData) ->
     Length = X bsl N + Acc,
     <<_:Length/binary, Rest2/binary>> = Rest,
     dfp_read_field_def_streaming_input_call_request(Rest2,
-						    0, 0, F@_1, F@_2,
-						    TrUserData).
+                                                    0, 0, F@_1, F@_2,
+                                                    TrUserData).
 
 skip_group_streaming_input_call_request(Bin, FNum, Z2,
-					F@_1, F@_2, TrUserData) ->
+                                        F@_1, F@_2, TrUserData) ->
     {_, Rest} = read_group(Bin, FNum),
     dfp_read_field_def_streaming_input_call_request(Rest, 0,
-						    Z2, F@_1, F@_2, TrUserData).
+                                                    Z2, F@_1, F@_2, TrUserData).
 
 skip_32_streaming_input_call_request(<<_:32,
-				       Rest/binary>>,
-				     Z1, Z2, F@_1, F@_2, TrUserData) ->
+                                       Rest/binary>>,
+                                     Z1, Z2, F@_1, F@_2, TrUserData) ->
     dfp_read_field_def_streaming_input_call_request(Rest,
-						    Z1, Z2, F@_1, F@_2,
-						    TrUserData).
+                                                    Z1, Z2, F@_1, F@_2,
+                                                    TrUserData).
 
 skip_64_streaming_input_call_request(<<_:64,
-				       Rest/binary>>,
-				     Z1, Z2, F@_1, F@_2, TrUserData) ->
+                                       Rest/binary>>,
+                                     Z1, Z2, F@_1, F@_2, TrUserData) ->
     dfp_read_field_def_streaming_input_call_request(Rest,
-						    Z1, Z2, F@_1, F@_2,
-						    TrUserData).
+                                                    Z1, Z2, F@_1, F@_2,
+                                                    TrUserData).
 
 decode_msg_streaming_input_call_response(Bin,
-					 TrUserData) ->
+                                         TrUserData) ->
     dfp_read_field_def_streaming_input_call_response(Bin, 0,
-						     0, id(0, TrUserData),
-						     TrUserData).
+                                                     0, id(0, TrUserData),
+                                                     TrUserData).
 
 dfp_read_field_def_streaming_input_call_response(<<8,
-						   Rest/binary>>,
-						 Z1, Z2, F@_1, TrUserData) ->
+                                                   Rest/binary>>,
+                                                 Z1, Z2, F@_1, TrUserData) ->
     d_field_streaming_input_call_response_aggregated_payload_size(Rest,
-								  Z1, Z2, F@_1,
-								  TrUserData);
+                                                                  Z1, Z2, F@_1,
+                                                                  TrUserData);
 dfp_read_field_def_streaming_input_call_response(<<>>,
-						 0, 0, F@_1, _) ->
+                                                 0, 0, F@_1, _) ->
     #{aggregated_payload_size => F@_1};
 dfp_read_field_def_streaming_input_call_response(Other,
-						 Z1, Z2, F@_1, TrUserData) ->
+                                                 Z1, Z2, F@_1, TrUserData) ->
     dg_read_field_def_streaming_input_call_response(Other,
-						    Z1, Z2, F@_1, TrUserData).
+                                                    Z1, Z2, F@_1, TrUserData).
 
 dg_read_field_def_streaming_input_call_response(<<1:1,
-						  X:7, Rest/binary>>,
-						N, Acc, F@_1, TrUserData)
-    when N < 32 - 7 ->
+                                                  X:7, Rest/binary>>,
+                                                N, Acc, F@_1, TrUserData)
+  when N < 32 - 7 ->
     dg_read_field_def_streaming_input_call_response(Rest,
-						    N + 7, X bsl N + Acc, F@_1,
-						    TrUserData);
+                                                    N + 7, X bsl N + Acc, F@_1,
+                                                    TrUserData);
 dg_read_field_def_streaming_input_call_response(<<0:1,
-						  X:7, Rest/binary>>,
-						N, Acc, F@_1, TrUserData) ->
+                                                  X:7, Rest/binary>>,
+                                                N, Acc, F@_1, TrUserData) ->
     Key = X bsl N + Acc,
     case Key of
-      8 ->
-	  d_field_streaming_input_call_response_aggregated_payload_size(Rest,
-									0, 0,
-									F@_1,
-									TrUserData);
-      _ ->
-	  case Key band 7 of
-	    0 ->
-		skip_varint_streaming_input_call_response(Rest, 0, 0,
-							  F@_1, TrUserData);
-	    1 ->
-		skip_64_streaming_input_call_response(Rest, 0, 0, F@_1,
-						      TrUserData);
-	    2 ->
-		skip_length_delimited_streaming_input_call_response(Rest,
-								    0, 0, F@_1,
-								    TrUserData);
-	    3 ->
-		skip_group_streaming_input_call_response(Rest,
-							 Key bsr 3, 0, F@_1,
-							 TrUserData);
-	    5 ->
-		skip_32_streaming_input_call_response(Rest, 0, 0, F@_1,
-						      TrUserData)
-	  end
+        8 ->
+            d_field_streaming_input_call_response_aggregated_payload_size(Rest,
+                                                                          0, 0,
+                                                                          F@_1,
+                                                                          TrUserData);
+        _ ->
+            case Key band 7 of
+                0 ->
+                    skip_varint_streaming_input_call_response(Rest, 0, 0,
+                                                              F@_1, TrUserData);
+                1 ->
+                    skip_64_streaming_input_call_response(Rest, 0, 0, F@_1,
+                                                          TrUserData);
+                2 ->
+                    skip_length_delimited_streaming_input_call_response(Rest,
+                                                                        0, 0, F@_1,
+                                                                        TrUserData);
+                3 ->
+                    skip_group_streaming_input_call_response(Rest,
+                                                             Key bsr 3, 0, F@_1,
+                                                             TrUserData);
+                5 ->
+                    skip_32_streaming_input_call_response(Rest, 0, 0, F@_1,
+                                                          TrUserData)
+            end
     end;
 dg_read_field_def_streaming_input_call_response(<<>>, 0,
-						0, F@_1, _) ->
+                                                0, F@_1, _) ->
     #{aggregated_payload_size => F@_1}.
 
 d_field_streaming_input_call_response_aggregated_payload_size(<<1:1,
-								X:7,
-								Rest/binary>>,
-							      N, Acc, F@_1,
-							      TrUserData)
-    when N < 57 ->
+                                                                X:7,
+                                                                Rest/binary>>,
+                                                              N, Acc, F@_1,
+                                                              TrUserData)
+  when N < 57 ->
     d_field_streaming_input_call_response_aggregated_payload_size(Rest,
-								  N + 7,
-								  X bsl N + Acc,
-								  F@_1,
-								  TrUserData);
+                                                                  N + 7,
+                                                                  X bsl N + Acc,
+                                                                  F@_1,
+                                                                  TrUserData);
 d_field_streaming_input_call_response_aggregated_payload_size(<<0:1,
-								X:7,
-								Rest/binary>>,
-							      N, Acc, _,
-							      TrUserData) ->
+                                                                X:7,
+                                                                Rest/binary>>,
+                                                              N, Acc, _,
+                                                              TrUserData) ->
     {NewFValue, RestF} = {begin
-			    <<Res:32/signed-native>> = <<(X bsl N +
-							    Acc):32/unsigned-native>>,
-			    id(Res, TrUserData)
-			  end,
-			  Rest},
+                              <<Res:32/signed-native>> = <<(X bsl N +
+                                                                Acc):32/unsigned-native>>,
+                              id(Res, TrUserData)
+                          end,
+                          Rest},
     dfp_read_field_def_streaming_input_call_response(RestF,
-						     0, 0, NewFValue,
-						     TrUserData).
+                                                     0, 0, NewFValue,
+                                                     TrUserData).
 
 skip_varint_streaming_input_call_response(<<1:1, _:7,
-					    Rest/binary>>,
-					  Z1, Z2, F@_1, TrUserData) ->
+                                            Rest/binary>>,
+                                          Z1, Z2, F@_1, TrUserData) ->
     skip_varint_streaming_input_call_response(Rest, Z1, Z2,
-					      F@_1, TrUserData);
+                                              F@_1, TrUserData);
 skip_varint_streaming_input_call_response(<<0:1, _:7,
-					    Rest/binary>>,
-					  Z1, Z2, F@_1, TrUserData) ->
+                                            Rest/binary>>,
+                                          Z1, Z2, F@_1, TrUserData) ->
     dfp_read_field_def_streaming_input_call_response(Rest,
-						     Z1, Z2, F@_1, TrUserData).
+                                                     Z1, Z2, F@_1, TrUserData).
 
 skip_length_delimited_streaming_input_call_response(<<1:1,
-						      X:7, Rest/binary>>,
-						    N, Acc, F@_1, TrUserData)
-    when N < 57 ->
+                                                      X:7, Rest/binary>>,
+                                                    N, Acc, F@_1, TrUserData)
+  when N < 57 ->
     skip_length_delimited_streaming_input_call_response(Rest,
-							N + 7, X bsl N + Acc,
-							F@_1, TrUserData);
+                                                        N + 7, X bsl N + Acc,
+                                                        F@_1, TrUserData);
 skip_length_delimited_streaming_input_call_response(<<0:1,
-						      X:7, Rest/binary>>,
-						    N, Acc, F@_1, TrUserData) ->
+                                                      X:7, Rest/binary>>,
+                                                    N, Acc, F@_1, TrUserData) ->
     Length = X bsl N + Acc,
     <<_:Length/binary, Rest2/binary>> = Rest,
     dfp_read_field_def_streaming_input_call_response(Rest2,
-						     0, 0, F@_1, TrUserData).
+                                                     0, 0, F@_1, TrUserData).
 
 skip_group_streaming_input_call_response(Bin, FNum, Z2,
-					 F@_1, TrUserData) ->
+                                         F@_1, TrUserData) ->
     {_, Rest} = read_group(Bin, FNum),
     dfp_read_field_def_streaming_input_call_response(Rest,
-						     0, Z2, F@_1, TrUserData).
+                                                     0, Z2, F@_1, TrUserData).
 
 skip_32_streaming_input_call_response(<<_:32,
-					Rest/binary>>,
-				      Z1, Z2, F@_1, TrUserData) ->
+                                        Rest/binary>>,
+                                      Z1, Z2, F@_1, TrUserData) ->
     dfp_read_field_def_streaming_input_call_response(Rest,
-						     Z1, Z2, F@_1, TrUserData).
+                                                     Z1, Z2, F@_1, TrUserData).
 
 skip_64_streaming_input_call_response(<<_:64,
-					Rest/binary>>,
-				      Z1, Z2, F@_1, TrUserData) ->
+                                        Rest/binary>>,
+                                      Z1, Z2, F@_1, TrUserData) ->
     dfp_read_field_def_streaming_input_call_response(Rest,
-						     Z1, Z2, F@_1, TrUserData).
+                                                     Z1, Z2, F@_1, TrUserData).
 
 decode_msg_response_parameters(Bin, TrUserData) ->
     dfp_read_field_def_response_parameters(Bin, 0, 0,
-					   id(0, TrUserData), id(0, TrUserData),
-					   id('$undef', TrUserData),
-					   TrUserData).
+                                           id(0, TrUserData), id(0, TrUserData),
+                                           id('$undef', TrUserData),
+                                           TrUserData).
 
 dfp_read_field_def_response_parameters(<<8,
-					 Rest/binary>>,
-				       Z1, Z2, F@_1, F@_2, F@_3, TrUserData) ->
+                                         Rest/binary>>,
+                                       Z1, Z2, F@_1, F@_2, F@_3, TrUserData) ->
     d_field_response_parameters_size(Rest, Z1, Z2, F@_1,
-				     F@_2, F@_3, TrUserData);
+                                     F@_2, F@_3, TrUserData);
 dfp_read_field_def_response_parameters(<<16,
-					 Rest/binary>>,
-				       Z1, Z2, F@_1, F@_2, F@_3, TrUserData) ->
+                                         Rest/binary>>,
+                                       Z1, Z2, F@_1, F@_2, F@_3, TrUserData) ->
     d_field_response_parameters_interval_us(Rest, Z1, Z2,
-					    F@_1, F@_2, F@_3, TrUserData);
+                                            F@_1, F@_2, F@_3, TrUserData);
 dfp_read_field_def_response_parameters(<<26,
-					 Rest/binary>>,
-				       Z1, Z2, F@_1, F@_2, F@_3, TrUserData) ->
+                                         Rest/binary>>,
+                                       Z1, Z2, F@_1, F@_2, F@_3, TrUserData) ->
     d_field_response_parameters_compressed(Rest, Z1, Z2,
-					   F@_1, F@_2, F@_3, TrUserData);
+                                           F@_1, F@_2, F@_3, TrUserData);
 dfp_read_field_def_response_parameters(<<>>, 0, 0, F@_1,
-				       F@_2, F@_3, _) ->
+                                       F@_2, F@_3, _) ->
     S1 = #{size => F@_1, interval_us => F@_2},
     if F@_3 == '$undef' -> S1;
        true -> S1#{compressed => F@_3}
     end;
 dfp_read_field_def_response_parameters(Other, Z1, Z2,
-				       F@_1, F@_2, F@_3, TrUserData) ->
+                                       F@_1, F@_2, F@_3, TrUserData) ->
     dg_read_field_def_response_parameters(Other, Z1, Z2,
-					  F@_1, F@_2, F@_3, TrUserData).
+                                          F@_1, F@_2, F@_3, TrUserData).
 
 dg_read_field_def_response_parameters(<<1:1, X:7,
-					Rest/binary>>,
-				      N, Acc, F@_1, F@_2, F@_3, TrUserData)
-    when N < 32 - 7 ->
+                                        Rest/binary>>,
+                                      N, Acc, F@_1, F@_2, F@_3, TrUserData)
+  when N < 32 - 7 ->
     dg_read_field_def_response_parameters(Rest, N + 7,
-					  X bsl N + Acc, F@_1, F@_2, F@_3,
-					  TrUserData);
+                                          X bsl N + Acc, F@_1, F@_2, F@_3,
+                                          TrUserData);
 dg_read_field_def_response_parameters(<<0:1, X:7,
-					Rest/binary>>,
-				      N, Acc, F@_1, F@_2, F@_3, TrUserData) ->
+                                        Rest/binary>>,
+                                      N, Acc, F@_1, F@_2, F@_3, TrUserData) ->
     Key = X bsl N + Acc,
     case Key of
-      8 ->
-	  d_field_response_parameters_size(Rest, 0, 0, F@_1, F@_2,
-					   F@_3, TrUserData);
-      16 ->
-	  d_field_response_parameters_interval_us(Rest, 0, 0,
-						  F@_1, F@_2, F@_3, TrUserData);
-      26 ->
-	  d_field_response_parameters_compressed(Rest, 0, 0, F@_1,
-						 F@_2, F@_3, TrUserData);
-      _ ->
-	  case Key band 7 of
-	    0 ->
-		skip_varint_response_parameters(Rest, 0, 0, F@_1, F@_2,
-						F@_3, TrUserData);
-	    1 ->
-		skip_64_response_parameters(Rest, 0, 0, F@_1, F@_2,
-					    F@_3, TrUserData);
-	    2 ->
-		skip_length_delimited_response_parameters(Rest, 0, 0,
-							  F@_1, F@_2, F@_3,
-							  TrUserData);
-	    3 ->
-		skip_group_response_parameters(Rest, Key bsr 3, 0, F@_1,
-					       F@_2, F@_3, TrUserData);
-	    5 ->
-		skip_32_response_parameters(Rest, 0, 0, F@_1, F@_2,
-					    F@_3, TrUserData)
-	  end
+        8 ->
+            d_field_response_parameters_size(Rest, 0, 0, F@_1, F@_2,
+                                             F@_3, TrUserData);
+        16 ->
+            d_field_response_parameters_interval_us(Rest, 0, 0,
+                                                    F@_1, F@_2, F@_3, TrUserData);
+        26 ->
+            d_field_response_parameters_compressed(Rest, 0, 0, F@_1,
+                                                   F@_2, F@_3, TrUserData);
+        _ ->
+            case Key band 7 of
+                0 ->
+                    skip_varint_response_parameters(Rest, 0, 0, F@_1, F@_2,
+                                                    F@_3, TrUserData);
+                1 ->
+                    skip_64_response_parameters(Rest, 0, 0, F@_1, F@_2,
+                                                F@_3, TrUserData);
+                2 ->
+                    skip_length_delimited_response_parameters(Rest, 0, 0,
+                                                              F@_1, F@_2, F@_3,
+                                                              TrUserData);
+                3 ->
+                    skip_group_response_parameters(Rest, Key bsr 3, 0, F@_1,
+                                                   F@_2, F@_3, TrUserData);
+                5 ->
+                    skip_32_response_parameters(Rest, 0, 0, F@_1, F@_2,
+                                                F@_3, TrUserData)
+            end
     end;
 dg_read_field_def_response_parameters(<<>>, 0, 0, F@_1,
-				      F@_2, F@_3, _) ->
+                                      F@_2, F@_3, _) ->
     S1 = #{size => F@_1, interval_us => F@_2},
     if F@_3 == '$undef' -> S1;
        true -> S1#{compressed => F@_3}
     end.
 
 d_field_response_parameters_size(<<1:1, X:7,
-				   Rest/binary>>,
-				 N, Acc, F@_1, F@_2, F@_3, TrUserData)
-    when N < 57 ->
+                                   Rest/binary>>,
+                                 N, Acc, F@_1, F@_2, F@_3, TrUserData)
+  when N < 57 ->
     d_field_response_parameters_size(Rest, N + 7,
-				     X bsl N + Acc, F@_1, F@_2, F@_3,
-				     TrUserData);
+                                     X bsl N + Acc, F@_1, F@_2, F@_3,
+                                     TrUserData);
 d_field_response_parameters_size(<<0:1, X:7,
-				   Rest/binary>>,
-				 N, Acc, _, F@_2, F@_3, TrUserData) ->
+                                   Rest/binary>>,
+                                 N, Acc, _, F@_2, F@_3, TrUserData) ->
     {NewFValue, RestF} = {begin
-			    <<Res:32/signed-native>> = <<(X bsl N +
-							    Acc):32/unsigned-native>>,
-			    id(Res, TrUserData)
-			  end,
-			  Rest},
+                              <<Res:32/signed-native>> = <<(X bsl N +
+                                                                Acc):32/unsigned-native>>,
+                              id(Res, TrUserData)
+                          end,
+                          Rest},
     dfp_read_field_def_response_parameters(RestF, 0, 0,
-					   NewFValue, F@_2, F@_3, TrUserData).
+                                           NewFValue, F@_2, F@_3, TrUserData).
 
 d_field_response_parameters_interval_us(<<1:1, X:7,
-					  Rest/binary>>,
-					N, Acc, F@_1, F@_2, F@_3, TrUserData)
-    when N < 57 ->
+                                          Rest/binary>>,
+                                        N, Acc, F@_1, F@_2, F@_3, TrUserData)
+  when N < 57 ->
     d_field_response_parameters_interval_us(Rest, N + 7,
-					    X bsl N + Acc, F@_1, F@_2, F@_3,
-					    TrUserData);
+                                            X bsl N + Acc, F@_1, F@_2, F@_3,
+                                            TrUserData);
 d_field_response_parameters_interval_us(<<0:1, X:7,
-					  Rest/binary>>,
-					N, Acc, F@_1, _, F@_3, TrUserData) ->
+                                          Rest/binary>>,
+                                        N, Acc, F@_1, _, F@_3, TrUserData) ->
     {NewFValue, RestF} = {begin
-			    <<Res:32/signed-native>> = <<(X bsl N +
-							    Acc):32/unsigned-native>>,
-			    id(Res, TrUserData)
-			  end,
-			  Rest},
+                              <<Res:32/signed-native>> = <<(X bsl N +
+                                                                Acc):32/unsigned-native>>,
+                              id(Res, TrUserData)
+                          end,
+                          Rest},
     dfp_read_field_def_response_parameters(RestF, 0, 0,
-					   F@_1, NewFValue, F@_3, TrUserData).
+                                           F@_1, NewFValue, F@_3, TrUserData).
 
 d_field_response_parameters_compressed(<<1:1, X:7,
-					 Rest/binary>>,
-				       N, Acc, F@_1, F@_2, F@_3, TrUserData)
-    when N < 57 ->
+                                         Rest/binary>>,
+                                       N, Acc, F@_1, F@_2, F@_3, TrUserData)
+  when N < 57 ->
     d_field_response_parameters_compressed(Rest, N + 7,
-					   X bsl N + Acc, F@_1, F@_2, F@_3,
-					   TrUserData);
+                                           X bsl N + Acc, F@_1, F@_2, F@_3,
+                                           TrUserData);
 d_field_response_parameters_compressed(<<0:1, X:7,
-					 Rest/binary>>,
-				       N, Acc, F@_1, F@_2, Prev, TrUserData) ->
+                                         Rest/binary>>,
+                                       N, Acc, F@_1, F@_2, Prev, TrUserData) ->
     {NewFValue, RestF} = begin
-			   Len = X bsl N + Acc,
-			   <<Bs:Len/binary, Rest2/binary>> = Rest,
-			   {id(decode_msg_bool_value(Bs, TrUserData),
-			       TrUserData),
-			    Rest2}
-			 end,
+                             Len = X bsl N + Acc,
+                             <<Bs:Len/binary, Rest2/binary>> = Rest,
+                             {id(decode_msg_bool_value(Bs, TrUserData),
+                                 TrUserData),
+                              Rest2}
+                         end,
     dfp_read_field_def_response_parameters(RestF, 0, 0,
-					   F@_1, F@_2,
-					   if Prev == '$undef' -> NewFValue;
-					      true ->
-						  merge_msg_bool_value(Prev,
-								       NewFValue,
-								       TrUserData)
-					   end,
-					   TrUserData).
+                                           F@_1, F@_2,
+                                           if Prev == '$undef' -> NewFValue;
+                                              true ->
+                                                   merge_msg_bool_value(Prev,
+                                                                        NewFValue,
+                                                                        TrUserData)
+                                           end,
+                                           TrUserData).
 
 skip_varint_response_parameters(<<1:1, _:7,
-				  Rest/binary>>,
-				Z1, Z2, F@_1, F@_2, F@_3, TrUserData) ->
+                                  Rest/binary>>,
+                                Z1, Z2, F@_1, F@_2, F@_3, TrUserData) ->
     skip_varint_response_parameters(Rest, Z1, Z2, F@_1,
-				    F@_2, F@_3, TrUserData);
+                                    F@_2, F@_3, TrUserData);
 skip_varint_response_parameters(<<0:1, _:7,
-				  Rest/binary>>,
-				Z1, Z2, F@_1, F@_2, F@_3, TrUserData) ->
+                                  Rest/binary>>,
+                                Z1, Z2, F@_1, F@_2, F@_3, TrUserData) ->
     dfp_read_field_def_response_parameters(Rest, Z1, Z2,
-					   F@_1, F@_2, F@_3, TrUserData).
+                                           F@_1, F@_2, F@_3, TrUserData).
 
 skip_length_delimited_response_parameters(<<1:1, X:7,
-					    Rest/binary>>,
-					  N, Acc, F@_1, F@_2, F@_3, TrUserData)
-    when N < 57 ->
+                                            Rest/binary>>,
+                                          N, Acc, F@_1, F@_2, F@_3, TrUserData)
+  when N < 57 ->
     skip_length_delimited_response_parameters(Rest, N + 7,
-					      X bsl N + Acc, F@_1, F@_2, F@_3,
-					      TrUserData);
+                                              X bsl N + Acc, F@_1, F@_2, F@_3,
+                                              TrUserData);
 skip_length_delimited_response_parameters(<<0:1, X:7,
-					    Rest/binary>>,
-					  N, Acc, F@_1, F@_2, F@_3,
-					  TrUserData) ->
+                                            Rest/binary>>,
+                                          N, Acc, F@_1, F@_2, F@_3,
+                                          TrUserData) ->
     Length = X bsl N + Acc,
     <<_:Length/binary, Rest2/binary>> = Rest,
     dfp_read_field_def_response_parameters(Rest2, 0, 0,
-					   F@_1, F@_2, F@_3, TrUserData).
+                                           F@_1, F@_2, F@_3, TrUserData).
 
 skip_group_response_parameters(Bin, FNum, Z2, F@_1,
-			       F@_2, F@_3, TrUserData) ->
+                               F@_2, F@_3, TrUserData) ->
     {_, Rest} = read_group(Bin, FNum),
     dfp_read_field_def_response_parameters(Rest, 0, Z2,
-					   F@_1, F@_2, F@_3, TrUserData).
+                                           F@_1, F@_2, F@_3, TrUserData).
 
 skip_32_response_parameters(<<_:32, Rest/binary>>, Z1,
-			    Z2, F@_1, F@_2, F@_3, TrUserData) ->
+                            Z2, F@_1, F@_2, F@_3, TrUserData) ->
     dfp_read_field_def_response_parameters(Rest, Z1, Z2,
-					   F@_1, F@_2, F@_3, TrUserData).
+                                           F@_1, F@_2, F@_3, TrUserData).
 
 skip_64_response_parameters(<<_:64, Rest/binary>>, Z1,
-			    Z2, F@_1, F@_2, F@_3, TrUserData) ->
+                            Z2, F@_1, F@_2, F@_3, TrUserData) ->
     dfp_read_field_def_response_parameters(Rest, Z1, Z2,
-					   F@_1, F@_2, F@_3, TrUserData).
+                                           F@_1, F@_2, F@_3, TrUserData).
 
 decode_msg_streaming_output_call_request(Bin,
-					 TrUserData) ->
+                                         TrUserData) ->
     dfp_read_field_def_streaming_output_call_request(Bin, 0,
-						     0,
-						     id('COMPRESSABLE',
-							TrUserData),
-						     id([], TrUserData),
-						     id('$undef', TrUserData),
-						     id('$undef', TrUserData),
-						     TrUserData).
+                                                     0,
+                                                     id('COMPRESSABLE',
+                                                        TrUserData),
+                                                     id([], TrUserData),
+                                                     id('$undef', TrUserData),
+                                                     id('$undef', TrUserData),
+                                                     TrUserData).
 
 dfp_read_field_def_streaming_output_call_request(<<8,
-						   Rest/binary>>,
-						 Z1, Z2, F@_1, F@_2, F@_3, F@_4,
-						 TrUserData) ->
+                                                   Rest/binary>>,
+                                                 Z1, Z2, F@_1, F@_2, F@_3, F@_4,
+                                                 TrUserData) ->
     d_field_streaming_output_call_request_response_type(Rest,
-							Z1, Z2, F@_1, F@_2,
-							F@_3, F@_4, TrUserData);
+                                                        Z1, Z2, F@_1, F@_2,
+                                                        F@_3, F@_4, TrUserData);
 dfp_read_field_def_streaming_output_call_request(<<18,
-						   Rest/binary>>,
-						 Z1, Z2, F@_1, F@_2, F@_3, F@_4,
-						 TrUserData) ->
+                                                   Rest/binary>>,
+                                                 Z1, Z2, F@_1, F@_2, F@_3, F@_4,
+                                                 TrUserData) ->
     d_field_streaming_output_call_request_response_parameters(Rest,
-							      Z1, Z2, F@_1,
-							      F@_2, F@_3, F@_4,
-							      TrUserData);
+                                                              Z1, Z2, F@_1,
+                                                              F@_2, F@_3, F@_4,
+                                                              TrUserData);
 dfp_read_field_def_streaming_output_call_request(<<26,
-						   Rest/binary>>,
-						 Z1, Z2, F@_1, F@_2, F@_3, F@_4,
-						 TrUserData) ->
+                                                   Rest/binary>>,
+                                                 Z1, Z2, F@_1, F@_2, F@_3, F@_4,
+                                                 TrUserData) ->
     d_field_streaming_output_call_request_payload(Rest, Z1,
-						  Z2, F@_1, F@_2, F@_3, F@_4,
-						  TrUserData);
+                                                  Z2, F@_1, F@_2, F@_3, F@_4,
+                                                  TrUserData);
 dfp_read_field_def_streaming_output_call_request(<<58,
-						   Rest/binary>>,
-						 Z1, Z2, F@_1, F@_2, F@_3, F@_4,
-						 TrUserData) ->
+                                                   Rest/binary>>,
+                                                 Z1, Z2, F@_1, F@_2, F@_3, F@_4,
+                                                 TrUserData) ->
     d_field_streaming_output_call_request_response_status(Rest,
-							  Z1, Z2, F@_1, F@_2,
-							  F@_3, F@_4,
-							  TrUserData);
+                                                          Z1, Z2, F@_1, F@_2,
+                                                          F@_3, F@_4,
+                                                          TrUserData);
 dfp_read_field_def_streaming_output_call_request(<<>>,
-						 0, 0, F@_1, R1, F@_3, F@_4,
-						 TrUserData) ->
+                                                 0, 0, F@_1, R1, F@_3, F@_4,
+                                                 TrUserData) ->
     S1 = #{response_type => F@_1},
     S2 = if R1 == '$undef' -> S1;
-	    true ->
-		S1#{response_parameters =>
-			lists_reverse(R1, TrUserData)}
-	 end,
+            true ->
+                 S1#{response_parameters =>
+                         lists_reverse(R1, TrUserData)}
+         end,
     S3 = if F@_3 == '$undef' -> S2;
-	    true -> S2#{payload => F@_3}
-	 end,
+            true -> S2#{payload => F@_3}
+         end,
     if F@_4 == '$undef' -> S3;
        true -> S3#{response_status => F@_4}
     end;
 dfp_read_field_def_streaming_output_call_request(Other,
-						 Z1, Z2, F@_1, F@_2, F@_3, F@_4,
-						 TrUserData) ->
+                                                 Z1, Z2, F@_1, F@_2, F@_3, F@_4,
+                                                 TrUserData) ->
     dg_read_field_def_streaming_output_call_request(Other,
-						    Z1, Z2, F@_1, F@_2, F@_3,
-						    F@_4, TrUserData).
+                                                    Z1, Z2, F@_1, F@_2, F@_3,
+                                                    F@_4, TrUserData).
 
 dg_read_field_def_streaming_output_call_request(<<1:1,
-						  X:7, Rest/binary>>,
-						N, Acc, F@_1, F@_2, F@_3, F@_4,
-						TrUserData)
-    when N < 32 - 7 ->
+                                                  X:7, Rest/binary>>,
+                                                N, Acc, F@_1, F@_2, F@_3, F@_4,
+                                                TrUserData)
+  when N < 32 - 7 ->
     dg_read_field_def_streaming_output_call_request(Rest,
-						    N + 7, X bsl N + Acc, F@_1,
-						    F@_2, F@_3, F@_4,
-						    TrUserData);
+                                                    N + 7, X bsl N + Acc, F@_1,
+                                                    F@_2, F@_3, F@_4,
+                                                    TrUserData);
 dg_read_field_def_streaming_output_call_request(<<0:1,
-						  X:7, Rest/binary>>,
-						N, Acc, F@_1, F@_2, F@_3, F@_4,
-						TrUserData) ->
+                                                  X:7, Rest/binary>>,
+                                                N, Acc, F@_1, F@_2, F@_3, F@_4,
+                                                TrUserData) ->
     Key = X bsl N + Acc,
     case Key of
-      8 ->
-	  d_field_streaming_output_call_request_response_type(Rest,
-							      0, 0, F@_1, F@_2,
-							      F@_3, F@_4,
-							      TrUserData);
-      18 ->
-	  d_field_streaming_output_call_request_response_parameters(Rest,
-								    0, 0, F@_1,
-								    F@_2, F@_3,
-								    F@_4,
-								    TrUserData);
-      26 ->
-	  d_field_streaming_output_call_request_payload(Rest, 0,
-							0, F@_1, F@_2, F@_3,
-							F@_4, TrUserData);
-      58 ->
-	  d_field_streaming_output_call_request_response_status(Rest,
-								0, 0, F@_1,
-								F@_2, F@_3,
-								F@_4,
-								TrUserData);
-      _ ->
-	  case Key band 7 of
-	    0 ->
-		skip_varint_streaming_output_call_request(Rest, 0, 0,
-							  F@_1, F@_2, F@_3,
-							  F@_4, TrUserData);
-	    1 ->
-		skip_64_streaming_output_call_request(Rest, 0, 0, F@_1,
-						      F@_2, F@_3, F@_4,
-						      TrUserData);
-	    2 ->
-		skip_length_delimited_streaming_output_call_request(Rest,
-								    0, 0, F@_1,
-								    F@_2, F@_3,
-								    F@_4,
-								    TrUserData);
-	    3 ->
-		skip_group_streaming_output_call_request(Rest,
-							 Key bsr 3, 0, F@_1,
-							 F@_2, F@_3, F@_4,
-							 TrUserData);
-	    5 ->
-		skip_32_streaming_output_call_request(Rest, 0, 0, F@_1,
-						      F@_2, F@_3, F@_4,
-						      TrUserData)
-	  end
+        8 ->
+            d_field_streaming_output_call_request_response_type(Rest,
+                                                                0, 0, F@_1, F@_2,
+                                                                F@_3, F@_4,
+                                                                TrUserData);
+        18 ->
+            d_field_streaming_output_call_request_response_parameters(Rest,
+                                                                      0, 0, F@_1,
+                                                                      F@_2, F@_3,
+                                                                      F@_4,
+                                                                      TrUserData);
+        26 ->
+            d_field_streaming_output_call_request_payload(Rest, 0,
+                                                          0, F@_1, F@_2, F@_3,
+                                                          F@_4, TrUserData);
+        58 ->
+            d_field_streaming_output_call_request_response_status(Rest,
+                                                                  0, 0, F@_1,
+                                                                  F@_2, F@_3,
+                                                                  F@_4,
+                                                                  TrUserData);
+        _ ->
+            case Key band 7 of
+                0 ->
+                    skip_varint_streaming_output_call_request(Rest, 0, 0,
+                                                              F@_1, F@_2, F@_3,
+                                                              F@_4, TrUserData);
+                1 ->
+                    skip_64_streaming_output_call_request(Rest, 0, 0, F@_1,
+                                                          F@_2, F@_3, F@_4,
+                                                          TrUserData);
+                2 ->
+                    skip_length_delimited_streaming_output_call_request(Rest,
+                                                                        0, 0, F@_1,
+                                                                        F@_2, F@_3,
+                                                                        F@_4,
+                                                                        TrUserData);
+                3 ->
+                    skip_group_streaming_output_call_request(Rest,
+                                                             Key bsr 3, 0, F@_1,
+                                                             F@_2, F@_3, F@_4,
+                                                             TrUserData);
+                5 ->
+                    skip_32_streaming_output_call_request(Rest, 0, 0, F@_1,
+                                                          F@_2, F@_3, F@_4,
+                                                          TrUserData)
+            end
     end;
 dg_read_field_def_streaming_output_call_request(<<>>, 0,
-						0, F@_1, R1, F@_3, F@_4,
-						TrUserData) ->
+                                                0, F@_1, R1, F@_3, F@_4,
+                                                TrUserData) ->
     S1 = #{response_type => F@_1},
     S2 = if R1 == '$undef' -> S1;
-	    true ->
-		S1#{response_parameters =>
-			lists_reverse(R1, TrUserData)}
-	 end,
+            true ->
+                 S1#{response_parameters =>
+                         lists_reverse(R1, TrUserData)}
+         end,
     S3 = if F@_3 == '$undef' -> S2;
-	    true -> S2#{payload => F@_3}
-	 end,
+            true -> S2#{payload => F@_3}
+         end,
     if F@_4 == '$undef' -> S3;
        true -> S3#{response_status => F@_4}
     end.
 
 d_field_streaming_output_call_request_response_type(<<1:1,
-						      X:7, Rest/binary>>,
-						    N, Acc, F@_1, F@_2, F@_3,
-						    F@_4, TrUserData)
-    when N < 57 ->
+                                                      X:7, Rest/binary>>,
+                                                    N, Acc, F@_1, F@_2, F@_3,
+                                                    F@_4, TrUserData)
+  when N < 57 ->
     d_field_streaming_output_call_request_response_type(Rest,
-							N + 7, X bsl N + Acc,
-							F@_1, F@_2, F@_3, F@_4,
-							TrUserData);
+                                                        N + 7, X bsl N + Acc,
+                                                        F@_1, F@_2, F@_3, F@_4,
+                                                        TrUserData);
 d_field_streaming_output_call_request_response_type(<<0:1,
-						      X:7, Rest/binary>>,
-						    N, Acc, _, F@_2, F@_3, F@_4,
-						    TrUserData) ->
+                                                      X:7, Rest/binary>>,
+                                                    N, Acc, _, F@_2, F@_3, F@_4,
+                                                    TrUserData) ->
     {NewFValue, RestF} =
-	{id('d_enum_grpc.testing.PayloadType'(begin
-						<<Res:32/signed-native>> = <<(X
-										bsl
-										N
-										+
-										Acc):32/unsigned-native>>,
-						id(Res, TrUserData)
-					      end),
-	    TrUserData),
-	 Rest},
+        {id('d_enum_grpc.testing.PayloadType'(begin
+                                                  <<Res:32/signed-native>> = <<(X
+                                                                                    bsl
+                                                                                    N
+                                                                                +
+                                                                                    Acc):32/unsigned-native>>,
+                                                  id(Res, TrUserData)
+                                              end),
+            TrUserData),
+         Rest},
     dfp_read_field_def_streaming_output_call_request(RestF,
-						     0, 0, NewFValue, F@_2,
-						     F@_3, F@_4, TrUserData).
+                                                     0, 0, NewFValue, F@_2,
+                                                     F@_3, F@_4, TrUserData).
 
 d_field_streaming_output_call_request_response_parameters(<<1:1,
-							    X:7, Rest/binary>>,
-							  N, Acc, F@_1, F@_2,
-							  F@_3, F@_4,
-							  TrUserData)
-    when N < 57 ->
+                                                            X:7, Rest/binary>>,
+                                                          N, Acc, F@_1, F@_2,
+                                                          F@_3, F@_4,
+                                                          TrUserData)
+  when N < 57 ->
     d_field_streaming_output_call_request_response_parameters(Rest,
-							      N + 7,
-							      X bsl N + Acc,
-							      F@_1, F@_2, F@_3,
-							      F@_4, TrUserData);
+                                                              N + 7,
+                                                              X bsl N + Acc,
+                                                              F@_1, F@_2, F@_3,
+                                                              F@_4, TrUserData);
 d_field_streaming_output_call_request_response_parameters(<<0:1,
-							    X:7, Rest/binary>>,
-							  N, Acc, F@_1, Prev,
-							  F@_3, F@_4,
-							  TrUserData) ->
+                                                            X:7, Rest/binary>>,
+                                                          N, Acc, F@_1, Prev,
+                                                          F@_3, F@_4,
+                                                          TrUserData) ->
     {NewFValue, RestF} = begin
-			   Len = X bsl N + Acc,
-			   <<Bs:Len/binary, Rest2/binary>> = Rest,
-			   {id(decode_msg_response_parameters(Bs, TrUserData),
-			       TrUserData),
-			    Rest2}
-			 end,
+                             Len = X bsl N + Acc,
+                             <<Bs:Len/binary, Rest2/binary>> = Rest,
+                             {id(decode_msg_response_parameters(Bs, TrUserData),
+                                 TrUserData),
+                              Rest2}
+                         end,
     dfp_read_field_def_streaming_output_call_request(RestF,
-						     0, 0, F@_1,
-						     cons(NewFValue, Prev,
-							  TrUserData),
-						     F@_3, F@_4, TrUserData).
+                                                     0, 0, F@_1,
+                                                     cons(NewFValue, Prev,
+                                                          TrUserData),
+                                                     F@_3, F@_4, TrUserData).
 
 d_field_streaming_output_call_request_payload(<<1:1,
-						X:7, Rest/binary>>,
-					      N, Acc, F@_1, F@_2, F@_3, F@_4,
-					      TrUserData)
-    when N < 57 ->
+                                                X:7, Rest/binary>>,
+                                              N, Acc, F@_1, F@_2, F@_3, F@_4,
+                                              TrUserData)
+  when N < 57 ->
     d_field_streaming_output_call_request_payload(Rest,
-						  N + 7, X bsl N + Acc, F@_1,
-						  F@_2, F@_3, F@_4, TrUserData);
+                                                  N + 7, X bsl N + Acc, F@_1,
+                                                  F@_2, F@_3, F@_4, TrUserData);
 d_field_streaming_output_call_request_payload(<<0:1,
-						X:7, Rest/binary>>,
-					      N, Acc, F@_1, F@_2, Prev, F@_4,
-					      TrUserData) ->
+                                                X:7, Rest/binary>>,
+                                              N, Acc, F@_1, F@_2, Prev, F@_4,
+                                              TrUserData) ->
     {NewFValue, RestF} = begin
-			   Len = X bsl N + Acc,
-			   <<Bs:Len/binary, Rest2/binary>> = Rest,
-			   {id(decode_msg_payload(Bs, TrUserData), TrUserData),
-			    Rest2}
-			 end,
+                             Len = X bsl N + Acc,
+                             <<Bs:Len/binary, Rest2/binary>> = Rest,
+                             {id(decode_msg_payload(Bs, TrUserData), TrUserData),
+                              Rest2}
+                         end,
     dfp_read_field_def_streaming_output_call_request(RestF,
-						     0, 0, F@_1, F@_2,
-						     if Prev == '$undef' ->
-							    NewFValue;
-							true ->
-							    merge_msg_payload(Prev,
-									      NewFValue,
-									      TrUserData)
-						     end,
-						     F@_4, TrUserData).
+                                                     0, 0, F@_1, F@_2,
+                                                     if Prev == '$undef' ->
+                                                             NewFValue;
+                                                        true ->
+                                                             merge_msg_payload(Prev,
+                                                                               NewFValue,
+                                                                               TrUserData)
+                                                     end,
+                                                     F@_4, TrUserData).
 
 d_field_streaming_output_call_request_response_status(<<1:1,
-							X:7, Rest/binary>>,
-						      N, Acc, F@_1, F@_2, F@_3,
-						      F@_4, TrUserData)
-    when N < 57 ->
+                                                        X:7, Rest/binary>>,
+                                                      N, Acc, F@_1, F@_2, F@_3,
+                                                      F@_4, TrUserData)
+  when N < 57 ->
     d_field_streaming_output_call_request_response_status(Rest,
-							  N + 7, X bsl N + Acc,
-							  F@_1, F@_2, F@_3,
-							  F@_4, TrUserData);
+                                                          N + 7, X bsl N + Acc,
+                                                          F@_1, F@_2, F@_3,
+                                                          F@_4, TrUserData);
 d_field_streaming_output_call_request_response_status(<<0:1,
-							X:7, Rest/binary>>,
-						      N, Acc, F@_1, F@_2, F@_3,
-						      Prev, TrUserData) ->
+                                                        X:7, Rest/binary>>,
+                                                      N, Acc, F@_1, F@_2, F@_3,
+                                                      Prev, TrUserData) ->
     {NewFValue, RestF} = begin
-			   Len = X bsl N + Acc,
-			   <<Bs:Len/binary, Rest2/binary>> = Rest,
-			   {id(decode_msg_echo_status(Bs, TrUserData),
-			       TrUserData),
-			    Rest2}
-			 end,
+                             Len = X bsl N + Acc,
+                             <<Bs:Len/binary, Rest2/binary>> = Rest,
+                             {id(decode_msg_echo_status(Bs, TrUserData),
+                                 TrUserData),
+                              Rest2}
+                         end,
     dfp_read_field_def_streaming_output_call_request(RestF,
-						     0, 0, F@_1, F@_2, F@_3,
-						     if Prev == '$undef' ->
-							    NewFValue;
-							true ->
-							    merge_msg_echo_status(Prev,
-										  NewFValue,
-										  TrUserData)
-						     end,
-						     TrUserData).
+                                                     0, 0, F@_1, F@_2, F@_3,
+                                                     if Prev == '$undef' ->
+                                                             NewFValue;
+                                                        true ->
+                                                             merge_msg_echo_status(Prev,
+                                                                                   NewFValue,
+                                                                                   TrUserData)
+                                                     end,
+                                                     TrUserData).
 
 skip_varint_streaming_output_call_request(<<1:1, _:7,
-					    Rest/binary>>,
-					  Z1, Z2, F@_1, F@_2, F@_3, F@_4,
-					  TrUserData) ->
+                                            Rest/binary>>,
+                                          Z1, Z2, F@_1, F@_2, F@_3, F@_4,
+                                          TrUserData) ->
     skip_varint_streaming_output_call_request(Rest, Z1, Z2,
-					      F@_1, F@_2, F@_3, F@_4,
-					      TrUserData);
+                                              F@_1, F@_2, F@_3, F@_4,
+                                              TrUserData);
 skip_varint_streaming_output_call_request(<<0:1, _:7,
-					    Rest/binary>>,
-					  Z1, Z2, F@_1, F@_2, F@_3, F@_4,
-					  TrUserData) ->
+                                            Rest/binary>>,
+                                          Z1, Z2, F@_1, F@_2, F@_3, F@_4,
+                                          TrUserData) ->
     dfp_read_field_def_streaming_output_call_request(Rest,
-						     Z1, Z2, F@_1, F@_2, F@_3,
-						     F@_4, TrUserData).
+                                                     Z1, Z2, F@_1, F@_2, F@_3,
+                                                     F@_4, TrUserData).
 
 skip_length_delimited_streaming_output_call_request(<<1:1,
-						      X:7, Rest/binary>>,
-						    N, Acc, F@_1, F@_2, F@_3,
-						    F@_4, TrUserData)
-    when N < 57 ->
+                                                      X:7, Rest/binary>>,
+                                                    N, Acc, F@_1, F@_2, F@_3,
+                                                    F@_4, TrUserData)
+  when N < 57 ->
     skip_length_delimited_streaming_output_call_request(Rest,
-							N + 7, X bsl N + Acc,
-							F@_1, F@_2, F@_3, F@_4,
-							TrUserData);
+                                                        N + 7, X bsl N + Acc,
+                                                        F@_1, F@_2, F@_3, F@_4,
+                                                        TrUserData);
 skip_length_delimited_streaming_output_call_request(<<0:1,
-						      X:7, Rest/binary>>,
-						    N, Acc, F@_1, F@_2, F@_3,
-						    F@_4, TrUserData) ->
+                                                      X:7, Rest/binary>>,
+                                                    N, Acc, F@_1, F@_2, F@_3,
+                                                    F@_4, TrUserData) ->
     Length = X bsl N + Acc,
     <<_:Length/binary, Rest2/binary>> = Rest,
     dfp_read_field_def_streaming_output_call_request(Rest2,
-						     0, 0, F@_1, F@_2, F@_3,
-						     F@_4, TrUserData).
+                                                     0, 0, F@_1, F@_2, F@_3,
+                                                     F@_4, TrUserData).
 
 skip_group_streaming_output_call_request(Bin, FNum, Z2,
-					 F@_1, F@_2, F@_3, F@_4, TrUserData) ->
+                                         F@_1, F@_2, F@_3, F@_4, TrUserData) ->
     {_, Rest} = read_group(Bin, FNum),
     dfp_read_field_def_streaming_output_call_request(Rest,
-						     0, Z2, F@_1, F@_2, F@_3,
-						     F@_4, TrUserData).
+                                                     0, Z2, F@_1, F@_2, F@_3,
+                                                     F@_4, TrUserData).
 
 skip_32_streaming_output_call_request(<<_:32,
-					Rest/binary>>,
-				      Z1, Z2, F@_1, F@_2, F@_3, F@_4,
-				      TrUserData) ->
+                                        Rest/binary>>,
+                                      Z1, Z2, F@_1, F@_2, F@_3, F@_4,
+                                      TrUserData) ->
     dfp_read_field_def_streaming_output_call_request(Rest,
-						     Z1, Z2, F@_1, F@_2, F@_3,
-						     F@_4, TrUserData).
+                                                     Z1, Z2, F@_1, F@_2, F@_3,
+                                                     F@_4, TrUserData).
 
 skip_64_streaming_output_call_request(<<_:64,
-					Rest/binary>>,
-				      Z1, Z2, F@_1, F@_2, F@_3, F@_4,
-				      TrUserData) ->
+                                        Rest/binary>>,
+                                      Z1, Z2, F@_1, F@_2, F@_3, F@_4,
+                                      TrUserData) ->
     dfp_read_field_def_streaming_output_call_request(Rest,
-						     Z1, Z2, F@_1, F@_2, F@_3,
-						     F@_4, TrUserData).
+                                                     Z1, Z2, F@_1, F@_2, F@_3,
+                                                     F@_4, TrUserData).
 
 decode_msg_streaming_output_call_response(Bin,
-					  TrUserData) ->
+                                          TrUserData) ->
     dfp_read_field_def_streaming_output_call_response(Bin,
-						      0, 0,
-						      id('$undef', TrUserData),
-						      TrUserData).
+                                                      0, 0,
+                                                      id('$undef', TrUserData),
+                                                      TrUserData).
 
 dfp_read_field_def_streaming_output_call_response(<<10,
-						    Rest/binary>>,
-						  Z1, Z2, F@_1, TrUserData) ->
+                                                    Rest/binary>>,
+                                                  Z1, Z2, F@_1, TrUserData) ->
     d_field_streaming_output_call_response_payload(Rest, Z1,
-						   Z2, F@_1, TrUserData);
+                                                   Z2, F@_1, TrUserData);
 dfp_read_field_def_streaming_output_call_response(<<>>,
-						  0, 0, F@_1, _) ->
+                                                  0, 0, F@_1, _) ->
     S1 = #{},
     if F@_1 == '$undef' -> S1;
        true -> S1#{payload => F@_1}
     end;
 dfp_read_field_def_streaming_output_call_response(Other,
-						  Z1, Z2, F@_1, TrUserData) ->
+                                                  Z1, Z2, F@_1, TrUserData) ->
     dg_read_field_def_streaming_output_call_response(Other,
-						     Z1, Z2, F@_1, TrUserData).
+                                                     Z1, Z2, F@_1, TrUserData).
 
 dg_read_field_def_streaming_output_call_response(<<1:1,
-						   X:7, Rest/binary>>,
-						 N, Acc, F@_1, TrUserData)
-    when N < 32 - 7 ->
+                                                   X:7, Rest/binary>>,
+                                                 N, Acc, F@_1, TrUserData)
+  when N < 32 - 7 ->
     dg_read_field_def_streaming_output_call_response(Rest,
-						     N + 7, X bsl N + Acc, F@_1,
-						     TrUserData);
+                                                     N + 7, X bsl N + Acc, F@_1,
+                                                     TrUserData);
 dg_read_field_def_streaming_output_call_response(<<0:1,
-						   X:7, Rest/binary>>,
-						 N, Acc, F@_1, TrUserData) ->
+                                                   X:7, Rest/binary>>,
+                                                 N, Acc, F@_1, TrUserData) ->
     Key = X bsl N + Acc,
     case Key of
-      10 ->
-	  d_field_streaming_output_call_response_payload(Rest, 0,
-							 0, F@_1, TrUserData);
-      _ ->
-	  case Key band 7 of
-	    0 ->
-		skip_varint_streaming_output_call_response(Rest, 0, 0,
-							   F@_1, TrUserData);
-	    1 ->
-		skip_64_streaming_output_call_response(Rest, 0, 0, F@_1,
-						       TrUserData);
-	    2 ->
-		skip_length_delimited_streaming_output_call_response(Rest,
-								     0, 0, F@_1,
-								     TrUserData);
-	    3 ->
-		skip_group_streaming_output_call_response(Rest,
-							  Key bsr 3, 0, F@_1,
-							  TrUserData);
-	    5 ->
-		skip_32_streaming_output_call_response(Rest, 0, 0, F@_1,
-						       TrUserData)
-	  end
+        10 ->
+            d_field_streaming_output_call_response_payload(Rest, 0,
+                                                           0, F@_1, TrUserData);
+        _ ->
+            case Key band 7 of
+                0 ->
+                    skip_varint_streaming_output_call_response(Rest, 0, 0,
+                                                               F@_1, TrUserData);
+                1 ->
+                    skip_64_streaming_output_call_response(Rest, 0, 0, F@_1,
+                                                           TrUserData);
+                2 ->
+                    skip_length_delimited_streaming_output_call_response(Rest,
+                                                                         0, 0, F@_1,
+                                                                         TrUserData);
+                3 ->
+                    skip_group_streaming_output_call_response(Rest,
+                                                              Key bsr 3, 0, F@_1,
+                                                              TrUserData);
+                5 ->
+                    skip_32_streaming_output_call_response(Rest, 0, 0, F@_1,
+                                                           TrUserData)
+            end
     end;
 dg_read_field_def_streaming_output_call_response(<<>>,
-						 0, 0, F@_1, _) ->
+                                                 0, 0, F@_1, _) ->
     S1 = #{},
     if F@_1 == '$undef' -> S1;
        true -> S1#{payload => F@_1}
     end.
 
 d_field_streaming_output_call_response_payload(<<1:1,
-						 X:7, Rest/binary>>,
-					       N, Acc, F@_1, TrUserData)
-    when N < 57 ->
+                                                 X:7, Rest/binary>>,
+                                               N, Acc, F@_1, TrUserData)
+  when N < 57 ->
     d_field_streaming_output_call_response_payload(Rest,
-						   N + 7, X bsl N + Acc, F@_1,
-						   TrUserData);
+                                                   N + 7, X bsl N + Acc, F@_1,
+                                                   TrUserData);
 d_field_streaming_output_call_response_payload(<<0:1,
-						 X:7, Rest/binary>>,
-					       N, Acc, Prev, TrUserData) ->
+                                                 X:7, Rest/binary>>,
+                                               N, Acc, Prev, TrUserData) ->
     {NewFValue, RestF} = begin
-			   Len = X bsl N + Acc,
-			   <<Bs:Len/binary, Rest2/binary>> = Rest,
-			   {id(decode_msg_payload(Bs, TrUserData), TrUserData),
-			    Rest2}
-			 end,
+                             Len = X bsl N + Acc,
+                             <<Bs:Len/binary, Rest2/binary>> = Rest,
+                             {id(decode_msg_payload(Bs, TrUserData), TrUserData),
+                              Rest2}
+                         end,
     dfp_read_field_def_streaming_output_call_response(RestF,
-						      0, 0,
-						      if Prev == '$undef' ->
-							     NewFValue;
-							 true ->
-							     merge_msg_payload(Prev,
-									       NewFValue,
-									       TrUserData)
-						      end,
-						      TrUserData).
+                                                      0, 0,
+                                                      if Prev == '$undef' ->
+                                                              NewFValue;
+                                                         true ->
+                                                              merge_msg_payload(Prev,
+                                                                                NewFValue,
+                                                                                TrUserData)
+                                                      end,
+                                                      TrUserData).
 
 skip_varint_streaming_output_call_response(<<1:1, _:7,
-					     Rest/binary>>,
-					   Z1, Z2, F@_1, TrUserData) ->
+                                             Rest/binary>>,
+                                           Z1, Z2, F@_1, TrUserData) ->
     skip_varint_streaming_output_call_response(Rest, Z1, Z2,
-					       F@_1, TrUserData);
+                                               F@_1, TrUserData);
 skip_varint_streaming_output_call_response(<<0:1, _:7,
-					     Rest/binary>>,
-					   Z1, Z2, F@_1, TrUserData) ->
+                                             Rest/binary>>,
+                                           Z1, Z2, F@_1, TrUserData) ->
     dfp_read_field_def_streaming_output_call_response(Rest,
-						      Z1, Z2, F@_1, TrUserData).
+                                                      Z1, Z2, F@_1, TrUserData).
 
 skip_length_delimited_streaming_output_call_response(<<1:1,
-						       X:7, Rest/binary>>,
-						     N, Acc, F@_1, TrUserData)
-    when N < 57 ->
+                                                       X:7, Rest/binary>>,
+                                                     N, Acc, F@_1, TrUserData)
+  when N < 57 ->
     skip_length_delimited_streaming_output_call_response(Rest,
-							 N + 7, X bsl N + Acc,
-							 F@_1, TrUserData);
+                                                         N + 7, X bsl N + Acc,
+                                                         F@_1, TrUserData);
 skip_length_delimited_streaming_output_call_response(<<0:1,
-						       X:7, Rest/binary>>,
-						     N, Acc, F@_1,
-						     TrUserData) ->
+                                                       X:7, Rest/binary>>,
+                                                     N, Acc, F@_1,
+                                                     TrUserData) ->
     Length = X bsl N + Acc,
     <<_:Length/binary, Rest2/binary>> = Rest,
     dfp_read_field_def_streaming_output_call_response(Rest2,
-						      0, 0, F@_1, TrUserData).
+                                                      0, 0, F@_1, TrUserData).
 
 skip_group_streaming_output_call_response(Bin, FNum, Z2,
-					  F@_1, TrUserData) ->
+                                          F@_1, TrUserData) ->
     {_, Rest} = read_group(Bin, FNum),
     dfp_read_field_def_streaming_output_call_response(Rest,
-						      0, Z2, F@_1, TrUserData).
+                                                      0, Z2, F@_1, TrUserData).
 
 skip_32_streaming_output_call_response(<<_:32,
-					 Rest/binary>>,
-				       Z1, Z2, F@_1, TrUserData) ->
+                                         Rest/binary>>,
+                                       Z1, Z2, F@_1, TrUserData) ->
     dfp_read_field_def_streaming_output_call_response(Rest,
-						      Z1, Z2, F@_1, TrUserData).
+                                                      Z1, Z2, F@_1, TrUserData).
 
 skip_64_streaming_output_call_response(<<_:64,
-					 Rest/binary>>,
-				       Z1, Z2, F@_1, TrUserData) ->
+                                         Rest/binary>>,
+                                       Z1, Z2, F@_1, TrUserData) ->
     dfp_read_field_def_streaming_output_call_response(Rest,
-						      Z1, Z2, F@_1, TrUserData).
+                                                      Z1, Z2, F@_1, TrUserData).
 
 decode_msg_reconnect_params(Bin, TrUserData) ->
     dfp_read_field_def_reconnect_params(Bin, 0, 0,
-					id(0, TrUserData), TrUserData).
+                                        id(0, TrUserData), TrUserData).
 
 dfp_read_field_def_reconnect_params(<<8, Rest/binary>>,
-				    Z1, Z2, F@_1, TrUserData) ->
+                                    Z1, Z2, F@_1, TrUserData) ->
     d_field_reconnect_params_max_reconnect_backoff_ms(Rest,
-						      Z1, Z2, F@_1, TrUserData);
+                                                      Z1, Z2, F@_1, TrUserData);
 dfp_read_field_def_reconnect_params(<<>>, 0, 0, F@_1,
-				    _) ->
+                                    _) ->
     #{max_reconnect_backoff_ms => F@_1};
 dfp_read_field_def_reconnect_params(Other, Z1, Z2, F@_1,
-				    TrUserData) ->
+                                    TrUserData) ->
     dg_read_field_def_reconnect_params(Other, Z1, Z2, F@_1,
-				       TrUserData).
+                                       TrUserData).
 
 dg_read_field_def_reconnect_params(<<1:1, X:7,
-				     Rest/binary>>,
-				   N, Acc, F@_1, TrUserData)
-    when N < 32 - 7 ->
+                                     Rest/binary>>,
+                                   N, Acc, F@_1, TrUserData)
+  when N < 32 - 7 ->
     dg_read_field_def_reconnect_params(Rest, N + 7,
-				       X bsl N + Acc, F@_1, TrUserData);
+                                       X bsl N + Acc, F@_1, TrUserData);
 dg_read_field_def_reconnect_params(<<0:1, X:7,
-				     Rest/binary>>,
-				   N, Acc, F@_1, TrUserData) ->
+                                     Rest/binary>>,
+                                   N, Acc, F@_1, TrUserData) ->
     Key = X bsl N + Acc,
     case Key of
-      8 ->
-	  d_field_reconnect_params_max_reconnect_backoff_ms(Rest,
-							    0, 0, F@_1,
-							    TrUserData);
-      _ ->
-	  case Key band 7 of
-	    0 ->
-		skip_varint_reconnect_params(Rest, 0, 0, F@_1,
-					     TrUserData);
-	    1 ->
-		skip_64_reconnect_params(Rest, 0, 0, F@_1, TrUserData);
-	    2 ->
-		skip_length_delimited_reconnect_params(Rest, 0, 0, F@_1,
-						       TrUserData);
-	    3 ->
-		skip_group_reconnect_params(Rest, Key bsr 3, 0, F@_1,
-					    TrUserData);
-	    5 ->
-		skip_32_reconnect_params(Rest, 0, 0, F@_1, TrUserData)
-	  end
+        8 ->
+            d_field_reconnect_params_max_reconnect_backoff_ms(Rest,
+                                                              0, 0, F@_1,
+                                                              TrUserData);
+        _ ->
+            case Key band 7 of
+                0 ->
+                    skip_varint_reconnect_params(Rest, 0, 0, F@_1,
+                                                 TrUserData);
+                1 ->
+                    skip_64_reconnect_params(Rest, 0, 0, F@_1, TrUserData);
+                2 ->
+                    skip_length_delimited_reconnect_params(Rest, 0, 0, F@_1,
+                                                           TrUserData);
+                3 ->
+                    skip_group_reconnect_params(Rest, Key bsr 3, 0, F@_1,
+                                                TrUserData);
+                5 ->
+                    skip_32_reconnect_params(Rest, 0, 0, F@_1, TrUserData)
+            end
     end;
 dg_read_field_def_reconnect_params(<<>>, 0, 0, F@_1,
-				   _) ->
+                                   _) ->
     #{max_reconnect_backoff_ms => F@_1}.
 
 d_field_reconnect_params_max_reconnect_backoff_ms(<<1:1,
-						    X:7, Rest/binary>>,
-						  N, Acc, F@_1, TrUserData)
-    when N < 57 ->
+                                                    X:7, Rest/binary>>,
+                                                  N, Acc, F@_1, TrUserData)
+  when N < 57 ->
     d_field_reconnect_params_max_reconnect_backoff_ms(Rest,
-						      N + 7, X bsl N + Acc,
-						      F@_1, TrUserData);
+                                                      N + 7, X bsl N + Acc,
+                                                      F@_1, TrUserData);
 d_field_reconnect_params_max_reconnect_backoff_ms(<<0:1,
-						    X:7, Rest/binary>>,
-						  N, Acc, _, TrUserData) ->
+                                                    X:7, Rest/binary>>,
+                                                  N, Acc, _, TrUserData) ->
     {NewFValue, RestF} = {begin
-			    <<Res:32/signed-native>> = <<(X bsl N +
-							    Acc):32/unsigned-native>>,
-			    id(Res, TrUserData)
-			  end,
-			  Rest},
+                              <<Res:32/signed-native>> = <<(X bsl N +
+                                                                Acc):32/unsigned-native>>,
+                              id(Res, TrUserData)
+                          end,
+                          Rest},
     dfp_read_field_def_reconnect_params(RestF, 0, 0,
-					NewFValue, TrUserData).
+                                        NewFValue, TrUserData).
 
 skip_varint_reconnect_params(<<1:1, _:7, Rest/binary>>,
-			     Z1, Z2, F@_1, TrUserData) ->
+                             Z1, Z2, F@_1, TrUserData) ->
     skip_varint_reconnect_params(Rest, Z1, Z2, F@_1,
-				 TrUserData);
+                                 TrUserData);
 skip_varint_reconnect_params(<<0:1, _:7, Rest/binary>>,
-			     Z1, Z2, F@_1, TrUserData) ->
+                             Z1, Z2, F@_1, TrUserData) ->
     dfp_read_field_def_reconnect_params(Rest, Z1, Z2, F@_1,
-					TrUserData).
+                                        TrUserData).
 
 skip_length_delimited_reconnect_params(<<1:1, X:7,
-					 Rest/binary>>,
-				       N, Acc, F@_1, TrUserData)
-    when N < 57 ->
+                                         Rest/binary>>,
+                                       N, Acc, F@_1, TrUserData)
+  when N < 57 ->
     skip_length_delimited_reconnect_params(Rest, N + 7,
-					   X bsl N + Acc, F@_1, TrUserData);
+                                           X bsl N + Acc, F@_1, TrUserData);
 skip_length_delimited_reconnect_params(<<0:1, X:7,
-					 Rest/binary>>,
-				       N, Acc, F@_1, TrUserData) ->
+                                         Rest/binary>>,
+                                       N, Acc, F@_1, TrUserData) ->
     Length = X bsl N + Acc,
     <<_:Length/binary, Rest2/binary>> = Rest,
     dfp_read_field_def_reconnect_params(Rest2, 0, 0, F@_1,
-					TrUserData).
+                                        TrUserData).
 
 skip_group_reconnect_params(Bin, FNum, Z2, F@_1,
-			    TrUserData) ->
+                            TrUserData) ->
     {_, Rest} = read_group(Bin, FNum),
     dfp_read_field_def_reconnect_params(Rest, 0, Z2, F@_1,
-					TrUserData).
+                                        TrUserData).
 
 skip_32_reconnect_params(<<_:32, Rest/binary>>, Z1, Z2,
-			 F@_1, TrUserData) ->
+                         F@_1, TrUserData) ->
     dfp_read_field_def_reconnect_params(Rest, Z1, Z2, F@_1,
-					TrUserData).
+                                        TrUserData).
 
 skip_64_reconnect_params(<<_:64, Rest/binary>>, Z1, Z2,
-			 F@_1, TrUserData) ->
+                         F@_1, TrUserData) ->
     dfp_read_field_def_reconnect_params(Rest, Z1, Z2, F@_1,
-					TrUserData).
+                                        TrUserData).
 
 decode_msg_reconnect_info(Bin, TrUserData) ->
     dfp_read_field_def_reconnect_info(Bin, 0, 0,
-				      id(false, TrUserData), id([], TrUserData),
-				      TrUserData).
+                                      id(false, TrUserData), id([], TrUserData),
+                                      TrUserData).
 
 dfp_read_field_def_reconnect_info(<<8, Rest/binary>>,
-				  Z1, Z2, F@_1, F@_2, TrUserData) ->
+                                  Z1, Z2, F@_1, F@_2, TrUserData) ->
     d_field_reconnect_info_passed(Rest, Z1, Z2, F@_1, F@_2,
-				  TrUserData);
+                                  TrUserData);
 dfp_read_field_def_reconnect_info(<<18, Rest/binary>>,
-				  Z1, Z2, F@_1, F@_2, TrUserData) ->
+                                  Z1, Z2, F@_1, F@_2, TrUserData) ->
     d_pfield_reconnect_info_backoff_ms(Rest, Z1, Z2, F@_1,
-				       F@_2, TrUserData);
+                                       F@_2, TrUserData);
 dfp_read_field_def_reconnect_info(<<16, Rest/binary>>,
-				  Z1, Z2, F@_1, F@_2, TrUserData) ->
+                                  Z1, Z2, F@_1, F@_2, TrUserData) ->
     d_field_reconnect_info_backoff_ms(Rest, Z1, Z2, F@_1,
-				      F@_2, TrUserData);
+                                      F@_2, TrUserData);
 dfp_read_field_def_reconnect_info(<<>>, 0, 0, F@_1, R1,
-				  TrUserData) ->
+                                  TrUserData) ->
     #{passed => F@_1,
       backoff_ms => lists_reverse(R1, TrUserData)};
 dfp_read_field_def_reconnect_info(Other, Z1, Z2, F@_1,
-				  F@_2, TrUserData) ->
+                                  F@_2, TrUserData) ->
     dg_read_field_def_reconnect_info(Other, Z1, Z2, F@_1,
-				     F@_2, TrUserData).
+                                     F@_2, TrUserData).
 
 dg_read_field_def_reconnect_info(<<1:1, X:7,
-				   Rest/binary>>,
-				 N, Acc, F@_1, F@_2, TrUserData)
-    when N < 32 - 7 ->
+                                   Rest/binary>>,
+                                 N, Acc, F@_1, F@_2, TrUserData)
+  when N < 32 - 7 ->
     dg_read_field_def_reconnect_info(Rest, N + 7,
-				     X bsl N + Acc, F@_1, F@_2, TrUserData);
+                                     X bsl N + Acc, F@_1, F@_2, TrUserData);
 dg_read_field_def_reconnect_info(<<0:1, X:7,
-				   Rest/binary>>,
-				 N, Acc, F@_1, F@_2, TrUserData) ->
+                                   Rest/binary>>,
+                                 N, Acc, F@_1, F@_2, TrUserData) ->
     Key = X bsl N + Acc,
     case Key of
-      8 ->
-	  d_field_reconnect_info_passed(Rest, 0, 0, F@_1, F@_2,
-					TrUserData);
-      18 ->
-	  d_pfield_reconnect_info_backoff_ms(Rest, 0, 0, F@_1,
-					     F@_2, TrUserData);
-      16 ->
-	  d_field_reconnect_info_backoff_ms(Rest, 0, 0, F@_1,
-					    F@_2, TrUserData);
-      _ ->
-	  case Key band 7 of
-	    0 ->
-		skip_varint_reconnect_info(Rest, 0, 0, F@_1, F@_2,
-					   TrUserData);
-	    1 ->
-		skip_64_reconnect_info(Rest, 0, 0, F@_1, F@_2,
-				       TrUserData);
-	    2 ->
-		skip_length_delimited_reconnect_info(Rest, 0, 0, F@_1,
-						     F@_2, TrUserData);
-	    3 ->
-		skip_group_reconnect_info(Rest, Key bsr 3, 0, F@_1,
-					  F@_2, TrUserData);
-	    5 ->
-		skip_32_reconnect_info(Rest, 0, 0, F@_1, F@_2,
-				       TrUserData)
-	  end
+        8 ->
+            d_field_reconnect_info_passed(Rest, 0, 0, F@_1, F@_2,
+                                          TrUserData);
+        18 ->
+            d_pfield_reconnect_info_backoff_ms(Rest, 0, 0, F@_1,
+                                               F@_2, TrUserData);
+        16 ->
+            d_field_reconnect_info_backoff_ms(Rest, 0, 0, F@_1,
+                                              F@_2, TrUserData);
+        _ ->
+            case Key band 7 of
+                0 ->
+                    skip_varint_reconnect_info(Rest, 0, 0, F@_1, F@_2,
+                                               TrUserData);
+                1 ->
+                    skip_64_reconnect_info(Rest, 0, 0, F@_1, F@_2,
+                                           TrUserData);
+                2 ->
+                    skip_length_delimited_reconnect_info(Rest, 0, 0, F@_1,
+                                                         F@_2, TrUserData);
+                3 ->
+                    skip_group_reconnect_info(Rest, Key bsr 3, 0, F@_1,
+                                              F@_2, TrUserData);
+                5 ->
+                    skip_32_reconnect_info(Rest, 0, 0, F@_1, F@_2,
+                                           TrUserData)
+            end
     end;
 dg_read_field_def_reconnect_info(<<>>, 0, 0, F@_1, R1,
-				 TrUserData) ->
+                                 TrUserData) ->
     #{passed => F@_1,
       backoff_ms => lists_reverse(R1, TrUserData)}.
 
 d_field_reconnect_info_passed(<<1:1, X:7, Rest/binary>>,
-			      N, Acc, F@_1, F@_2, TrUserData)
-    when N < 57 ->
+                              N, Acc, F@_1, F@_2, TrUserData)
+  when N < 57 ->
     d_field_reconnect_info_passed(Rest, N + 7,
-				  X bsl N + Acc, F@_1, F@_2, TrUserData);
+                                  X bsl N + Acc, F@_1, F@_2, TrUserData);
 d_field_reconnect_info_passed(<<0:1, X:7, Rest/binary>>,
-			      N, Acc, _, F@_2, TrUserData) ->
+                              N, Acc, _, F@_2, TrUserData) ->
     {NewFValue, RestF} = {id(X bsl N + Acc =/= 0,
-			     TrUserData),
-			  Rest},
+                             TrUserData),
+                          Rest},
     dfp_read_field_def_reconnect_info(RestF, 0, 0,
-				      NewFValue, F@_2, TrUserData).
+                                      NewFValue, F@_2, TrUserData).
 
 d_field_reconnect_info_backoff_ms(<<1:1, X:7,
-				    Rest/binary>>,
-				  N, Acc, F@_1, F@_2, TrUserData)
-    when N < 57 ->
+                                    Rest/binary>>,
+                                  N, Acc, F@_1, F@_2, TrUserData)
+  when N < 57 ->
     d_field_reconnect_info_backoff_ms(Rest, N + 7,
-				      X bsl N + Acc, F@_1, F@_2, TrUserData);
+                                      X bsl N + Acc, F@_1, F@_2, TrUserData);
 d_field_reconnect_info_backoff_ms(<<0:1, X:7,
-				    Rest/binary>>,
-				  N, Acc, F@_1, Prev, TrUserData) ->
+                                    Rest/binary>>,
+                                  N, Acc, F@_1, Prev, TrUserData) ->
     {NewFValue, RestF} = {begin
-			    <<Res:32/signed-native>> = <<(X bsl N +
-							    Acc):32/unsigned-native>>,
-			    id(Res, TrUserData)
-			  end,
-			  Rest},
+                              <<Res:32/signed-native>> = <<(X bsl N +
+                                                                Acc):32/unsigned-native>>,
+                              id(Res, TrUserData)
+                          end,
+                          Rest},
     dfp_read_field_def_reconnect_info(RestF, 0, 0, F@_1,
-				      cons(NewFValue, Prev, TrUserData),
-				      TrUserData).
+                                      cons(NewFValue, Prev, TrUserData),
+                                      TrUserData).
 
 d_pfield_reconnect_info_backoff_ms(<<1:1, X:7,
-				     Rest/binary>>,
-				   N, Acc, F@_1, F@_2, TrUserData)
-    when N < 57 ->
+                                     Rest/binary>>,
+                                   N, Acc, F@_1, F@_2, TrUserData)
+  when N < 57 ->
     d_pfield_reconnect_info_backoff_ms(Rest, N + 7,
-				       X bsl N + Acc, F@_1, F@_2, TrUserData);
+                                       X bsl N + Acc, F@_1, F@_2, TrUserData);
 d_pfield_reconnect_info_backoff_ms(<<0:1, X:7,
-				     Rest/binary>>,
-				   N, Acc, F@_1, E, TrUserData) ->
+                                     Rest/binary>>,
+                                   N, Acc, F@_1, E, TrUserData) ->
     Len = X bsl N + Acc,
     <<PackedBytes:Len/binary, Rest2/binary>> = Rest,
     NewSeq =
-	d_packed_field_reconnect_info_backoff_ms(PackedBytes, 0,
-						 0, E, TrUserData),
+        d_packed_field_reconnect_info_backoff_ms(PackedBytes, 0,
+                                                 0, E, TrUserData),
     dfp_read_field_def_reconnect_info(Rest2, 0, 0, F@_1,
-				      NewSeq, TrUserData).
+                                      NewSeq, TrUserData).
 
 d_packed_field_reconnect_info_backoff_ms(<<1:1, X:7,
-					   Rest/binary>>,
-					 N, Acc, AccSeq, TrUserData)
-    when N < 57 ->
+                                           Rest/binary>>,
+                                         N, Acc, AccSeq, TrUserData)
+  when N < 57 ->
     d_packed_field_reconnect_info_backoff_ms(Rest, N + 7,
-					     X bsl N + Acc, AccSeq, TrUserData);
+                                             X bsl N + Acc, AccSeq, TrUserData);
 d_packed_field_reconnect_info_backoff_ms(<<0:1, X:7,
-					   Rest/binary>>,
-					 N, Acc, AccSeq, TrUserData) ->
+                                           Rest/binary>>,
+                                         N, Acc, AccSeq, TrUserData) ->
     {NewFValue, RestF} = {begin
-			    <<Res:32/signed-native>> = <<(X bsl N +
-							    Acc):32/unsigned-native>>,
-			    id(Res, TrUserData)
-			  end,
-			  Rest},
+                              <<Res:32/signed-native>> = <<(X bsl N +
+                                                                Acc):32/unsigned-native>>,
+                              id(Res, TrUserData)
+                          end,
+                          Rest},
     d_packed_field_reconnect_info_backoff_ms(RestF, 0, 0,
-					     [NewFValue | AccSeq], TrUserData);
+                                             [NewFValue | AccSeq], TrUserData);
 d_packed_field_reconnect_info_backoff_ms(<<>>, 0, 0,
-					 AccSeq, _) ->
+                                         AccSeq, _) ->
     AccSeq.
 
 skip_varint_reconnect_info(<<1:1, _:7, Rest/binary>>,
-			   Z1, Z2, F@_1, F@_2, TrUserData) ->
+                           Z1, Z2, F@_1, F@_2, TrUserData) ->
     skip_varint_reconnect_info(Rest, Z1, Z2, F@_1, F@_2,
-			       TrUserData);
+                               TrUserData);
 skip_varint_reconnect_info(<<0:1, _:7, Rest/binary>>,
-			   Z1, Z2, F@_1, F@_2, TrUserData) ->
+                           Z1, Z2, F@_1, F@_2, TrUserData) ->
     dfp_read_field_def_reconnect_info(Rest, Z1, Z2, F@_1,
-				      F@_2, TrUserData).
+                                      F@_2, TrUserData).
 
 skip_length_delimited_reconnect_info(<<1:1, X:7,
-				       Rest/binary>>,
-				     N, Acc, F@_1, F@_2, TrUserData)
-    when N < 57 ->
+                                       Rest/binary>>,
+                                     N, Acc, F@_1, F@_2, TrUserData)
+  when N < 57 ->
     skip_length_delimited_reconnect_info(Rest, N + 7,
-					 X bsl N + Acc, F@_1, F@_2, TrUserData);
+                                         X bsl N + Acc, F@_1, F@_2, TrUserData);
 skip_length_delimited_reconnect_info(<<0:1, X:7,
-				       Rest/binary>>,
-				     N, Acc, F@_1, F@_2, TrUserData) ->
+                                       Rest/binary>>,
+                                     N, Acc, F@_1, F@_2, TrUserData) ->
     Length = X bsl N + Acc,
     <<_:Length/binary, Rest2/binary>> = Rest,
     dfp_read_field_def_reconnect_info(Rest2, 0, 0, F@_1,
-				      F@_2, TrUserData).
+                                      F@_2, TrUserData).
 
 skip_group_reconnect_info(Bin, FNum, Z2, F@_1, F@_2,
-			  TrUserData) ->
+                          TrUserData) ->
     {_, Rest} = read_group(Bin, FNum),
     dfp_read_field_def_reconnect_info(Rest, 0, Z2, F@_1,
-				      F@_2, TrUserData).
+                                      F@_2, TrUserData).
 
 skip_32_reconnect_info(<<_:32, Rest/binary>>, Z1, Z2,
-		       F@_1, F@_2, TrUserData) ->
+                       F@_1, F@_2, TrUserData) ->
     dfp_read_field_def_reconnect_info(Rest, Z1, Z2, F@_1,
-				      F@_2, TrUserData).
+                                      F@_2, TrUserData).
 
 skip_64_reconnect_info(<<_:64, Rest/binary>>, Z1, Z2,
-		       F@_1, F@_2, TrUserData) ->
+                       F@_1, F@_2, TrUserData) ->
     dfp_read_field_def_reconnect_info(Rest, Z1, Z2, F@_1,
-				      F@_2, TrUserData).
+                                      F@_2, TrUserData).
 
 'd_enum_grpc.testing.PayloadType'(0) -> 'COMPRESSABLE';
 'd_enum_grpc.testing.PayloadType'(V) -> V.
@@ -3256,34 +3256,34 @@ merge_msgs(Prev, New, MsgName) when is_atom(MsgName) ->
 merge_msgs(Prev, New, MsgName, Opts) ->
     TrUserData = proplists:get_value(user_data, Opts),
     case MsgName of
-      empty -> merge_msg_empty(Prev, New, TrUserData);
-      bool_value ->
-	  merge_msg_bool_value(Prev, New, TrUserData);
-      payload -> merge_msg_payload(Prev, New, TrUserData);
-      echo_status ->
-	  merge_msg_echo_status(Prev, New, TrUserData);
-      simple_request ->
-	  merge_msg_simple_request(Prev, New, TrUserData);
-      simple_response ->
-	  merge_msg_simple_response(Prev, New, TrUserData);
-      streaming_input_call_request ->
-	  merge_msg_streaming_input_call_request(Prev, New,
-						 TrUserData);
-      streaming_input_call_response ->
-	  merge_msg_streaming_input_call_response(Prev, New,
-						  TrUserData);
-      response_parameters ->
-	  merge_msg_response_parameters(Prev, New, TrUserData);
-      streaming_output_call_request ->
-	  merge_msg_streaming_output_call_request(Prev, New,
-						  TrUserData);
-      streaming_output_call_response ->
-	  merge_msg_streaming_output_call_response(Prev, New,
-						   TrUserData);
-      reconnect_params ->
-	  merge_msg_reconnect_params(Prev, New, TrUserData);
-      reconnect_info ->
-	  merge_msg_reconnect_info(Prev, New, TrUserData)
+        empty -> merge_msg_empty(Prev, New, TrUserData);
+        bool_value ->
+            merge_msg_bool_value(Prev, New, TrUserData);
+        payload -> merge_msg_payload(Prev, New, TrUserData);
+        echo_status ->
+            merge_msg_echo_status(Prev, New, TrUserData);
+        simple_request ->
+            merge_msg_simple_request(Prev, New, TrUserData);
+        simple_response ->
+            merge_msg_simple_response(Prev, New, TrUserData);
+        streaming_input_call_request ->
+            merge_msg_streaming_input_call_request(Prev, New,
+                                                   TrUserData);
+        streaming_input_call_response ->
+            merge_msg_streaming_input_call_response(Prev, New,
+                                                    TrUserData);
+        response_parameters ->
+            merge_msg_response_parameters(Prev, New, TrUserData);
+        streaming_output_call_request ->
+            merge_msg_streaming_output_call_request(Prev, New,
+                                                    TrUserData);
+        streaming_output_call_response ->
+            merge_msg_streaming_output_call_response(Prev, New,
+                                                     TrUserData);
+        reconnect_params ->
+            merge_msg_reconnect_params(Prev, New, TrUserData);
+        reconnect_info ->
+            merge_msg_reconnect_info(Prev, New, TrUserData)
     end.
 
 -compile({nowarn_unused_function,merge_msg_empty/3}).
@@ -3293,316 +3293,316 @@ merge_msg_empty(_Prev, New, _TrUserData) -> New.
 merge_msg_bool_value(PMsg, NMsg, _) ->
     S1 = #{},
     case {PMsg, NMsg} of
-      {_, #{value := NFvalue}} -> S1#{value => NFvalue};
-      {#{value := PFvalue}, _} -> S1#{value => PFvalue};
-      _ -> S1
+        {_, #{value := NFvalue}} -> S1#{value => NFvalue};
+        {#{value := PFvalue}, _} -> S1#{value => PFvalue};
+        _ -> S1
     end.
 
 -compile({nowarn_unused_function,merge_msg_payload/3}).
 merge_msg_payload(PMsg, NMsg, _) ->
     S1 = #{},
     S2 = case {PMsg, NMsg} of
-	   {_, #{type := NFtype}} -> S1#{type => NFtype};
-	   {#{type := PFtype}, _} -> S1#{type => PFtype};
-	   _ -> S1
-	 end,
+             {_, #{type := NFtype}} -> S1#{type => NFtype};
+             {#{type := PFtype}, _} -> S1#{type => PFtype};
+             _ -> S1
+         end,
     case {PMsg, NMsg} of
-      {_, #{body := NFbody}} -> S2#{body => NFbody};
-      {#{body := PFbody}, _} -> S2#{body => PFbody};
-      _ -> S2
+        {_, #{body := NFbody}} -> S2#{body => NFbody};
+        {#{body := PFbody}, _} -> S2#{body => PFbody};
+        _ -> S2
     end.
 
 -compile({nowarn_unused_function,merge_msg_echo_status/3}).
 merge_msg_echo_status(PMsg, NMsg, _) ->
     S1 = #{},
     S2 = case {PMsg, NMsg} of
-	   {_, #{code := NFcode}} -> S1#{code => NFcode};
-	   {#{code := PFcode}, _} -> S1#{code => PFcode};
-	   _ -> S1
-	 end,
+             {_, #{code := NFcode}} -> S1#{code => NFcode};
+             {#{code := PFcode}, _} -> S1#{code => PFcode};
+             _ -> S1
+         end,
     case {PMsg, NMsg} of
-      {_, #{message := NFmessage}} ->
-	  S2#{message => NFmessage};
-      {#{message := PFmessage}, _} ->
-	  S2#{message => PFmessage};
-      _ -> S2
+        {_, #{message := NFmessage}} ->
+            S2#{message => NFmessage};
+        {#{message := PFmessage}, _} ->
+            S2#{message => PFmessage};
+        _ -> S2
     end.
 
 -compile({nowarn_unused_function,merge_msg_simple_request/3}).
 merge_msg_simple_request(PMsg, NMsg, TrUserData) ->
     S1 = #{},
     S2 = case {PMsg, NMsg} of
-	   {_, #{response_type := NFresponse_type}} ->
-	       S1#{response_type => NFresponse_type};
-	   {#{response_type := PFresponse_type}, _} ->
-	       S1#{response_type => PFresponse_type};
-	   _ -> S1
-	 end,
+             {_, #{response_type := NFresponse_type}} ->
+                 S1#{response_type => NFresponse_type};
+             {#{response_type := PFresponse_type}, _} ->
+                 S1#{response_type => PFresponse_type};
+             _ -> S1
+         end,
     S3 = case {PMsg, NMsg} of
-	   {_, #{response_size := NFresponse_size}} ->
-	       S2#{response_size => NFresponse_size};
-	   {#{response_size := PFresponse_size}, _} ->
-	       S2#{response_size => PFresponse_size};
-	   _ -> S2
-	 end,
+             {_, #{response_size := NFresponse_size}} ->
+                 S2#{response_size => NFresponse_size};
+             {#{response_size := PFresponse_size}, _} ->
+                 S2#{response_size => PFresponse_size};
+             _ -> S2
+         end,
     S4 = case {PMsg, NMsg} of
-	   {#{payload := PFpayload}, #{payload := NFpayload}} ->
-	       S3#{payload =>
-		       merge_msg_payload(PFpayload, NFpayload, TrUserData)};
-	   {_, #{payload := NFpayload}} ->
-	       S3#{payload => NFpayload};
-	   {#{payload := PFpayload}, _} ->
-	       S3#{payload => PFpayload};
-	   {_, _} -> S3
-	 end,
+             {#{payload := PFpayload}, #{payload := NFpayload}} ->
+                 S3#{payload =>
+                         merge_msg_payload(PFpayload, NFpayload, TrUserData)};
+             {_, #{payload := NFpayload}} ->
+                 S3#{payload => NFpayload};
+             {#{payload := PFpayload}, _} ->
+                 S3#{payload => PFpayload};
+             {_, _} -> S3
+         end,
     S5 = case {PMsg, NMsg} of
-	   {_, #{fill_username := NFfill_username}} ->
-	       S4#{fill_username => NFfill_username};
-	   {#{fill_username := PFfill_username}, _} ->
-	       S4#{fill_username => PFfill_username};
-	   _ -> S4
-	 end,
+             {_, #{fill_username := NFfill_username}} ->
+                 S4#{fill_username => NFfill_username};
+             {#{fill_username := PFfill_username}, _} ->
+                 S4#{fill_username => PFfill_username};
+             _ -> S4
+         end,
     S6 = case {PMsg, NMsg} of
-	   {_, #{fill_oauth_scope := NFfill_oauth_scope}} ->
-	       S5#{fill_oauth_scope => NFfill_oauth_scope};
-	   {#{fill_oauth_scope := PFfill_oauth_scope}, _} ->
-	       S5#{fill_oauth_scope => PFfill_oauth_scope};
-	   _ -> S5
-	 end,
+             {_, #{fill_oauth_scope := NFfill_oauth_scope}} ->
+                 S5#{fill_oauth_scope => NFfill_oauth_scope};
+             {#{fill_oauth_scope := PFfill_oauth_scope}, _} ->
+                 S5#{fill_oauth_scope => PFfill_oauth_scope};
+             _ -> S5
+         end,
     S7 = case {PMsg, NMsg} of
-	   {#{response_compressed := PFresponse_compressed},
-	    #{response_compressed := NFresponse_compressed}} ->
-	       S6#{response_compressed =>
-		       merge_msg_bool_value(PFresponse_compressed,
-					    NFresponse_compressed, TrUserData)};
-	   {_, #{response_compressed := NFresponse_compressed}} ->
-	       S6#{response_compressed => NFresponse_compressed};
-	   {#{response_compressed := PFresponse_compressed}, _} ->
-	       S6#{response_compressed => PFresponse_compressed};
-	   {_, _} -> S6
-	 end,
+             {#{response_compressed := PFresponse_compressed},
+              #{response_compressed := NFresponse_compressed}} ->
+                 S6#{response_compressed =>
+                         merge_msg_bool_value(PFresponse_compressed,
+                                              NFresponse_compressed, TrUserData)};
+             {_, #{response_compressed := NFresponse_compressed}} ->
+                 S6#{response_compressed => NFresponse_compressed};
+             {#{response_compressed := PFresponse_compressed}, _} ->
+                 S6#{response_compressed => PFresponse_compressed};
+             {_, _} -> S6
+         end,
     S8 = case {PMsg, NMsg} of
-	   {#{response_status := PFresponse_status},
-	    #{response_status := NFresponse_status}} ->
-	       S7#{response_status =>
-		       merge_msg_echo_status(PFresponse_status,
-					     NFresponse_status, TrUserData)};
-	   {_, #{response_status := NFresponse_status}} ->
-	       S7#{response_status => NFresponse_status};
-	   {#{response_status := PFresponse_status}, _} ->
-	       S7#{response_status => PFresponse_status};
-	   {_, _} -> S7
-	 end,
+             {#{response_status := PFresponse_status},
+              #{response_status := NFresponse_status}} ->
+                 S7#{response_status =>
+                         merge_msg_echo_status(PFresponse_status,
+                                               NFresponse_status, TrUserData)};
+             {_, #{response_status := NFresponse_status}} ->
+                 S7#{response_status => NFresponse_status};
+             {#{response_status := PFresponse_status}, _} ->
+                 S7#{response_status => PFresponse_status};
+             {_, _} -> S7
+         end,
     case {PMsg, NMsg} of
-      {#{expect_compressed := PFexpect_compressed},
-       #{expect_compressed := NFexpect_compressed}} ->
-	  S8#{expect_compressed =>
-		  merge_msg_bool_value(PFexpect_compressed,
-				       NFexpect_compressed, TrUserData)};
-      {_, #{expect_compressed := NFexpect_compressed}} ->
-	  S8#{expect_compressed => NFexpect_compressed};
-      {#{expect_compressed := PFexpect_compressed}, _} ->
-	  S8#{expect_compressed => PFexpect_compressed};
-      {_, _} -> S8
+        {#{expect_compressed := PFexpect_compressed},
+         #{expect_compressed := NFexpect_compressed}} ->
+            S8#{expect_compressed =>
+                    merge_msg_bool_value(PFexpect_compressed,
+                                         NFexpect_compressed, TrUserData)};
+        {_, #{expect_compressed := NFexpect_compressed}} ->
+            S8#{expect_compressed => NFexpect_compressed};
+        {#{expect_compressed := PFexpect_compressed}, _} ->
+            S8#{expect_compressed => PFexpect_compressed};
+        {_, _} -> S8
     end.
 
 -compile({nowarn_unused_function,merge_msg_simple_response/3}).
 merge_msg_simple_response(PMsg, NMsg, TrUserData) ->
     S1 = #{},
     S2 = case {PMsg, NMsg} of
-	   {#{payload := PFpayload}, #{payload := NFpayload}} ->
-	       S1#{payload =>
-		       merge_msg_payload(PFpayload, NFpayload, TrUserData)};
-	   {_, #{payload := NFpayload}} ->
-	       S1#{payload => NFpayload};
-	   {#{payload := PFpayload}, _} ->
-	       S1#{payload => PFpayload};
-	   {_, _} -> S1
-	 end,
+             {#{payload := PFpayload}, #{payload := NFpayload}} ->
+                 S1#{payload =>
+                         merge_msg_payload(PFpayload, NFpayload, TrUserData)};
+             {_, #{payload := NFpayload}} ->
+                 S1#{payload => NFpayload};
+             {#{payload := PFpayload}, _} ->
+                 S1#{payload => PFpayload};
+             {_, _} -> S1
+         end,
     S3 = case {PMsg, NMsg} of
-	   {_, #{username := NFusername}} ->
-	       S2#{username => NFusername};
-	   {#{username := PFusername}, _} ->
-	       S2#{username => PFusername};
-	   _ -> S2
-	 end,
+             {_, #{username := NFusername}} ->
+                 S2#{username => NFusername};
+             {#{username := PFusername}, _} ->
+                 S2#{username => PFusername};
+             _ -> S2
+         end,
     case {PMsg, NMsg} of
-      {_, #{oauth_scope := NFoauth_scope}} ->
-	  S3#{oauth_scope => NFoauth_scope};
-      {#{oauth_scope := PFoauth_scope}, _} ->
-	  S3#{oauth_scope => PFoauth_scope};
-      _ -> S3
+        {_, #{oauth_scope := NFoauth_scope}} ->
+            S3#{oauth_scope => NFoauth_scope};
+        {#{oauth_scope := PFoauth_scope}, _} ->
+            S3#{oauth_scope => PFoauth_scope};
+        _ -> S3
     end.
 
 -compile({nowarn_unused_function,merge_msg_streaming_input_call_request/3}).
 merge_msg_streaming_input_call_request(PMsg, NMsg,
-				       TrUserData) ->
+                                       TrUserData) ->
     S1 = #{},
     S2 = case {PMsg, NMsg} of
-	   {#{payload := PFpayload}, #{payload := NFpayload}} ->
-	       S1#{payload =>
-		       merge_msg_payload(PFpayload, NFpayload, TrUserData)};
-	   {_, #{payload := NFpayload}} ->
-	       S1#{payload => NFpayload};
-	   {#{payload := PFpayload}, _} ->
-	       S1#{payload => PFpayload};
-	   {_, _} -> S1
-	 end,
+             {#{payload := PFpayload}, #{payload := NFpayload}} ->
+                 S1#{payload =>
+                         merge_msg_payload(PFpayload, NFpayload, TrUserData)};
+             {_, #{payload := NFpayload}} ->
+                 S1#{payload => NFpayload};
+             {#{payload := PFpayload}, _} ->
+                 S1#{payload => PFpayload};
+             {_, _} -> S1
+         end,
     case {PMsg, NMsg} of
-      {#{expect_compressed := PFexpect_compressed},
-       #{expect_compressed := NFexpect_compressed}} ->
-	  S2#{expect_compressed =>
-		  merge_msg_bool_value(PFexpect_compressed,
-				       NFexpect_compressed, TrUserData)};
-      {_, #{expect_compressed := NFexpect_compressed}} ->
-	  S2#{expect_compressed => NFexpect_compressed};
-      {#{expect_compressed := PFexpect_compressed}, _} ->
-	  S2#{expect_compressed => PFexpect_compressed};
-      {_, _} -> S2
+        {#{expect_compressed := PFexpect_compressed},
+         #{expect_compressed := NFexpect_compressed}} ->
+            S2#{expect_compressed =>
+                    merge_msg_bool_value(PFexpect_compressed,
+                                         NFexpect_compressed, TrUserData)};
+        {_, #{expect_compressed := NFexpect_compressed}} ->
+            S2#{expect_compressed => NFexpect_compressed};
+        {#{expect_compressed := PFexpect_compressed}, _} ->
+            S2#{expect_compressed => PFexpect_compressed};
+        {_, _} -> S2
     end.
 
 -compile({nowarn_unused_function,merge_msg_streaming_input_call_response/3}).
 merge_msg_streaming_input_call_response(PMsg, NMsg,
-					_) ->
+                                        _) ->
     S1 = #{},
     case {PMsg, NMsg} of
-      {_,
-       #{aggregated_payload_size :=
-	     NFaggregated_payload_size}} ->
-	  S1#{aggregated_payload_size =>
-		  NFaggregated_payload_size};
-      {#{aggregated_payload_size :=
-	     PFaggregated_payload_size},
-       _} ->
-	  S1#{aggregated_payload_size =>
-		  PFaggregated_payload_size};
-      _ -> S1
+        {_,
+         #{aggregated_payload_size :=
+               NFaggregated_payload_size}} ->
+            S1#{aggregated_payload_size =>
+                    NFaggregated_payload_size};
+        {#{aggregated_payload_size :=
+               PFaggregated_payload_size},
+         _} ->
+            S1#{aggregated_payload_size =>
+                    PFaggregated_payload_size};
+        _ -> S1
     end.
 
 -compile({nowarn_unused_function,merge_msg_response_parameters/3}).
 merge_msg_response_parameters(PMsg, NMsg, TrUserData) ->
     S1 = #{},
     S2 = case {PMsg, NMsg} of
-	   {_, #{size := NFsize}} -> S1#{size => NFsize};
-	   {#{size := PFsize}, _} -> S1#{size => PFsize};
-	   _ -> S1
-	 end,
+             {_, #{size := NFsize}} -> S1#{size => NFsize};
+             {#{size := PFsize}, _} -> S1#{size => PFsize};
+             _ -> S1
+         end,
     S3 = case {PMsg, NMsg} of
-	   {_, #{interval_us := NFinterval_us}} ->
-	       S2#{interval_us => NFinterval_us};
-	   {#{interval_us := PFinterval_us}, _} ->
-	       S2#{interval_us => PFinterval_us};
-	   _ -> S2
-	 end,
+             {_, #{interval_us := NFinterval_us}} ->
+                 S2#{interval_us => NFinterval_us};
+             {#{interval_us := PFinterval_us}, _} ->
+                 S2#{interval_us => PFinterval_us};
+             _ -> S2
+         end,
     case {PMsg, NMsg} of
-      {#{compressed := PFcompressed},
-       #{compressed := NFcompressed}} ->
-	  S3#{compressed =>
-		  merge_msg_bool_value(PFcompressed, NFcompressed,
-				       TrUserData)};
-      {_, #{compressed := NFcompressed}} ->
-	  S3#{compressed => NFcompressed};
-      {#{compressed := PFcompressed}, _} ->
-	  S3#{compressed => PFcompressed};
-      {_, _} -> S3
+        {#{compressed := PFcompressed},
+         #{compressed := NFcompressed}} ->
+            S3#{compressed =>
+                    merge_msg_bool_value(PFcompressed, NFcompressed,
+                                         TrUserData)};
+        {_, #{compressed := NFcompressed}} ->
+            S3#{compressed => NFcompressed};
+        {#{compressed := PFcompressed}, _} ->
+            S3#{compressed => PFcompressed};
+        {_, _} -> S3
     end.
 
 -compile({nowarn_unused_function,merge_msg_streaming_output_call_request/3}).
 merge_msg_streaming_output_call_request(PMsg, NMsg,
-					TrUserData) ->
+                                        TrUserData) ->
     S1 = #{},
     S2 = case {PMsg, NMsg} of
-	   {_, #{response_type := NFresponse_type}} ->
-	       S1#{response_type => NFresponse_type};
-	   {#{response_type := PFresponse_type}, _} ->
-	       S1#{response_type => PFresponse_type};
-	   _ -> S1
-	 end,
+             {_, #{response_type := NFresponse_type}} ->
+                 S1#{response_type => NFresponse_type};
+             {#{response_type := PFresponse_type}, _} ->
+                 S1#{response_type => PFresponse_type};
+             _ -> S1
+         end,
     S3 = case {PMsg, NMsg} of
-	   {#{response_parameters := PFresponse_parameters},
-	    #{response_parameters := NFresponse_parameters}} ->
-	       S2#{response_parameters =>
-		       'erlang_++'(PFresponse_parameters,
-				   NFresponse_parameters, TrUserData)};
-	   {_, #{response_parameters := NFresponse_parameters}} ->
-	       S2#{response_parameters => NFresponse_parameters};
-	   {#{response_parameters := PFresponse_parameters}, _} ->
-	       S2#{response_parameters => PFresponse_parameters};
-	   {_, _} -> S2
-	 end,
+             {#{response_parameters := PFresponse_parameters},
+              #{response_parameters := NFresponse_parameters}} ->
+                 S2#{response_parameters =>
+                         'erlang_++'(PFresponse_parameters,
+                                     NFresponse_parameters, TrUserData)};
+             {_, #{response_parameters := NFresponse_parameters}} ->
+                 S2#{response_parameters => NFresponse_parameters};
+             {#{response_parameters := PFresponse_parameters}, _} ->
+                 S2#{response_parameters => PFresponse_parameters};
+             {_, _} -> S2
+         end,
     S4 = case {PMsg, NMsg} of
-	   {#{payload := PFpayload}, #{payload := NFpayload}} ->
-	       S3#{payload =>
-		       merge_msg_payload(PFpayload, NFpayload, TrUserData)};
-	   {_, #{payload := NFpayload}} ->
-	       S3#{payload => NFpayload};
-	   {#{payload := PFpayload}, _} ->
-	       S3#{payload => PFpayload};
-	   {_, _} -> S3
-	 end,
+             {#{payload := PFpayload}, #{payload := NFpayload}} ->
+                 S3#{payload =>
+                         merge_msg_payload(PFpayload, NFpayload, TrUserData)};
+             {_, #{payload := NFpayload}} ->
+                 S3#{payload => NFpayload};
+             {#{payload := PFpayload}, _} ->
+                 S3#{payload => PFpayload};
+             {_, _} -> S3
+         end,
     case {PMsg, NMsg} of
-      {#{response_status := PFresponse_status},
-       #{response_status := NFresponse_status}} ->
-	  S4#{response_status =>
-		  merge_msg_echo_status(PFresponse_status,
-					NFresponse_status, TrUserData)};
-      {_, #{response_status := NFresponse_status}} ->
-	  S4#{response_status => NFresponse_status};
-      {#{response_status := PFresponse_status}, _} ->
-	  S4#{response_status => PFresponse_status};
-      {_, _} -> S4
+        {#{response_status := PFresponse_status},
+         #{response_status := NFresponse_status}} ->
+            S4#{response_status =>
+                    merge_msg_echo_status(PFresponse_status,
+                                          NFresponse_status, TrUserData)};
+        {_, #{response_status := NFresponse_status}} ->
+            S4#{response_status => NFresponse_status};
+        {#{response_status := PFresponse_status}, _} ->
+            S4#{response_status => PFresponse_status};
+        {_, _} -> S4
     end.
 
 -compile({nowarn_unused_function,merge_msg_streaming_output_call_response/3}).
 merge_msg_streaming_output_call_response(PMsg, NMsg,
-					 TrUserData) ->
+                                         TrUserData) ->
     S1 = #{},
     case {PMsg, NMsg} of
-      {#{payload := PFpayload}, #{payload := NFpayload}} ->
-	  S1#{payload =>
-		  merge_msg_payload(PFpayload, NFpayload, TrUserData)};
-      {_, #{payload := NFpayload}} ->
-	  S1#{payload => NFpayload};
-      {#{payload := PFpayload}, _} ->
-	  S1#{payload => PFpayload};
-      {_, _} -> S1
+        {#{payload := PFpayload}, #{payload := NFpayload}} ->
+            S1#{payload =>
+                    merge_msg_payload(PFpayload, NFpayload, TrUserData)};
+        {_, #{payload := NFpayload}} ->
+            S1#{payload => NFpayload};
+        {#{payload := PFpayload}, _} ->
+            S1#{payload => PFpayload};
+        {_, _} -> S1
     end.
 
 -compile({nowarn_unused_function,merge_msg_reconnect_params/3}).
 merge_msg_reconnect_params(PMsg, NMsg, _) ->
     S1 = #{},
     case {PMsg, NMsg} of
-      {_,
-       #{max_reconnect_backoff_ms :=
-	     NFmax_reconnect_backoff_ms}} ->
-	  S1#{max_reconnect_backoff_ms =>
-		  NFmax_reconnect_backoff_ms};
-      {#{max_reconnect_backoff_ms :=
-	     PFmax_reconnect_backoff_ms},
-       _} ->
-	  S1#{max_reconnect_backoff_ms =>
-		  PFmax_reconnect_backoff_ms};
-      _ -> S1
+        {_,
+         #{max_reconnect_backoff_ms :=
+               NFmax_reconnect_backoff_ms}} ->
+            S1#{max_reconnect_backoff_ms =>
+                    NFmax_reconnect_backoff_ms};
+        {#{max_reconnect_backoff_ms :=
+               PFmax_reconnect_backoff_ms},
+         _} ->
+            S1#{max_reconnect_backoff_ms =>
+                    PFmax_reconnect_backoff_ms};
+        _ -> S1
     end.
 
 -compile({nowarn_unused_function,merge_msg_reconnect_info/3}).
 merge_msg_reconnect_info(PMsg, NMsg, TrUserData) ->
     S1 = #{},
     S2 = case {PMsg, NMsg} of
-	   {_, #{passed := NFpassed}} -> S1#{passed => NFpassed};
-	   {#{passed := PFpassed}, _} -> S1#{passed => PFpassed};
-	   _ -> S1
-	 end,
+             {_, #{passed := NFpassed}} -> S1#{passed => NFpassed};
+             {#{passed := PFpassed}, _} -> S1#{passed => PFpassed};
+             _ -> S1
+         end,
     case {PMsg, NMsg} of
-      {#{backoff_ms := PFbackoff_ms},
-       #{backoff_ms := NFbackoff_ms}} ->
-	  S2#{backoff_ms =>
-		  'erlang_++'(PFbackoff_ms, NFbackoff_ms, TrUserData)};
-      {_, #{backoff_ms := NFbackoff_ms}} ->
-	  S2#{backoff_ms => NFbackoff_ms};
-      {#{backoff_ms := PFbackoff_ms}, _} ->
-	  S2#{backoff_ms => PFbackoff_ms};
-      {_, _} -> S2
+        {#{backoff_ms := PFbackoff_ms},
+         #{backoff_ms := NFbackoff_ms}} ->
+            S2#{backoff_ms =>
+                    'erlang_++'(PFbackoff_ms, NFbackoff_ms, TrUserData)};
+        {_, #{backoff_ms := NFbackoff_ms}} ->
+            S2#{backoff_ms => NFbackoff_ms};
+        {#{backoff_ms := PFbackoff_ms}, _} ->
+            S2#{backoff_ms => PFbackoff_ms};
+        {_, _} -> S2
     end.
 
 
@@ -3612,35 +3612,35 @@ verify_msg(Msg, MsgName) when is_atom(MsgName) ->
 verify_msg(Msg, MsgName, Opts) ->
     TrUserData = proplists:get_value(user_data, Opts),
     case MsgName of
-      empty -> v_msg_empty(Msg, [MsgName], TrUserData);
-      bool_value ->
-	  v_msg_bool_value(Msg, [MsgName], TrUserData);
-      payload -> v_msg_payload(Msg, [MsgName], TrUserData);
-      echo_status ->
-	  v_msg_echo_status(Msg, [MsgName], TrUserData);
-      simple_request ->
-	  v_msg_simple_request(Msg, [MsgName], TrUserData);
-      simple_response ->
-	  v_msg_simple_response(Msg, [MsgName], TrUserData);
-      streaming_input_call_request ->
-	  v_msg_streaming_input_call_request(Msg, [MsgName],
-					     TrUserData);
-      streaming_input_call_response ->
-	  v_msg_streaming_input_call_response(Msg, [MsgName],
-					      TrUserData);
-      response_parameters ->
-	  v_msg_response_parameters(Msg, [MsgName], TrUserData);
-      streaming_output_call_request ->
-	  v_msg_streaming_output_call_request(Msg, [MsgName],
-					      TrUserData);
-      streaming_output_call_response ->
-	  v_msg_streaming_output_call_response(Msg, [MsgName],
-					       TrUserData);
-      reconnect_params ->
-	  v_msg_reconnect_params(Msg, [MsgName], TrUserData);
-      reconnect_info ->
-	  v_msg_reconnect_info(Msg, [MsgName], TrUserData);
-      _ -> mk_type_error(not_a_known_message, Msg, [])
+        empty -> v_msg_empty(Msg, [MsgName], TrUserData);
+        bool_value ->
+            v_msg_bool_value(Msg, [MsgName], TrUserData);
+        payload -> v_msg_payload(Msg, [MsgName], TrUserData);
+        echo_status ->
+            v_msg_echo_status(Msg, [MsgName], TrUserData);
+        simple_request ->
+            v_msg_simple_request(Msg, [MsgName], TrUserData);
+        simple_response ->
+            v_msg_simple_response(Msg, [MsgName], TrUserData);
+        streaming_input_call_request ->
+            v_msg_streaming_input_call_request(Msg, [MsgName],
+                                               TrUserData);
+        streaming_input_call_response ->
+            v_msg_streaming_input_call_response(Msg, [MsgName],
+                                                TrUserData);
+        response_parameters ->
+            v_msg_response_parameters(Msg, [MsgName], TrUserData);
+        streaming_output_call_request ->
+            v_msg_streaming_output_call_request(Msg, [MsgName],
+                                                TrUserData);
+        streaming_output_call_response ->
+            v_msg_streaming_output_call_response(Msg, [MsgName],
+                                                 TrUserData);
+        reconnect_params ->
+            v_msg_reconnect_params(Msg, [MsgName], TrUserData);
+        reconnect_info ->
+            v_msg_reconnect_info(Msg, [MsgName], TrUserData);
+        _ -> mk_type_error(not_a_known_message, Msg, [])
     end.
 
 
@@ -3648,14 +3648,14 @@ verify_msg(Msg, MsgName, Opts) ->
 -dialyzer({nowarn_function,v_msg_empty/3}).
 v_msg_empty(#{} = M, Path, _) ->
     lists:foreach(fun (OtherKey) ->
-			  mk_type_error({extraneous_key, OtherKey}, M, Path)
-		  end,
-		  maps:keys(M)),
+                          mk_type_error({extraneous_key, OtherKey}, M, Path)
+                  end,
+                  maps:keys(M)),
     ok;
 v_msg_empty(M, Path, _TrUserData) when is_map(M) ->
     mk_type_error({missing_fields, [] -- maps:keys(M),
-		   empty},
-		  M, Path);
+                   empty},
+                  M, Path);
 v_msg_empty(X, Path, _TrUserData) ->
     mk_type_error({expected_msg, empty}, X, Path).
 
@@ -3663,20 +3663,20 @@ v_msg_empty(X, Path, _TrUserData) ->
 -dialyzer({nowarn_function,v_msg_bool_value/3}).
 v_msg_bool_value(#{} = M, Path, TrUserData) ->
     case M of
-      #{value := F1} ->
-	  v_type_bool(F1, [value | Path], TrUserData);
-      _ -> ok
+        #{value := F1} ->
+            v_type_bool(F1, [value | Path], TrUserData);
+        _ -> ok
     end,
     lists:foreach(fun (value) -> ok;
-		      (OtherKey) ->
-			  mk_type_error({extraneous_key, OtherKey}, M, Path)
-		  end,
-		  maps:keys(M)),
+                      (OtherKey) ->
+                          mk_type_error({extraneous_key, OtherKey}, M, Path)
+                  end,
+                  maps:keys(M)),
     ok;
 v_msg_bool_value(M, Path, _TrUserData) when is_map(M) ->
     mk_type_error({missing_fields, [] -- maps:keys(M),
-		   bool_value},
-		  M, Path);
+                   bool_value},
+                  M, Path);
 v_msg_bool_value(X, Path, _TrUserData) ->
     mk_type_error({expected_msg, bool_value}, X, Path).
 
@@ -3684,27 +3684,27 @@ v_msg_bool_value(X, Path, _TrUserData) ->
 -dialyzer({nowarn_function,v_msg_payload/3}).
 v_msg_payload(#{} = M, Path, TrUserData) ->
     case M of
-      #{type := F1} ->
-	  'v_enum_grpc.testing.PayloadType'(F1, [type | Path],
-					    TrUserData);
-      _ -> ok
+        #{type := F1} ->
+            'v_enum_grpc.testing.PayloadType'(F1, [type | Path],
+                                              TrUserData);
+        _ -> ok
     end,
     case M of
-      #{body := F2} ->
-	  v_type_bytes(F2, [body | Path], TrUserData);
-      _ -> ok
+        #{body := F2} ->
+            v_type_bytes(F2, [body | Path], TrUserData);
+        _ -> ok
     end,
     lists:foreach(fun (type) -> ok;
-		      (body) -> ok;
-		      (OtherKey) ->
-			  mk_type_error({extraneous_key, OtherKey}, M, Path)
-		  end,
-		  maps:keys(M)),
+                      (body) -> ok;
+                      (OtherKey) ->
+                          mk_type_error({extraneous_key, OtherKey}, M, Path)
+                  end,
+                  maps:keys(M)),
     ok;
 v_msg_payload(M, Path, _TrUserData) when is_map(M) ->
     mk_type_error({missing_fields, [] -- maps:keys(M),
-		   payload},
-		  M, Path);
+                   payload},
+                  M, Path);
 v_msg_payload(X, Path, _TrUserData) ->
     mk_type_error({expected_msg, payload}, X, Path).
 
@@ -3712,27 +3712,27 @@ v_msg_payload(X, Path, _TrUserData) ->
 -dialyzer({nowarn_function,v_msg_echo_status/3}).
 v_msg_echo_status(#{} = M, Path, TrUserData) ->
     case M of
-      #{code := F1} ->
-	  v_type_int32(F1, [code | Path], TrUserData);
-      _ -> ok
+        #{code := F1} ->
+            v_type_int32(F1, [code | Path], TrUserData);
+        _ -> ok
     end,
     case M of
-      #{message := F2} ->
-	  v_type_string(F2, [message | Path], TrUserData);
-      _ -> ok
+        #{message := F2} ->
+            v_type_string(F2, [message | Path], TrUserData);
+        _ -> ok
     end,
     lists:foreach(fun (code) -> ok;
-		      (message) -> ok;
-		      (OtherKey) ->
-			  mk_type_error({extraneous_key, OtherKey}, M, Path)
-		  end,
-		  maps:keys(M)),
+                      (message) -> ok;
+                      (OtherKey) ->
+                          mk_type_error({extraneous_key, OtherKey}, M, Path)
+                  end,
+                  maps:keys(M)),
     ok;
 v_msg_echo_status(M, Path, _TrUserData)
-    when is_map(M) ->
+  when is_map(M) ->
     mk_type_error({missing_fields, [] -- maps:keys(M),
-		   echo_status},
-		  M, Path);
+                   echo_status},
+                  M, Path);
 v_msg_echo_status(X, Path, _TrUserData) ->
     mk_type_error({expected_msg, echo_status}, X, Path).
 
@@ -3740,67 +3740,67 @@ v_msg_echo_status(X, Path, _TrUserData) ->
 -dialyzer({nowarn_function,v_msg_simple_request/3}).
 v_msg_simple_request(#{} = M, Path, TrUserData) ->
     case M of
-      #{response_type := F1} ->
-	  'v_enum_grpc.testing.PayloadType'(F1,
-					    [response_type | Path], TrUserData);
-      _ -> ok
+        #{response_type := F1} ->
+            'v_enum_grpc.testing.PayloadType'(F1,
+                                              [response_type | Path], TrUserData);
+        _ -> ok
     end,
     case M of
-      #{response_size := F2} ->
-	  v_type_int32(F2, [response_size | Path], TrUserData);
-      _ -> ok
+        #{response_size := F2} ->
+            v_type_int32(F2, [response_size | Path], TrUserData);
+        _ -> ok
     end,
     case M of
-      #{payload := F3} ->
-	  v_msg_payload(F3, [payload | Path], TrUserData);
-      _ -> ok
+        #{payload := F3} ->
+            v_msg_payload(F3, [payload | Path], TrUserData);
+        _ -> ok
     end,
     case M of
-      #{fill_username := F4} ->
-	  v_type_bool(F4, [fill_username | Path], TrUserData);
-      _ -> ok
+        #{fill_username := F4} ->
+            v_type_bool(F4, [fill_username | Path], TrUserData);
+        _ -> ok
     end,
     case M of
-      #{fill_oauth_scope := F5} ->
-	  v_type_bool(F5, [fill_oauth_scope | Path], TrUserData);
-      _ -> ok
+        #{fill_oauth_scope := F5} ->
+            v_type_bool(F5, [fill_oauth_scope | Path], TrUserData);
+        _ -> ok
     end,
     case M of
-      #{response_compressed := F6} ->
-	  v_msg_bool_value(F6, [response_compressed | Path],
-			   TrUserData);
-      _ -> ok
+        #{response_compressed := F6} ->
+            v_msg_bool_value(F6, [response_compressed | Path],
+                             TrUserData);
+        _ -> ok
     end,
     case M of
-      #{response_status := F7} ->
-	  v_msg_echo_status(F7, [response_status | Path],
-			    TrUserData);
-      _ -> ok
+        #{response_status := F7} ->
+            v_msg_echo_status(F7, [response_status | Path],
+                              TrUserData);
+        _ -> ok
     end,
     case M of
-      #{expect_compressed := F8} ->
-	  v_msg_bool_value(F8, [expect_compressed | Path],
-			   TrUserData);
-      _ -> ok
+        #{expect_compressed := F8} ->
+            v_msg_bool_value(F8, [expect_compressed | Path],
+                             TrUserData);
+        _ -> ok
     end,
     lists:foreach(fun (response_type) -> ok;
-		      (response_size) -> ok;
-		      (payload) -> ok;
-		      (fill_username) -> ok;
-		      (fill_oauth_scope) -> ok;
-		      (response_compressed) -> ok;
-		      (response_status) -> ok;
-		      (expect_compressed) -> ok;
-		      (OtherKey) ->
-			  mk_type_error({extraneous_key, OtherKey}, M, Path)
-		  end,
-		  maps:keys(M)),
+                      (response_size) -> ok;
+                      (payload) -> ok;
+                      (fill_username) -> ok;
+                      (fill_oauth_scope) -> ok;
+                      (response_compressed) -> ok;
+                      (response_status) -> ok;
+                      (expect_compressed) -> ok;
+                      (OtherKey) ->
+                          mk_type_error({extraneous_key, OtherKey}, M, Path)
+                  end,
+                  maps:keys(M)),
     ok;
 v_msg_simple_request(M, Path, _TrUserData)
-    when is_map(M) ->
+  when is_map(M) ->
     mk_type_error({missing_fields, [] -- maps:keys(M),
-		   simple_request},
-		  M, Path);
+                   simple_request},
+                  M, Path);
 v_msg_simple_request(X, Path, _TrUserData) ->
     mk_type_error({expected_msg, simple_request}, X, Path).
 
@@ -3808,313 +3808,313 @@ v_msg_simple_request(X, Path, _TrUserData) ->
 -dialyzer({nowarn_function,v_msg_simple_response/3}).
 v_msg_simple_response(#{} = M, Path, TrUserData) ->
     case M of
-      #{payload := F1} ->
-	  v_msg_payload(F1, [payload | Path], TrUserData);
-      _ -> ok
+        #{payload := F1} ->
+            v_msg_payload(F1, [payload | Path], TrUserData);
+        _ -> ok
     end,
     case M of
-      #{username := F2} ->
-	  v_type_string(F2, [username | Path], TrUserData);
-      _ -> ok
+        #{username := F2} ->
+            v_type_string(F2, [username | Path], TrUserData);
+        _ -> ok
     end,
     case M of
-      #{oauth_scope := F3} ->
-	  v_type_string(F3, [oauth_scope | Path], TrUserData);
-      _ -> ok
+        #{oauth_scope := F3} ->
+            v_type_string(F3, [oauth_scope | Path], TrUserData);
+        _ -> ok
     end,
     lists:foreach(fun (payload) -> ok;
-		      (username) -> ok;
-		      (oauth_scope) -> ok;
-		      (OtherKey) ->
-			  mk_type_error({extraneous_key, OtherKey}, M, Path)
-		  end,
-		  maps:keys(M)),
+                      (username) -> ok;
+                      (oauth_scope) -> ok;
+                      (OtherKey) ->
+                          mk_type_error({extraneous_key, OtherKey}, M, Path)
+                  end,
+                  maps:keys(M)),
     ok;
 v_msg_simple_response(M, Path, _TrUserData)
-    when is_map(M) ->
+  when is_map(M) ->
     mk_type_error({missing_fields, [] -- maps:keys(M),
-		   simple_response},
-		  M, Path);
+                   simple_response},
+                  M, Path);
 v_msg_simple_response(X, Path, _TrUserData) ->
     mk_type_error({expected_msg, simple_response}, X, Path).
 
 -compile({nowarn_unused_function,v_msg_streaming_input_call_request/3}).
 -dialyzer({nowarn_function,v_msg_streaming_input_call_request/3}).
 v_msg_streaming_input_call_request(#{} = M, Path,
-				   TrUserData) ->
+                                   TrUserData) ->
     case M of
-      #{payload := F1} ->
-	  v_msg_payload(F1, [payload | Path], TrUserData);
-      _ -> ok
+        #{payload := F1} ->
+            v_msg_payload(F1, [payload | Path], TrUserData);
+        _ -> ok
     end,
     case M of
-      #{expect_compressed := F2} ->
-	  v_msg_bool_value(F2, [expect_compressed | Path],
-			   TrUserData);
-      _ -> ok
+        #{expect_compressed := F2} ->
+            v_msg_bool_value(F2, [expect_compressed | Path],
+                             TrUserData);
+        _ -> ok
     end,
     lists:foreach(fun (payload) -> ok;
-		      (expect_compressed) -> ok;
-		      (OtherKey) ->
-			  mk_type_error({extraneous_key, OtherKey}, M, Path)
-		  end,
-		  maps:keys(M)),
+                      (expect_compressed) -> ok;
+                      (OtherKey) ->
+                          mk_type_error({extraneous_key, OtherKey}, M, Path)
+                  end,
+                  maps:keys(M)),
     ok;
 v_msg_streaming_input_call_request(M, Path, _TrUserData)
-    when is_map(M) ->
+  when is_map(M) ->
     mk_type_error({missing_fields, [] -- maps:keys(M),
-		   streaming_input_call_request},
-		  M, Path);
+                   streaming_input_call_request},
+                  M, Path);
 v_msg_streaming_input_call_request(X, Path,
-				   _TrUserData) ->
+                                   _TrUserData) ->
     mk_type_error({expected_msg,
-		   streaming_input_call_request},
-		  X, Path).
+                   streaming_input_call_request},
+                  X, Path).
 
 -compile({nowarn_unused_function,v_msg_streaming_input_call_response/3}).
 -dialyzer({nowarn_function,v_msg_streaming_input_call_response/3}).
 v_msg_streaming_input_call_response(#{} = M, Path,
-				    TrUserData) ->
+                                    TrUserData) ->
     case M of
-      #{aggregated_payload_size := F1} ->
-	  v_type_int32(F1, [aggregated_payload_size | Path],
-		       TrUserData);
-      _ -> ok
+        #{aggregated_payload_size := F1} ->
+            v_type_int32(F1, [aggregated_payload_size | Path],
+                         TrUserData);
+        _ -> ok
     end,
     lists:foreach(fun (aggregated_payload_size) -> ok;
-		      (OtherKey) ->
-			  mk_type_error({extraneous_key, OtherKey}, M, Path)
-		  end,
-		  maps:keys(M)),
+                      (OtherKey) ->
+                          mk_type_error({extraneous_key, OtherKey}, M, Path)
+                  end,
+                  maps:keys(M)),
     ok;
 v_msg_streaming_input_call_response(M, Path,
-				    _TrUserData)
-    when is_map(M) ->
+                                    _TrUserData)
+  when is_map(M) ->
     mk_type_error({missing_fields, [] -- maps:keys(M),
-		   streaming_input_call_response},
-		  M, Path);
+                   streaming_input_call_response},
+                  M, Path);
 v_msg_streaming_input_call_response(X, Path,
-				    _TrUserData) ->
+                                    _TrUserData) ->
     mk_type_error({expected_msg,
-		   streaming_input_call_response},
-		  X, Path).
+                   streaming_input_call_response},
+                  X, Path).
 
 -compile({nowarn_unused_function,v_msg_response_parameters/3}).
 -dialyzer({nowarn_function,v_msg_response_parameters/3}).
 v_msg_response_parameters(#{} = M, Path, TrUserData) ->
     case M of
-      #{size := F1} ->
-	  v_type_int32(F1, [size | Path], TrUserData);
-      _ -> ok
+        #{size := F1} ->
+            v_type_int32(F1, [size | Path], TrUserData);
+        _ -> ok
     end,
     case M of
-      #{interval_us := F2} ->
-	  v_type_int32(F2, [interval_us | Path], TrUserData);
-      _ -> ok
+        #{interval_us := F2} ->
+            v_type_int32(F2, [interval_us | Path], TrUserData);
+        _ -> ok
     end,
     case M of
-      #{compressed := F3} ->
-	  v_msg_bool_value(F3, [compressed | Path], TrUserData);
-      _ -> ok
+        #{compressed := F3} ->
+            v_msg_bool_value(F3, [compressed | Path], TrUserData);
+        _ -> ok
     end,
     lists:foreach(fun (size) -> ok;
-		      (interval_us) -> ok;
-		      (compressed) -> ok;
-		      (OtherKey) ->
-			  mk_type_error({extraneous_key, OtherKey}, M, Path)
-		  end,
-		  maps:keys(M)),
+                      (interval_us) -> ok;
+                      (compressed) -> ok;
+                      (OtherKey) ->
+                          mk_type_error({extraneous_key, OtherKey}, M, Path)
+                  end,
+                  maps:keys(M)),
     ok;
 v_msg_response_parameters(M, Path, _TrUserData)
-    when is_map(M) ->
+  when is_map(M) ->
     mk_type_error({missing_fields, [] -- maps:keys(M),
-		   response_parameters},
-		  M, Path);
+                   response_parameters},
+                  M, Path);
 v_msg_response_parameters(X, Path, _TrUserData) ->
     mk_type_error({expected_msg, response_parameters}, X,
-		  Path).
+                  Path).
 
 -compile({nowarn_unused_function,v_msg_streaming_output_call_request/3}).
 -dialyzer({nowarn_function,v_msg_streaming_output_call_request/3}).
 v_msg_streaming_output_call_request(#{} = M, Path,
-				    TrUserData) ->
+                                    TrUserData) ->
     case M of
-      #{response_type := F1} ->
-	  'v_enum_grpc.testing.PayloadType'(F1,
-					    [response_type | Path], TrUserData);
-      _ -> ok
+        #{response_type := F1} ->
+            'v_enum_grpc.testing.PayloadType'(F1,
+                                              [response_type | Path], TrUserData);
+        _ -> ok
     end,
     case M of
-      #{response_parameters := F2} ->
-	  if is_list(F2) ->
-		 _ = [v_msg_response_parameters(Elem,
-						[response_parameters | Path],
-						TrUserData)
-		      || Elem <- F2],
-		 ok;
-	     true ->
-		 mk_type_error({invalid_list_of,
-				{msg, response_parameters}},
-			       F2, [response_parameters | Path])
-	  end;
-      _ -> ok
+        #{response_parameters := F2} ->
+            if is_list(F2) ->
+                    _ = [v_msg_response_parameters(Elem,
+                                                   [response_parameters | Path],
+                                                   TrUserData)
+                         || Elem <- F2],
+                    ok;
+               true ->
+                    mk_type_error({invalid_list_of,
+                                   {msg, response_parameters}},
+                                  F2, [response_parameters | Path])
+            end;
+        _ -> ok
     end,
     case M of
-      #{payload := F3} ->
-	  v_msg_payload(F3, [payload | Path], TrUserData);
-      _ -> ok
+        #{payload := F3} ->
+            v_msg_payload(F3, [payload | Path], TrUserData);
+        _ -> ok
     end,
     case M of
-      #{response_status := F4} ->
-	  v_msg_echo_status(F4, [response_status | Path],
-			    TrUserData);
-      _ -> ok
+        #{response_status := F4} ->
+            v_msg_echo_status(F4, [response_status | Path],
+                              TrUserData);
+        _ -> ok
     end,
     lists:foreach(fun (response_type) -> ok;
-		      (response_parameters) -> ok;
-		      (payload) -> ok;
-		      (response_status) -> ok;
-		      (OtherKey) ->
-			  mk_type_error({extraneous_key, OtherKey}, M, Path)
-		  end,
-		  maps:keys(M)),
+                      (response_parameters) -> ok;
+                      (payload) -> ok;
+                      (response_status) -> ok;
+                      (OtherKey) ->
+                          mk_type_error({extraneous_key, OtherKey}, M, Path)
+                  end,
+                  maps:keys(M)),
     ok;
 v_msg_streaming_output_call_request(M, Path,
-				    _TrUserData)
-    when is_map(M) ->
+                                    _TrUserData)
+  when is_map(M) ->
     mk_type_error({missing_fields, [] -- maps:keys(M),
-		   streaming_output_call_request},
-		  M, Path);
+                   streaming_output_call_request},
+                  M, Path);
 v_msg_streaming_output_call_request(X, Path,
-				    _TrUserData) ->
+                                    _TrUserData) ->
     mk_type_error({expected_msg,
-		   streaming_output_call_request},
-		  X, Path).
+                   streaming_output_call_request},
+                  X, Path).
 
 -compile({nowarn_unused_function,v_msg_streaming_output_call_response/3}).
 -dialyzer({nowarn_function,v_msg_streaming_output_call_response/3}).
 v_msg_streaming_output_call_response(#{} = M, Path,
-				     TrUserData) ->
+                                     TrUserData) ->
     case M of
-      #{payload := F1} ->
-	  v_msg_payload(F1, [payload | Path], TrUserData);
-      _ -> ok
+        #{payload := F1} ->
+            v_msg_payload(F1, [payload | Path], TrUserData);
+        _ -> ok
     end,
     lists:foreach(fun (payload) -> ok;
-		      (OtherKey) ->
-			  mk_type_error({extraneous_key, OtherKey}, M, Path)
-		  end,
-		  maps:keys(M)),
+                      (OtherKey) ->
+                          mk_type_error({extraneous_key, OtherKey}, M, Path)
+                  end,
+                  maps:keys(M)),
     ok;
 v_msg_streaming_output_call_response(M, Path,
-				     _TrUserData)
-    when is_map(M) ->
+                                     _TrUserData)
+  when is_map(M) ->
     mk_type_error({missing_fields, [] -- maps:keys(M),
-		   streaming_output_call_response},
-		  M, Path);
+                   streaming_output_call_response},
+                  M, Path);
 v_msg_streaming_output_call_response(X, Path,
-				     _TrUserData) ->
+                                     _TrUserData) ->
     mk_type_error({expected_msg,
-		   streaming_output_call_response},
-		  X, Path).
+                   streaming_output_call_response},
+                  X, Path).
 
 -compile({nowarn_unused_function,v_msg_reconnect_params/3}).
 -dialyzer({nowarn_function,v_msg_reconnect_params/3}).
 v_msg_reconnect_params(#{} = M, Path, TrUserData) ->
     case M of
-      #{max_reconnect_backoff_ms := F1} ->
-	  v_type_int32(F1, [max_reconnect_backoff_ms | Path],
-		       TrUserData);
-      _ -> ok
+        #{max_reconnect_backoff_ms := F1} ->
+            v_type_int32(F1, [max_reconnect_backoff_ms | Path],
+                         TrUserData);
+        _ -> ok
     end,
     lists:foreach(fun (max_reconnect_backoff_ms) -> ok;
-		      (OtherKey) ->
-			  mk_type_error({extraneous_key, OtherKey}, M, Path)
-		  end,
-		  maps:keys(M)),
+                      (OtherKey) ->
+                          mk_type_error({extraneous_key, OtherKey}, M, Path)
+                  end,
+                  maps:keys(M)),
     ok;
 v_msg_reconnect_params(M, Path, _TrUserData)
-    when is_map(M) ->
+  when is_map(M) ->
     mk_type_error({missing_fields, [] -- maps:keys(M),
-		   reconnect_params},
-		  M, Path);
+                   reconnect_params},
+                  M, Path);
 v_msg_reconnect_params(X, Path, _TrUserData) ->
     mk_type_error({expected_msg, reconnect_params}, X,
-		  Path).
+                  Path).
 
 -compile({nowarn_unused_function,v_msg_reconnect_info/3}).
 -dialyzer({nowarn_function,v_msg_reconnect_info/3}).
 v_msg_reconnect_info(#{} = M, Path, TrUserData) ->
     case M of
-      #{passed := F1} ->
-	  v_type_bool(F1, [passed | Path], TrUserData);
-      _ -> ok
+        #{passed := F1} ->
+            v_type_bool(F1, [passed | Path], TrUserData);
+        _ -> ok
     end,
     case M of
-      #{backoff_ms := F2} ->
-	  if is_list(F2) ->
-		 _ = [v_type_int32(Elem, [backoff_ms | Path], TrUserData)
-		      || Elem <- F2],
-		 ok;
-	     true ->
-		 mk_type_error({invalid_list_of, int32}, F2,
-			       [backoff_ms | Path])
-	  end;
-      _ -> ok
+        #{backoff_ms := F2} ->
+            if is_list(F2) ->
+                    _ = [v_type_int32(Elem, [backoff_ms | Path], TrUserData)
+                         || Elem <- F2],
+                    ok;
+               true ->
+                    mk_type_error({invalid_list_of, int32}, F2,
+                                  [backoff_ms | Path])
+            end;
+        _ -> ok
     end,
     lists:foreach(fun (passed) -> ok;
-		      (backoff_ms) -> ok;
-		      (OtherKey) ->
-			  mk_type_error({extraneous_key, OtherKey}, M, Path)
-		  end,
-		  maps:keys(M)),
+                      (backoff_ms) -> ok;
+                      (OtherKey) ->
+                          mk_type_error({extraneous_key, OtherKey}, M, Path)
+                  end,
+                  maps:keys(M)),
     ok;
 v_msg_reconnect_info(M, Path, _TrUserData)
-    when is_map(M) ->
+  when is_map(M) ->
     mk_type_error({missing_fields, [] -- maps:keys(M),
-		   reconnect_info},
-		  M, Path);
+                   reconnect_info},
+                  M, Path);
 v_msg_reconnect_info(X, Path, _TrUserData) ->
     mk_type_error({expected_msg, reconnect_info}, X, Path).
 
 -compile({nowarn_unused_function,'v_enum_grpc.testing.PayloadType'/3}).
 -dialyzer({nowarn_function,'v_enum_grpc.testing.PayloadType'/3}).
 'v_enum_grpc.testing.PayloadType'('COMPRESSABLE', _Path,
-				  _TrUserData) ->
+                                  _TrUserData) ->
     ok;
 'v_enum_grpc.testing.PayloadType'(V, Path, TrUserData)
-    when is_integer(V) ->
+  when is_integer(V) ->
     v_type_sint32(V, Path, TrUserData);
 'v_enum_grpc.testing.PayloadType'(X, Path,
-				  _TrUserData) ->
+                                  _TrUserData) ->
     mk_type_error({invalid_enum,
-		   'grpc.testing.PayloadType'},
-		  X, Path).
+                   'grpc.testing.PayloadType'},
+                  X, Path).
 
 -compile({nowarn_unused_function,v_type_sint32/3}).
 -dialyzer({nowarn_function,v_type_sint32/3}).
 v_type_sint32(N, _Path, _TrUserData)
-    when -2147483648 =< N, N =< 2147483647 ->
+  when -2147483648 =< N, N =< 2147483647 ->
     ok;
 v_type_sint32(N, Path, _TrUserData)
-    when is_integer(N) ->
+  when is_integer(N) ->
     mk_type_error({value_out_of_range, sint32, signed, 32},
-		  N, Path);
+                  N, Path);
 v_type_sint32(X, Path, _TrUserData) ->
     mk_type_error({bad_integer, sint32, signed, 32}, X,
-		  Path).
+                  Path).
 
 -compile({nowarn_unused_function,v_type_int32/3}).
 -dialyzer({nowarn_function,v_type_int32/3}).
 v_type_int32(N, _Path, _TrUserData)
-    when -2147483648 =< N, N =< 2147483647 ->
+  when -2147483648 =< N, N =< 2147483647 ->
     ok;
 v_type_int32(N, Path, _TrUserData) when is_integer(N) ->
     mk_type_error({value_out_of_range, int32, signed, 32},
-		  N, Path);
+                  N, Path);
 v_type_int32(X, Path, _TrUserData) ->
     mk_type_error({bad_integer, int32, signed, 32}, X,
-		  Path).
+                  Path).
 
 -compile({nowarn_unused_function,v_type_bool/3}).
 -dialyzer({nowarn_function,v_type_bool/3}).
@@ -4128,14 +4128,14 @@ v_type_bool(X, Path, _TrUserData) ->
 -compile({nowarn_unused_function,v_type_string/3}).
 -dialyzer({nowarn_function,v_type_string/3}).
 v_type_string(S, Path, _TrUserData)
-    when is_list(S); is_binary(S) ->
+  when is_list(S); is_binary(S) ->
     try unicode:characters_to_binary(S) of
-      B when is_binary(B) -> ok;
-      {error, _, _} ->
-	  mk_type_error(bad_unicode_string, S, Path)
+        B when is_binary(B) -> ok;
+        {error, _, _} ->
+            mk_type_error(bad_unicode_string, S, Path)
     catch
-      error:badarg ->
-	  mk_type_error(bad_unicode_string, S, Path)
+        error:badarg ->
+            mk_type_error(bad_unicode_string, S, Path)
     end;
 v_type_string(X, Path, _TrUserData) ->
     mk_type_error(bad_unicode_string, X, Path).
@@ -4154,7 +4154,7 @@ v_type_bytes(X, Path, _TrUserData) ->
 mk_type_error(Error, ValueSeen, Path) ->
     Path2 = prettify_path(Path),
     erlang:error({gpb_type_error,
-		  {Error, [{value, ValueSeen}, {path, Path2}]}}).
+                  {Error, [{value, ValueSeen}, {path, Path2}]}}).
 
 
 -compile({nowarn_unused_function,prettify_path/1}).
@@ -4162,8 +4162,8 @@ mk_type_error(Error, ValueSeen, Path) ->
 prettify_path([]) -> top_level;
 prettify_path(PathR) ->
     list_to_atom(lists:append(lists:join(".",
-					 lists:map(fun atom_to_list/1,
-						   lists:reverse(PathR))))).
+                                         lists:map(fun atom_to_list/1,
+                                                   lists:reverse(PathR))))).
 
 
 -compile({nowarn_unused_function,id/2}).
@@ -4195,94 +4195,94 @@ get_msg_defs() ->
      {{msg, empty}, []},
      {{msg, bool_value},
       [#{name => value, fnum => 1, rnum => 2, type => bool,
-	 occurrence => optional, opts => []}]},
+         occurrence => optional, opts => []}]},
      {{msg, payload},
       [#{name => type, fnum => 1, rnum => 2,
-	 type => {enum, 'grpc.testing.PayloadType'},
-	 occurrence => optional, opts => []},
+         type => {enum, 'grpc.testing.PayloadType'},
+         occurrence => optional, opts => []},
        #{name => body, fnum => 2, rnum => 3, type => bytes,
-	 occurrence => optional, opts => []}]},
+         occurrence => optional, opts => []}]},
      {{msg, echo_status},
       [#{name => code, fnum => 1, rnum => 2, type => int32,
-	 occurrence => optional, opts => []},
+         occurrence => optional, opts => []},
        #{name => message, fnum => 2, rnum => 3, type => string,
-	 occurrence => optional, opts => []}]},
+         occurrence => optional, opts => []}]},
      {{msg, simple_request},
       [#{name => response_type, fnum => 1, rnum => 2,
-	 type => {enum, 'grpc.testing.PayloadType'},
-	 occurrence => optional, opts => []},
+         type => {enum, 'grpc.testing.PayloadType'},
+         occurrence => optional, opts => []},
        #{name => response_size, fnum => 2, rnum => 3,
-	 type => int32, occurrence => optional, opts => []},
+         type => int32, occurrence => optional, opts => []},
        #{name => payload, fnum => 3, rnum => 4,
-	 type => {msg, payload}, occurrence => optional,
-	 opts => []},
+         type => {msg, payload}, occurrence => optional,
+         opts => []},
        #{name => fill_username, fnum => 4, rnum => 5,
-	 type => bool, occurrence => optional, opts => []},
+         type => bool, occurrence => optional, opts => []},
        #{name => fill_oauth_scope, fnum => 5, rnum => 6,
-	 type => bool, occurrence => optional, opts => []},
+         type => bool, occurrence => optional, opts => []},
        #{name => response_compressed, fnum => 6, rnum => 7,
-	 type => {msg, bool_value}, occurrence => optional,
-	 opts => []},
+         type => {msg, bool_value}, occurrence => optional,
+         opts => []},
        #{name => response_status, fnum => 7, rnum => 8,
-	 type => {msg, echo_status}, occurrence => optional,
-	 opts => []},
+         type => {msg, echo_status}, occurrence => optional,
+         opts => []},
        #{name => expect_compressed, fnum => 8, rnum => 9,
-	 type => {msg, bool_value}, occurrence => optional,
-	 opts => []}]},
+         type => {msg, bool_value}, occurrence => optional,
+         opts => []}]},
      {{msg, simple_response},
       [#{name => payload, fnum => 1, rnum => 2,
-	 type => {msg, payload}, occurrence => optional,
-	 opts => []},
+         type => {msg, payload}, occurrence => optional,
+         opts => []},
        #{name => username, fnum => 2, rnum => 3,
-	 type => string, occurrence => optional, opts => []},
+         type => string, occurrence => optional, opts => []},
        #{name => oauth_scope, fnum => 3, rnum => 4,
-	 type => string, occurrence => optional, opts => []}]},
+         type => string, occurrence => optional, opts => []}]},
      {{msg, streaming_input_call_request},
       [#{name => payload, fnum => 1, rnum => 2,
-	 type => {msg, payload}, occurrence => optional,
-	 opts => []},
+         type => {msg, payload}, occurrence => optional,
+         opts => []},
        #{name => expect_compressed, fnum => 2, rnum => 3,
-	 type => {msg, bool_value}, occurrence => optional,
-	 opts => []}]},
+         type => {msg, bool_value}, occurrence => optional,
+         opts => []}]},
      {{msg, streaming_input_call_response},
       [#{name => aggregated_payload_size, fnum => 1,
-	 rnum => 2, type => int32, occurrence => optional,
-	 opts => []}]},
+         rnum => 2, type => int32, occurrence => optional,
+         opts => []}]},
      {{msg, response_parameters},
       [#{name => size, fnum => 1, rnum => 2, type => int32,
-	 occurrence => optional, opts => []},
+         occurrence => optional, opts => []},
        #{name => interval_us, fnum => 2, rnum => 3,
-	 type => int32, occurrence => optional, opts => []},
+         type => int32, occurrence => optional, opts => []},
        #{name => compressed, fnum => 3, rnum => 4,
-	 type => {msg, bool_value}, occurrence => optional,
-	 opts => []}]},
+         type => {msg, bool_value}, occurrence => optional,
+         opts => []}]},
      {{msg, streaming_output_call_request},
       [#{name => response_type, fnum => 1, rnum => 2,
-	 type => {enum, 'grpc.testing.PayloadType'},
-	 occurrence => optional, opts => []},
+         type => {enum, 'grpc.testing.PayloadType'},
+         occurrence => optional, opts => []},
        #{name => response_parameters, fnum => 2, rnum => 3,
-	 type => {msg, response_parameters},
-	 occurrence => repeated, opts => []},
+         type => {msg, response_parameters},
+         occurrence => repeated, opts => []},
        #{name => payload, fnum => 3, rnum => 4,
-	 type => {msg, payload}, occurrence => optional,
-	 opts => []},
+         type => {msg, payload}, occurrence => optional,
+         opts => []},
        #{name => response_status, fnum => 7, rnum => 5,
-	 type => {msg, echo_status}, occurrence => optional,
-	 opts => []}]},
+         type => {msg, echo_status}, occurrence => optional,
+         opts => []}]},
      {{msg, streaming_output_call_response},
       [#{name => payload, fnum => 1, rnum => 2,
-	 type => {msg, payload}, occurrence => optional,
-	 opts => []}]},
+         type => {msg, payload}, occurrence => optional,
+         opts => []}]},
      {{msg, reconnect_params},
       [#{name => max_reconnect_backoff_ms, fnum => 1,
-	 rnum => 2, type => int32, occurrence => optional,
-	 opts => []}]},
+         rnum => 2, type => int32, occurrence => optional,
+         opts => []}]},
      {{msg, reconnect_info},
       [#{name => passed, fnum => 1, rnum => 2, type => bool,
-	 occurrence => optional, opts => []},
+         occurrence => optional, opts => []},
        #{name => backoff_ms, fnum => 2, rnum => 3,
-	 type => int32, occurrence => repeated,
-	 opts => [packed]}]}].
+         type => int32, occurrence => repeated,
+         opts => [packed]}]}].
 
 
 get_msg_names() ->
@@ -4313,15 +4313,15 @@ get_enum_names() -> ['grpc.testing.PayloadType'].
 
 fetch_msg_def(MsgName) ->
     case find_msg_def(MsgName) of
-      Fs when is_list(Fs) -> Fs;
-      error -> erlang:error({no_such_msg, MsgName})
+        Fs when is_list(Fs) -> Fs;
+        error -> erlang:error({no_such_msg, MsgName})
     end.
 
 
 fetch_enum_def(EnumName) ->
     case find_enum_def(EnumName) of
-      Es when is_list(Es) -> Es;
-      error -> erlang:error({no_such_enum, EnumName})
+        Es when is_list(Es) -> Es;
+        error -> erlang:error({no_such_enum, EnumName})
     end.
 
 
@@ -4425,7 +4425,7 @@ find_enum_def(_) -> error.
 
 
 enum_symbol_by_value('grpc.testing.PayloadType',
-		     Value) ->
+                     Value) ->
     'enum_symbol_by_value_grpc.testing.PayloadType'(Value).
 
 
@@ -4450,50 +4450,50 @@ get_service_names() ->
 get_service_def('grpc.testing.TestService') ->
     {{service, 'grpc.testing.TestService'},
      [#{name => 'EmptyCall', input => empty, output => empty,
-	input_stream => false, output_stream => false,
-	opts => []},
+        input_stream => false, output_stream => false,
+        opts => []},
       #{name => 'UnaryCall', input => simple_request,
-	output => simple_response, input_stream => false,
-	output_stream => false, opts => []},
+        output => simple_response, input_stream => false,
+        output_stream => false, opts => []},
       #{name => 'CacheableUnaryCall', input => simple_request,
-	output => simple_response, input_stream => false,
-	output_stream => false, opts => []},
+        output => simple_response, input_stream => false,
+        output_stream => false, opts => []},
       #{name => 'StreamingOutputCall',
-	input => streaming_output_call_request,
-	output => streaming_output_call_response,
-	input_stream => false, output_stream => true,
-	opts => []},
+        input => streaming_output_call_request,
+        output => streaming_output_call_response,
+        input_stream => false, output_stream => true,
+        opts => []},
       #{name => 'StreamingInputCall',
-	input => streaming_input_call_request,
-	output => streaming_input_call_response,
-	input_stream => true, output_stream => false,
-	opts => []},
+        input => streaming_input_call_request,
+        output => streaming_input_call_response,
+        input_stream => true, output_stream => false,
+        opts => []},
       #{name => 'FullDuplexCall',
-	input => streaming_output_call_request,
-	output => streaming_output_call_response,
-	input_stream => true, output_stream => true,
-	opts => []},
+        input => streaming_output_call_request,
+        output => streaming_output_call_response,
+        input_stream => true, output_stream => true,
+        opts => []},
       #{name => 'HalfDuplexCall',
-	input => streaming_output_call_request,
-	output => streaming_output_call_response,
-	input_stream => true, output_stream => true,
-	opts => []},
+        input => streaming_output_call_request,
+        output => streaming_output_call_response,
+        input_stream => true, output_stream => true,
+        opts => []},
       #{name => 'UnimplementedCall', input => empty,
-	output => empty, input_stream => false,
-	output_stream => false, opts => []}]};
+        output => empty, input_stream => false,
+        output_stream => false, opts => []}]};
 get_service_def('grpc.testing.UnimplementedService') ->
     {{service, 'grpc.testing.UnimplementedService'},
      [#{name => 'UnimplementedCall', input => empty,
-	output => empty, input_stream => false,
-	output_stream => false, opts => []}]};
+        output => empty, input_stream => false,
+        output_stream => false, opts => []}]};
 get_service_def('grpc.testing.ReconnectService') ->
     {{service, 'grpc.testing.ReconnectService'},
      [#{name => 'Start', input => reconnect_params,
-	output => empty, input_stream => false,
-	output_stream => false, opts => []},
+        output => empty, input_stream => false,
+        output_stream => false, opts => []},
       #{name => 'Stop', input => empty,
-	output => reconnect_info, input_stream => false,
-	output_stream => false, opts => []}]};
+        output => reconnect_info, input_stream => false,
+        output_stream => false, opts => []}]};
 get_service_def(_) -> error.
 
 
@@ -4512,10 +4512,10 @@ get_rpc_names(_) -> error.
 find_rpc_def('grpc.testing.TestService', RpcName) ->
     'find_rpc_def_grpc.testing.TestService'(RpcName);
 find_rpc_def('grpc.testing.UnimplementedService',
-	     RpcName) ->
+             RpcName) ->
     'find_rpc_def_grpc.testing.UnimplementedService'(RpcName);
 find_rpc_def('grpc.testing.ReconnectService',
-	     RpcName) ->
+             RpcName) ->
     'find_rpc_def_grpc.testing.ReconnectService'(RpcName);
 find_rpc_def(_, _) -> error.
 
@@ -4583,9 +4583,9 @@ find_rpc_def(_, _) -> error.
 
 fetch_rpc_def(ServiceName, RpcName) ->
     case find_rpc_def(ServiceName, RpcName) of
-      Def when is_map(Def) -> Def;
-      error ->
-	  erlang:error({no_such_rpc, ServiceName, RpcName})
+        Def when is_map(Def) -> Def;
+        error ->
+            erlang:error({no_such_rpc, ServiceName, RpcName})
     end.
 
 
@@ -4647,37 +4647,37 @@ fqbins_to_service_and_rpc_name(S, R) ->
 %% to a fully qualified (ie with package name) service name and
 %% an rpc name as binaries.
 service_and_rpc_name_to_fqbins('grpc.testing.TestService',
-			       'EmptyCall') ->
+                               'EmptyCall') ->
     {<<"grpc.testing.TestService">>, <<"EmptyCall">>};
 service_and_rpc_name_to_fqbins('grpc.testing.TestService',
-			       'UnaryCall') ->
+                               'UnaryCall') ->
     {<<"grpc.testing.TestService">>, <<"UnaryCall">>};
 service_and_rpc_name_to_fqbins('grpc.testing.TestService',
-			       'CacheableUnaryCall') ->
+                               'CacheableUnaryCall') ->
     {<<"grpc.testing.TestService">>, <<"CacheableUnaryCall">>};
 service_and_rpc_name_to_fqbins('grpc.testing.TestService',
-			       'StreamingOutputCall') ->
+                               'StreamingOutputCall') ->
     {<<"grpc.testing.TestService">>, <<"StreamingOutputCall">>};
 service_and_rpc_name_to_fqbins('grpc.testing.TestService',
-			       'StreamingInputCall') ->
+                               'StreamingInputCall') ->
     {<<"grpc.testing.TestService">>, <<"StreamingInputCall">>};
 service_and_rpc_name_to_fqbins('grpc.testing.TestService',
-			       'FullDuplexCall') ->
+                               'FullDuplexCall') ->
     {<<"grpc.testing.TestService">>, <<"FullDuplexCall">>};
 service_and_rpc_name_to_fqbins('grpc.testing.TestService',
-			       'HalfDuplexCall') ->
+                               'HalfDuplexCall') ->
     {<<"grpc.testing.TestService">>, <<"HalfDuplexCall">>};
 service_and_rpc_name_to_fqbins('grpc.testing.TestService',
-			       'UnimplementedCall') ->
+                               'UnimplementedCall') ->
     {<<"grpc.testing.TestService">>, <<"UnimplementedCall">>};
 service_and_rpc_name_to_fqbins('grpc.testing.UnimplementedService',
-			       'UnimplementedCall') ->
+                               'UnimplementedCall') ->
     {<<"grpc.testing.UnimplementedService">>, <<"UnimplementedCall">>};
 service_and_rpc_name_to_fqbins('grpc.testing.ReconnectService',
-			       'Start') ->
+                               'Start') ->
     {<<"grpc.testing.ReconnectService">>, <<"Start">>};
 service_and_rpc_name_to_fqbins('grpc.testing.ReconnectService',
-			       'Stop') ->
+                               'Stop') ->
     {<<"grpc.testing.ReconnectService">>, <<"Stop">>};
 service_and_rpc_name_to_fqbins(S, R) ->
     error({gpb_error, {badservice_or_rpc, {S, R}}}).

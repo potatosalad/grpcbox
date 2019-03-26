@@ -101,11 +101,11 @@ auth_fun(Directory) ->
 issuer_ids_from_directory(Dir) ->
     {ok, Filenames} = file:list_dir(Dir),
     Keyfiles = lists:filter(fun(N) ->
-                                case filename:extension(N) of
-                                    ".pem" -> true;
-                                    ".crt" -> true;
-                                    _ -> false
-                                end
+                                    case filename:extension(N) of
+                                        ".pem" -> true;
+                                        ".crt" -> true;
+                                        _ -> false
+                                    end
                             end, Filenames),
     maps:from_list([issuer_id_from_file(filename:join([Dir, F]))
                     || F <- Keyfiles]).
@@ -118,7 +118,7 @@ certfile_to_issuer_id(Filename) ->
     {ok, Data} = file:read_file(Filename),
     [{'Certificate', Cert, not_encrypted}] = public_key:pem_decode(Data),
     {ok, IssuerID} = public_key:pkix_issuer_id(Cert, self),
-IssuerID.
+    IssuerID.
 
 %% grpc requests are of the form `<pkg>.<Service>/<Method>` in camelcase. For this reason we
 %% have gpb keep the service definitions in their original form and convert to snake case here

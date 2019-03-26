@@ -6,26 +6,26 @@
          route_chat/2]).
 
 -type route_summary() ::
-    #{point_count => integer(),
-      feature_count => integer(),
-      distance => integer(),
-      elapsed_time => integer()}.
+        #{point_count => integer(),
+          feature_count => integer(),
+          distance => integer(),
+          elapsed_time => integer()}.
 
 -type point() ::
-    #{latitude => integer(),
-      longitude => integer()}.
+        #{latitude => integer(),
+          longitude => integer()}.
 
 -type rectangle() ::
-    #{lo => point(),
-      hi => point()}.
+        #{lo => point(),
+          hi => point()}.
 
 -type route_note() ::
-    #{location => point(),
-      message => string()}.
+        #{location => point(),
+          message => string()}.
 
 -type feature() ::
-    #{name => string(),
-      location => point()}.
+        #{name => string(),
+          location => point()}.
 
 -spec get_feature(Ctx :: ctx:ctx(), Message :: point()) -> {ok, feature(), ctx:ctx()}.
 get_feature(Ctx, Message) ->
@@ -37,8 +37,8 @@ get_feature(Ctx, Message) ->
 list_features(_Message, GrpcStream) ->
     grpcbox_stream:add_headers([{<<"info">>, <<"this is a test-implementation">>}], GrpcStream),
     grpcbox_stream:send(#{name => <<"Tour Eiffel">>,
-                                        location => #{latitude => 3,
-                                                      longitude => 5}}, GrpcStream),
+                          location => #{latitude => 3,
+                                        longitude => 5}}, GrpcStream),
     grpcbox_stream:send(#{name => <<"Louvre">>,
                           location => #{latitude => 4,
                                         longitude => 5}}, GrpcStream),

@@ -43,7 +43,7 @@ unary_call(Ctx, Request=#{response_size := Size}) ->
     end.
 
 -spec cacheable_unary_call(ctx:ctx(), test_pb:simple_request()) ->
-    {ok, test_pb:simple_response()} | grpcbox_stream:grpc_error_response().
+                                  {ok, test_pb:simple_response()} | grpcbox_stream:grpc_error_response().
 cacheable_unary_call(Ctx, _SimpleRequest) ->
     {ok, #{}, Ctx}.
 
@@ -104,7 +104,7 @@ full_duplex_call_(Ref, Stream) ->
     end.
 
 -spec half_duplex_call(reference(), grpcbox_stream:t()) ->
-    ok | grpcbox_stream:grpc_error_response().
+                              ok | grpcbox_stream:grpc_error_response().
 half_duplex_call(_Ref, _Stream) ->
     ok.
 

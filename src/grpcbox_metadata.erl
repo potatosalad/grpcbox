@@ -31,7 +31,7 @@
 -spec new(#{unicode:chardata() => unicode:chardata()}) -> t().
 new(Map) ->
     maps:fold(fun(K, V, Acc) ->
-                  maps:put(string:lowercase(K), V, Acc)
+                      maps:put(string:lowercase(K), V, Acc)
               end, #{}, Map).
 
 new_incoming_ctx(Map) ->
@@ -49,9 +49,9 @@ pairs(List) ->
 -spec join([t()]) -> t().
 join(Metadatas) ->
     lists:foldl(fun(Map, Acc) ->
-                    maps:fold(fun(Key, Value, Acc1) ->
-                                  update(Key, Value, Acc1)
-                              end, Acc, Map)
+                        maps:fold(fun(Key, Value, Acc1) ->
+                                          update(Key, Value, Acc1)
+                                  end, Acc, Map)
                 end, #{}, Metadatas).
 
 -spec from_incoming_ctx(ctx:t()) -> t().

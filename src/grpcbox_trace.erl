@@ -25,12 +25,12 @@ unary_client(Ctx, _Channel, Handler, FullMethod, Input, _Def, _Options) ->
 
 new_stream(Ctx, Channel, Path, Def, Streamer, Options) ->
     {ok, S} = Streamer(Ctx, Channel, Path, Def, Options),
-    {ok, #{client_stream => S}}.
+    {ok, grpcbox_client_stream:put_private(S, ?MODULE, true)}.
 
-send_msg(#{client_stream := ClientStream}, Streamer, Input) ->
+send_msg(ClientStream=#{private := #{?MODULE := true}}, Streamer, Input) ->
     Streamer(ClientStream, Input).
 
-recv_msg(#{client_stream := ClientStream}, Streamer, Input) ->
+recv_msg(ClientStream=#{private := #{?MODULE := true}}, Streamer, Input) ->
     Streamer(ClientStream, Input).
 
 unary(Ctx, Message, _ServerInfo=#{full_method := FullMethod}, Handler) ->

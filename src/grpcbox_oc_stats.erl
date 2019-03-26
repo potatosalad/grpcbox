@@ -8,13 +8,13 @@
          extra_views/0,
          extra_views/1]).
 
-%% grpc_client_method 	Full gRPC method name, including package, service and method,
+%% grpc_client_method   Full gRPC method name, including package, service and method,
 %%                      e.g. google.bigtable.v2.Bigtable/CheckAndMutateRow
-%% grpc_client_status 	gRPC server status code received, e.g. OK, CANCELLED, DEADLINE_EXCEEDED
+%% grpc_client_status   gRPC server status code received, e.g. OK, CANCELLED, DEADLINE_EXCEEDED
 
-%% grpc_server_method 	Full gRPC method name, including package, service and method,
+%% grpc_server_method   Full gRPC method name, including package, service and method,
 %%                       e.g. com.exampleapi.v4.BookshelfService/Checkout
-%% grpc_server_status 	gRPC server status code returned, e.g. OK, CANCELLED, DEADLINE_EXCEEDED
+%% grpc_server_status   gRPC server status code returned, e.g. OK, CANCELLED, DEADLINE_EXCEEDED
 
 register_measures() ->
     register_measures(client),

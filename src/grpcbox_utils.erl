@@ -42,12 +42,12 @@ decode_header(Base64) ->
 encode_headers([]) ->
     [];
 encode_headers([{Key, Value} | Rest]) ->
-     case binary:longest_common_suffix([Key, <<"-bin">>]) == 4 of
-         true ->
-             [{Key, base64:encode(Value)} | encode_headers(Rest)];
-         false ->
-             [{Key, Value} | encode_headers(Rest)]
-     end.
+    case binary:longest_common_suffix([Key, <<"-bin">>]) == 4 of
+        true ->
+            [{Key, base64:encode(Value)} | encode_headers(Rest)];
+        false ->
+            [{Key, Value} | encode_headers(Rest)]
+    end.
 
 is_reserved_header(<<"content-type">>) -> true;
 is_reserved_header(<<"grpc-message-type">>) -> true;

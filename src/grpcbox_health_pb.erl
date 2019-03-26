@@ -53,12 +53,12 @@
 
 %% message types
 -type health_check_request() ::
-      #{service                 => iodata()         % = 1
-       }.
+        #{service                 => iodata()         % = 1
+         }.
 
 -type health_check_response() ::
-      #{status                  => 'UNKNOWN' | 'SERVING' | 'NOT_SERVING' | 'SERVICE_UNKNOWN' | integer() % = 1, enum health_check_response.ServingStatus
-       }.
+        #{status                  => 'UNKNOWN' | 'SERVING' | 'NOT_SERVING' | 'SERVICE_UNKNOWN' | integer() % = 1, enum health_check_response.ServingStatus
+         }.
 
 -export_type(['health_check_request'/0, 'health_check_response'/0]).
 
@@ -69,17 +69,17 @@ encode_msg(Msg, MsgName) when is_atom(MsgName) ->
 -spec encode_msg(health_check_request() | health_check_response(), atom(), list()) -> binary().
 encode_msg(Msg, MsgName, Opts) ->
     case proplists:get_bool(verify, Opts) of
-      true -> verify_msg(Msg, MsgName, Opts);
-      false -> ok
+        true -> verify_msg(Msg, MsgName, Opts);
+        false -> ok
     end,
     TrUserData = proplists:get_value(user_data, Opts),
     case MsgName of
-      health_check_request ->
-	  encode_msg_health_check_request(id(Msg, TrUserData),
-					  TrUserData);
-      health_check_response ->
-	  encode_msg_health_check_response(id(Msg, TrUserData),
-					   TrUserData)
+        health_check_request ->
+            encode_msg_health_check_request(id(Msg, TrUserData),
+                                            TrUserData);
+        health_check_response ->
+            encode_msg_health_check_response(id(Msg, TrUserData),
+                                             TrUserData)
     end.
 
 
@@ -88,18 +88,18 @@ encode_msg_health_check_request(Msg, TrUserData) ->
 
 
 encode_msg_health_check_request(#{} = M, Bin,
-				TrUserData) ->
+                                TrUserData) ->
     case M of
-      #{service := F1} ->
-	  begin
-	    TrF1 = id(F1, TrUserData),
-	    case is_empty_string(TrF1) of
-	      true -> Bin;
-	      false ->
-		  e_type_string(TrF1, <<Bin/binary, 10>>, TrUserData)
-	    end
-	  end;
-      _ -> Bin
+        #{service := F1} ->
+            begin
+                TrF1 = id(F1, TrUserData),
+                case is_empty_string(TrF1) of
+                    true -> Bin;
+                    false ->
+                        e_type_string(TrF1, <<Bin/binary, 10>>, TrUserData)
+                end
+            end;
+        _ -> Bin
     end.
 
 encode_msg_health_check_response(Msg, TrUserData) ->
@@ -107,36 +107,36 @@ encode_msg_health_check_response(Msg, TrUserData) ->
 
 
 encode_msg_health_check_response(#{} = M, Bin,
-				 TrUserData) ->
+                                 TrUserData) ->
     case M of
-      #{status := F1} ->
-	  begin
-	    TrF1 = id(F1, TrUserData),
-	    if TrF1 =:= 'UNKNOWN'; TrF1 =:= 0 -> Bin;
-	       true ->
-		   'e_enum_health_check_response.ServingStatus'(TrF1,
-								<<Bin/binary,
-								  8>>,
-								'MaybeTrUserData')
-	    end
-	  end;
-      _ -> Bin
+        #{status := F1} ->
+            begin
+                TrF1 = id(F1, TrUserData),
+                if TrF1 =:= 'UNKNOWN'; TrF1 =:= 0 -> Bin;
+                   true ->
+                        'e_enum_health_check_response.ServingStatus'(TrF1,
+                                                                     <<Bin/binary,
+                                                                       8>>,
+                                                                     'MaybeTrUserData')
+                end
+            end;
+        _ -> Bin
     end.
 
 'e_enum_health_check_response.ServingStatus'('UNKNOWN',
-					     Bin, _TrUserData) ->
+                                             Bin, _TrUserData) ->
     <<Bin/binary, 0>>;
 'e_enum_health_check_response.ServingStatus'('SERVING',
-					     Bin, _TrUserData) ->
+                                             Bin, _TrUserData) ->
     <<Bin/binary, 1>>;
 'e_enum_health_check_response.ServingStatus'('NOT_SERVING',
-					     Bin, _TrUserData) ->
+                                             Bin, _TrUserData) ->
     <<Bin/binary, 2>>;
 'e_enum_health_check_response.ServingStatus'('SERVICE_UNKNOWN',
-					     Bin, _TrUserData) ->
+                                             Bin, _TrUserData) ->
     <<Bin/binary, 3>>;
 'e_enum_health_check_response.ServingStatus'(V, Bin,
-					     _TrUserData) ->
+                                             _TrUserData) ->
     e_varint(V, Bin).
 
 -compile({nowarn_unused_function,e_type_sint/3}).
@@ -147,7 +147,7 @@ e_type_sint(Value, Bin, _TrUserData) ->
 
 -compile({nowarn_unused_function,e_type_int32/3}).
 e_type_int32(Value, Bin, _TrUserData)
-    when 0 =< Value, Value =< 127 ->
+  when 0 =< Value, Value =< 127 ->
     <<Bin/binary, Value>>;
 e_type_int32(Value, Bin, _TrUserData) ->
     <<N:64/unsigned-native>> = <<Value:64/signed-native>>,
@@ -155,7 +155,7 @@ e_type_int32(Value, Bin, _TrUserData) ->
 
 -compile({nowarn_unused_function,e_type_int64/3}).
 e_type_int64(Value, Bin, _TrUserData)
-    when 0 =< Value, Value =< 127 ->
+  when 0 =< Value, Value =< 127 ->
     <<Bin/binary, Value>>;
 e_type_int64(Value, Bin, _TrUserData) ->
     <<N:64/unsigned-native>> = <<Value:64/signed-native>>,
@@ -177,11 +177,11 @@ e_type_string(S, Bin, _TrUserData) ->
 
 -compile({nowarn_unused_function,e_type_bytes/3}).
 e_type_bytes(Bytes, Bin, _TrUserData)
-    when is_binary(Bytes) ->
+  when is_binary(Bytes) ->
     Bin2 = e_varint(byte_size(Bytes), Bin),
     <<Bin2/binary, Bytes/binary>>;
 e_type_bytes(Bytes, Bin, _TrUserData)
-    when is_list(Bytes) ->
+  when is_list(Bytes) ->
     BytesBin = iolist_to_binary(Bytes),
     Bin2 = e_varint(byte_size(BytesBin), Bin),
     <<Bin2/binary, BytesBin/binary>>.
@@ -240,11 +240,11 @@ is_empty_string(B) when is_binary(B) -> false.
 string_has_chars([C | _]) when is_integer(C) -> true;
 string_has_chars([H | T]) ->
     case string_has_chars(H) of
-      true -> true;
-      false -> string_has_chars(T)
+        true -> true;
+        false -> string_has_chars(T)
     end;
 string_has_chars(B)
-    when is_binary(B), byte_size(B) =/= 0 ->
+  when is_binary(B), byte_size(B) =/= 0 ->
     true;
 string_has_chars(C) when is_integer(C) -> true;
 string_has_chars(<<>>) -> false;
@@ -267,17 +267,17 @@ decode_msg_1_catch(Bin, MsgName, TrUserData) ->
 decode_msg_1_catch(Bin, MsgName, TrUserData) ->
     try decode_msg_2_doit(MsgName, Bin, TrUserData)
     catch Class:Reason ->
-        StackTrace = erlang:get_stacktrace(),
-        error({gpb_error,{decoding_failure, {Bin, MsgName, {Class, Reason, StackTrace}}}})
+            StackTrace = erlang:get_stacktrace(),
+            error({gpb_error,{decoding_failure, {Bin, MsgName, {Class, Reason, StackTrace}}}})
     end.
 -endif.
 
 decode_msg_2_doit(health_check_request, Bin,
-		  TrUserData) ->
+                  TrUserData) ->
     id(decode_msg_health_check_request(Bin, TrUserData),
        TrUserData);
 decode_msg_2_doit(health_check_response, Bin,
-		  TrUserData) ->
+                  TrUserData) ->
     id(decode_msg_health_check_response(Bin, TrUserData),
        TrUserData).
 
@@ -285,233 +285,233 @@ decode_msg_2_doit(health_check_response, Bin,
 
 decode_msg_health_check_request(Bin, TrUserData) ->
     dfp_read_field_def_health_check_request(Bin, 0, 0,
-					    id(<<>>, TrUserData), TrUserData).
+                                            id(<<>>, TrUserData), TrUserData).
 
 dfp_read_field_def_health_check_request(<<10,
-					  Rest/binary>>,
-					Z1, Z2, F@_1, TrUserData) ->
+                                          Rest/binary>>,
+                                        Z1, Z2, F@_1, TrUserData) ->
     d_field_health_check_request_service(Rest, Z1, Z2, F@_1,
-					 TrUserData);
+                                         TrUserData);
 dfp_read_field_def_health_check_request(<<>>, 0, 0,
-					F@_1, _) ->
+                                        F@_1, _) ->
     #{service => F@_1};
 dfp_read_field_def_health_check_request(Other, Z1, Z2,
-					F@_1, TrUserData) ->
+                                        F@_1, TrUserData) ->
     dg_read_field_def_health_check_request(Other, Z1, Z2,
-					   F@_1, TrUserData).
+                                           F@_1, TrUserData).
 
 dg_read_field_def_health_check_request(<<1:1, X:7,
-					 Rest/binary>>,
-				       N, Acc, F@_1, TrUserData)
-    when N < 32 - 7 ->
+                                         Rest/binary>>,
+                                       N, Acc, F@_1, TrUserData)
+  when N < 32 - 7 ->
     dg_read_field_def_health_check_request(Rest, N + 7,
-					   X bsl N + Acc, F@_1, TrUserData);
+                                           X bsl N + Acc, F@_1, TrUserData);
 dg_read_field_def_health_check_request(<<0:1, X:7,
-					 Rest/binary>>,
-				       N, Acc, F@_1, TrUserData) ->
+                                         Rest/binary>>,
+                                       N, Acc, F@_1, TrUserData) ->
     Key = X bsl N + Acc,
     case Key of
-      10 ->
-	  d_field_health_check_request_service(Rest, 0, 0, F@_1,
-					       TrUserData);
-      _ ->
-	  case Key band 7 of
-	    0 ->
-		skip_varint_health_check_request(Rest, 0, 0, F@_1,
-						 TrUserData);
-	    1 ->
-		skip_64_health_check_request(Rest, 0, 0, F@_1,
-					     TrUserData);
-	    2 ->
-		skip_length_delimited_health_check_request(Rest, 0, 0,
-							   F@_1, TrUserData);
-	    3 ->
-		skip_group_health_check_request(Rest, Key bsr 3, 0,
-						F@_1, TrUserData);
-	    5 ->
-		skip_32_health_check_request(Rest, 0, 0, F@_1,
-					     TrUserData)
-	  end
+        10 ->
+            d_field_health_check_request_service(Rest, 0, 0, F@_1,
+                                                 TrUserData);
+        _ ->
+            case Key band 7 of
+                0 ->
+                    skip_varint_health_check_request(Rest, 0, 0, F@_1,
+                                                     TrUserData);
+                1 ->
+                    skip_64_health_check_request(Rest, 0, 0, F@_1,
+                                                 TrUserData);
+                2 ->
+                    skip_length_delimited_health_check_request(Rest, 0, 0,
+                                                               F@_1, TrUserData);
+                3 ->
+                    skip_group_health_check_request(Rest, Key bsr 3, 0,
+                                                    F@_1, TrUserData);
+                5 ->
+                    skip_32_health_check_request(Rest, 0, 0, F@_1,
+                                                 TrUserData)
+            end
     end;
 dg_read_field_def_health_check_request(<<>>, 0, 0, F@_1,
-				       _) ->
+                                       _) ->
     #{service => F@_1}.
 
 d_field_health_check_request_service(<<1:1, X:7,
-				       Rest/binary>>,
-				     N, Acc, F@_1, TrUserData)
-    when N < 57 ->
+                                       Rest/binary>>,
+                                     N, Acc, F@_1, TrUserData)
+  when N < 57 ->
     d_field_health_check_request_service(Rest, N + 7,
-					 X bsl N + Acc, F@_1, TrUserData);
+                                         X bsl N + Acc, F@_1, TrUserData);
 d_field_health_check_request_service(<<0:1, X:7,
-				       Rest/binary>>,
-				     N, Acc, _, TrUserData) ->
+                                       Rest/binary>>,
+                                     N, Acc, _, TrUserData) ->
     {NewFValue, RestF} = begin
-			   Len = X bsl N + Acc,
-			   <<Bytes:Len/binary, Rest2/binary>> = Rest,
-			   {id(binary:copy(Bytes), TrUserData), Rest2}
-			 end,
+                             Len = X bsl N + Acc,
+                             <<Bytes:Len/binary, Rest2/binary>> = Rest,
+                             {id(binary:copy(Bytes), TrUserData), Rest2}
+                         end,
     dfp_read_field_def_health_check_request(RestF, 0, 0,
-					    NewFValue, TrUserData).
+                                            NewFValue, TrUserData).
 
 skip_varint_health_check_request(<<1:1, _:7,
-				   Rest/binary>>,
-				 Z1, Z2, F@_1, TrUserData) ->
+                                   Rest/binary>>,
+                                 Z1, Z2, F@_1, TrUserData) ->
     skip_varint_health_check_request(Rest, Z1, Z2, F@_1,
-				     TrUserData);
+                                     TrUserData);
 skip_varint_health_check_request(<<0:1, _:7,
-				   Rest/binary>>,
-				 Z1, Z2, F@_1, TrUserData) ->
+                                   Rest/binary>>,
+                                 Z1, Z2, F@_1, TrUserData) ->
     dfp_read_field_def_health_check_request(Rest, Z1, Z2,
-					    F@_1, TrUserData).
+                                            F@_1, TrUserData).
 
 skip_length_delimited_health_check_request(<<1:1, X:7,
-					     Rest/binary>>,
-					   N, Acc, F@_1, TrUserData)
-    when N < 57 ->
+                                             Rest/binary>>,
+                                           N, Acc, F@_1, TrUserData)
+  when N < 57 ->
     skip_length_delimited_health_check_request(Rest, N + 7,
-					       X bsl N + Acc, F@_1, TrUserData);
+                                               X bsl N + Acc, F@_1, TrUserData);
 skip_length_delimited_health_check_request(<<0:1, X:7,
-					     Rest/binary>>,
-					   N, Acc, F@_1, TrUserData) ->
+                                             Rest/binary>>,
+                                           N, Acc, F@_1, TrUserData) ->
     Length = X bsl N + Acc,
     <<_:Length/binary, Rest2/binary>> = Rest,
     dfp_read_field_def_health_check_request(Rest2, 0, 0,
-					    F@_1, TrUserData).
+                                            F@_1, TrUserData).
 
 skip_group_health_check_request(Bin, FNum, Z2, F@_1,
-				TrUserData) ->
+                                TrUserData) ->
     {_, Rest} = read_group(Bin, FNum),
     dfp_read_field_def_health_check_request(Rest, 0, Z2,
-					    F@_1, TrUserData).
+                                            F@_1, TrUserData).
 
 skip_32_health_check_request(<<_:32, Rest/binary>>, Z1,
-			     Z2, F@_1, TrUserData) ->
+                             Z2, F@_1, TrUserData) ->
     dfp_read_field_def_health_check_request(Rest, Z1, Z2,
-					    F@_1, TrUserData).
+                                            F@_1, TrUserData).
 
 skip_64_health_check_request(<<_:64, Rest/binary>>, Z1,
-			     Z2, F@_1, TrUserData) ->
+                             Z2, F@_1, TrUserData) ->
     dfp_read_field_def_health_check_request(Rest, Z1, Z2,
-					    F@_1, TrUserData).
+                                            F@_1, TrUserData).
 
 decode_msg_health_check_response(Bin, TrUserData) ->
     dfp_read_field_def_health_check_response(Bin, 0, 0,
-					     id('UNKNOWN', TrUserData),
-					     TrUserData).
+                                             id('UNKNOWN', TrUserData),
+                                             TrUserData).
 
 dfp_read_field_def_health_check_response(<<8,
-					   Rest/binary>>,
-					 Z1, Z2, F@_1, TrUserData) ->
+                                           Rest/binary>>,
+                                         Z1, Z2, F@_1, TrUserData) ->
     d_field_health_check_response_status(Rest, Z1, Z2, F@_1,
-					 TrUserData);
+                                         TrUserData);
 dfp_read_field_def_health_check_response(<<>>, 0, 0,
-					 F@_1, _) ->
+                                         F@_1, _) ->
     #{status => F@_1};
 dfp_read_field_def_health_check_response(Other, Z1, Z2,
-					 F@_1, TrUserData) ->
+                                         F@_1, TrUserData) ->
     dg_read_field_def_health_check_response(Other, Z1, Z2,
-					    F@_1, TrUserData).
+                                            F@_1, TrUserData).
 
 dg_read_field_def_health_check_response(<<1:1, X:7,
-					  Rest/binary>>,
-					N, Acc, F@_1, TrUserData)
-    when N < 32 - 7 ->
+                                          Rest/binary>>,
+                                        N, Acc, F@_1, TrUserData)
+  when N < 32 - 7 ->
     dg_read_field_def_health_check_response(Rest, N + 7,
-					    X bsl N + Acc, F@_1, TrUserData);
+                                            X bsl N + Acc, F@_1, TrUserData);
 dg_read_field_def_health_check_response(<<0:1, X:7,
-					  Rest/binary>>,
-					N, Acc, F@_1, TrUserData) ->
+                                          Rest/binary>>,
+                                        N, Acc, F@_1, TrUserData) ->
     Key = X bsl N + Acc,
     case Key of
-      8 ->
-	  d_field_health_check_response_status(Rest, 0, 0, F@_1,
-					       TrUserData);
-      _ ->
-	  case Key band 7 of
-	    0 ->
-		skip_varint_health_check_response(Rest, 0, 0, F@_1,
-						  TrUserData);
-	    1 ->
-		skip_64_health_check_response(Rest, 0, 0, F@_1,
-					      TrUserData);
-	    2 ->
-		skip_length_delimited_health_check_response(Rest, 0, 0,
-							    F@_1, TrUserData);
-	    3 ->
-		skip_group_health_check_response(Rest, Key bsr 3, 0,
-						 F@_1, TrUserData);
-	    5 ->
-		skip_32_health_check_response(Rest, 0, 0, F@_1,
-					      TrUserData)
-	  end
+        8 ->
+            d_field_health_check_response_status(Rest, 0, 0, F@_1,
+                                                 TrUserData);
+        _ ->
+            case Key band 7 of
+                0 ->
+                    skip_varint_health_check_response(Rest, 0, 0, F@_1,
+                                                      TrUserData);
+                1 ->
+                    skip_64_health_check_response(Rest, 0, 0, F@_1,
+                                                  TrUserData);
+                2 ->
+                    skip_length_delimited_health_check_response(Rest, 0, 0,
+                                                                F@_1, TrUserData);
+                3 ->
+                    skip_group_health_check_response(Rest, Key bsr 3, 0,
+                                                     F@_1, TrUserData);
+                5 ->
+                    skip_32_health_check_response(Rest, 0, 0, F@_1,
+                                                  TrUserData)
+            end
     end;
 dg_read_field_def_health_check_response(<<>>, 0, 0,
-					F@_1, _) ->
+                                        F@_1, _) ->
     #{status => F@_1}.
 
 d_field_health_check_response_status(<<1:1, X:7,
-				       Rest/binary>>,
-				     N, Acc, F@_1, TrUserData)
-    when N < 57 ->
+                                       Rest/binary>>,
+                                     N, Acc, F@_1, TrUserData)
+  when N < 57 ->
     d_field_health_check_response_status(Rest, N + 7,
-					 X bsl N + Acc, F@_1, TrUserData);
+                                         X bsl N + Acc, F@_1, TrUserData);
 d_field_health_check_response_status(<<0:1, X:7,
-				       Rest/binary>>,
-				     N, Acc, _, TrUserData) ->
+                                       Rest/binary>>,
+                                     N, Acc, _, TrUserData) ->
     {NewFValue, RestF} =
-	{id('d_enum_health_check_response.ServingStatus'(begin
-							   <<Res:32/signed-native>> =
-							       <<(X bsl N +
-								    Acc):32/unsigned-native>>,
-							   id(Res, TrUserData)
-							 end),
-	    TrUserData),
-	 Rest},
+        {id('d_enum_health_check_response.ServingStatus'(begin
+                                                             <<Res:32/signed-native>> =
+                                                                 <<(X bsl N +
+                                                                        Acc):32/unsigned-native>>,
+                                                             id(Res, TrUserData)
+                                                         end),
+            TrUserData),
+         Rest},
     dfp_read_field_def_health_check_response(RestF, 0, 0,
-					     NewFValue, TrUserData).
+                                             NewFValue, TrUserData).
 
 skip_varint_health_check_response(<<1:1, _:7,
-				    Rest/binary>>,
-				  Z1, Z2, F@_1, TrUserData) ->
+                                    Rest/binary>>,
+                                  Z1, Z2, F@_1, TrUserData) ->
     skip_varint_health_check_response(Rest, Z1, Z2, F@_1,
-				      TrUserData);
+                                      TrUserData);
 skip_varint_health_check_response(<<0:1, _:7,
-				    Rest/binary>>,
-				  Z1, Z2, F@_1, TrUserData) ->
+                                    Rest/binary>>,
+                                  Z1, Z2, F@_1, TrUserData) ->
     dfp_read_field_def_health_check_response(Rest, Z1, Z2,
-					     F@_1, TrUserData).
+                                             F@_1, TrUserData).
 
 skip_length_delimited_health_check_response(<<1:1, X:7,
-					      Rest/binary>>,
-					    N, Acc, F@_1, TrUserData)
-    when N < 57 ->
+                                              Rest/binary>>,
+                                            N, Acc, F@_1, TrUserData)
+  when N < 57 ->
     skip_length_delimited_health_check_response(Rest, N + 7,
-						X bsl N + Acc, F@_1,
-						TrUserData);
+                                                X bsl N + Acc, F@_1,
+                                                TrUserData);
 skip_length_delimited_health_check_response(<<0:1, X:7,
-					      Rest/binary>>,
-					    N, Acc, F@_1, TrUserData) ->
+                                              Rest/binary>>,
+                                            N, Acc, F@_1, TrUserData) ->
     Length = X bsl N + Acc,
     <<_:Length/binary, Rest2/binary>> = Rest,
     dfp_read_field_def_health_check_response(Rest2, 0, 0,
-					     F@_1, TrUserData).
+                                             F@_1, TrUserData).
 
 skip_group_health_check_response(Bin, FNum, Z2, F@_1,
-				 TrUserData) ->
+                                 TrUserData) ->
     {_, Rest} = read_group(Bin, FNum),
     dfp_read_field_def_health_check_response(Rest, 0, Z2,
-					     F@_1, TrUserData).
+                                             F@_1, TrUserData).
 
 skip_32_health_check_response(<<_:32, Rest/binary>>, Z1,
-			      Z2, F@_1, TrUserData) ->
+                              Z2, F@_1, TrUserData) ->
     dfp_read_field_def_health_check_response(Rest, Z1, Z2,
-					     F@_1, TrUserData).
+                                             F@_1, TrUserData).
 
 skip_64_health_check_response(<<_:64, Rest/binary>>, Z1,
-			      Z2, F@_1, TrUserData) ->
+                              Z2, F@_1, TrUserData) ->
     dfp_read_field_def_health_check_response(Rest, Z1, Z2,
-					     F@_1, TrUserData).
+                                             F@_1, TrUserData).
 
 'd_enum_health_check_response.ServingStatus'(0) ->
     'UNKNOWN';
@@ -587,30 +587,30 @@ merge_msgs(Prev, New, MsgName) when is_atom(MsgName) ->
 merge_msgs(Prev, New, MsgName, Opts) ->
     TrUserData = proplists:get_value(user_data, Opts),
     case MsgName of
-      health_check_request ->
-	  merge_msg_health_check_request(Prev, New, TrUserData);
-      health_check_response ->
-	  merge_msg_health_check_response(Prev, New, TrUserData)
+        health_check_request ->
+            merge_msg_health_check_request(Prev, New, TrUserData);
+        health_check_response ->
+            merge_msg_health_check_response(Prev, New, TrUserData)
     end.
 
 -compile({nowarn_unused_function,merge_msg_health_check_request/3}).
 merge_msg_health_check_request(PMsg, NMsg, _) ->
     S1 = #{},
     case {PMsg, NMsg} of
-      {_, #{service := NFservice}} ->
-	  S1#{service => NFservice};
-      {#{service := PFservice}, _} ->
-	  S1#{service => PFservice};
-      _ -> S1
+        {_, #{service := NFservice}} ->
+            S1#{service => NFservice};
+        {#{service := PFservice}, _} ->
+            S1#{service => PFservice};
+        _ -> S1
     end.
 
 -compile({nowarn_unused_function,merge_msg_health_check_response/3}).
 merge_msg_health_check_response(PMsg, NMsg, _) ->
     S1 = #{},
     case {PMsg, NMsg} of
-      {_, #{status := NFstatus}} -> S1#{status => NFstatus};
-      {#{status := PFstatus}, _} -> S1#{status => PFstatus};
-      _ -> S1
+        {_, #{status := NFstatus}} -> S1#{status => NFstatus};
+        {#{status := PFstatus}, _} -> S1#{status => PFstatus};
+        _ -> S1
     end.
 
 
@@ -620,11 +620,11 @@ verify_msg(Msg, MsgName) when is_atom(MsgName) ->
 verify_msg(Msg, MsgName, Opts) ->
     TrUserData = proplists:get_value(user_data, Opts),
     case MsgName of
-      health_check_request ->
-	  v_msg_health_check_request(Msg, [MsgName], TrUserData);
-      health_check_response ->
-	  v_msg_health_check_response(Msg, [MsgName], TrUserData);
-      _ -> mk_type_error(not_a_known_message, Msg, [])
+        health_check_request ->
+            v_msg_health_check_request(Msg, [MsgName], TrUserData);
+        health_check_response ->
+            v_msg_health_check_response(Msg, [MsgName], TrUserData);
+        _ -> mk_type_error(not_a_known_message, Msg, [])
     end.
 
 
@@ -632,99 +632,99 @@ verify_msg(Msg, MsgName, Opts) ->
 -dialyzer({nowarn_function,v_msg_health_check_request/3}).
 v_msg_health_check_request(#{} = M, Path, TrUserData) ->
     case M of
-      #{service := F1} ->
-	  v_type_string(F1, [service | Path], TrUserData);
-      _ -> ok
+        #{service := F1} ->
+            v_type_string(F1, [service | Path], TrUserData);
+        _ -> ok
     end,
     lists:foreach(fun (service) -> ok;
-		      (OtherKey) ->
-			  mk_type_error({extraneous_key, OtherKey}, M, Path)
-		  end,
-		  maps:keys(M)),
+                      (OtherKey) ->
+                          mk_type_error({extraneous_key, OtherKey}, M, Path)
+                  end,
+                  maps:keys(M)),
     ok;
 v_msg_health_check_request(M, Path, _TrUserData)
-    when is_map(M) ->
+  when is_map(M) ->
     mk_type_error({missing_fields, [] -- maps:keys(M),
-		   health_check_request},
-		  M, Path);
+                   health_check_request},
+                  M, Path);
 v_msg_health_check_request(X, Path, _TrUserData) ->
     mk_type_error({expected_msg, health_check_request}, X,
-		  Path).
+                  Path).
 
 -compile({nowarn_unused_function,v_msg_health_check_response/3}).
 -dialyzer({nowarn_function,v_msg_health_check_response/3}).
 v_msg_health_check_response(#{} = M, Path,
-			    TrUserData) ->
+                            TrUserData) ->
     case M of
-      #{status := F1} ->
-	  'v_enum_health_check_response.ServingStatus'(F1,
-						       [status | Path],
-						       TrUserData);
-      _ -> ok
+        #{status := F1} ->
+            'v_enum_health_check_response.ServingStatus'(F1,
+                                                         [status | Path],
+                                                         TrUserData);
+        _ -> ok
     end,
     lists:foreach(fun (status) -> ok;
-		      (OtherKey) ->
-			  mk_type_error({extraneous_key, OtherKey}, M, Path)
-		  end,
-		  maps:keys(M)),
+                      (OtherKey) ->
+                          mk_type_error({extraneous_key, OtherKey}, M, Path)
+                  end,
+                  maps:keys(M)),
     ok;
 v_msg_health_check_response(M, Path, _TrUserData)
-    when is_map(M) ->
+  when is_map(M) ->
     mk_type_error({missing_fields, [] -- maps:keys(M),
-		   health_check_response},
-		  M, Path);
+                   health_check_response},
+                  M, Path);
 v_msg_health_check_response(X, Path, _TrUserData) ->
     mk_type_error({expected_msg, health_check_response}, X,
-		  Path).
+                  Path).
 
 -compile({nowarn_unused_function,'v_enum_health_check_response.ServingStatus'/3}).
 -dialyzer({nowarn_function,'v_enum_health_check_response.ServingStatus'/3}).
 'v_enum_health_check_response.ServingStatus'('UNKNOWN',
-					     _Path, _TrUserData) ->
+                                             _Path, _TrUserData) ->
     ok;
 'v_enum_health_check_response.ServingStatus'('SERVING',
-					     _Path, _TrUserData) ->
+                                             _Path, _TrUserData) ->
     ok;
 'v_enum_health_check_response.ServingStatus'('NOT_SERVING',
-					     _Path, _TrUserData) ->
+                                             _Path, _TrUserData) ->
     ok;
 'v_enum_health_check_response.ServingStatus'('SERVICE_UNKNOWN',
-					     _Path, _TrUserData) ->
+                                             _Path, _TrUserData) ->
     ok;
 'v_enum_health_check_response.ServingStatus'(V, Path,
-					     TrUserData)
-    when is_integer(V) ->
+                                             TrUserData)
+  when is_integer(V) ->
     v_type_sint32(V, Path, TrUserData);
 'v_enum_health_check_response.ServingStatus'(X, Path,
-					     _TrUserData) ->
+                                             _TrUserData) ->
     mk_type_error({invalid_enum,
-		   'health_check_response.ServingStatus'},
-		  X, Path).
+                   'health_check_response.ServingStatus'},
+                  X, Path).
 
 -compile({nowarn_unused_function,v_type_sint32/3}).
 -dialyzer({nowarn_function,v_type_sint32/3}).
 v_type_sint32(N, _Path, _TrUserData)
-    when -2147483648 =< N, N =< 2147483647 ->
+  when -2147483648 =< N, N =< 2147483647 ->
     ok;
 v_type_sint32(N, Path, _TrUserData)
-    when is_integer(N) ->
+  when is_integer(N) ->
     mk_type_error({value_out_of_range, sint32, signed, 32},
-		  N, Path);
+                  N, Path);
 v_type_sint32(X, Path, _TrUserData) ->
     mk_type_error({bad_integer, sint32, signed, 32}, X,
-		  Path).
+                  Path).
 
 -compile({nowarn_unused_function,v_type_string/3}).
 -dialyzer({nowarn_function,v_type_string/3}).
 v_type_string(S, Path, _TrUserData)
-    when is_list(S); is_binary(S) ->
+  when is_list(S); is_binary(S) ->
     try unicode:characters_to_binary(S) of
-      B when is_binary(B) -> ok;
-      {error, _, _} ->
-	  mk_type_error(bad_unicode_string, S, Path)
+        B when is_binary(B) -> ok;
+        {error, _, _} ->
+            mk_type_error(bad_unicode_string, S, Path)
     catch
-      error:badarg ->
-	  mk_type_error(bad_unicode_string, S, Path)
+        error:badarg ->
+            mk_type_error(bad_unicode_string, S, Path)
     end;
 v_type_string(X, Path, _TrUserData) ->
     mk_type_error(bad_unicode_string, X, Path).
@@ -734,7 +734,7 @@ v_type_string(X, Path, _TrUserData) ->
 mk_type_error(Error, ValueSeen, Path) ->
     Path2 = prettify_path(Path),
     erlang:error({gpb_type_error,
-		  {Error, [{value, ValueSeen}, {path, Path2}]}}).
+                  {Error, [{value, ValueSeen}, {path, Path2}]}}).
 
 
 -compile({nowarn_unused_function,prettify_path/1}).
@@ -742,8 +742,8 @@ mk_type_error(Error, ValueSeen, Path) ->
 prettify_path([]) -> top_level;
 prettify_path(PathR) ->
     list_to_atom(lists:append(lists:join(".",
-					 lists:map(fun atom_to_list/1,
-						   lists:reverse(PathR))))).
+                                         lists:map(fun atom_to_list/1,
+                                                   lists:reverse(PathR))))).
 
 
 -compile({nowarn_unused_function,id/2}).
@@ -775,11 +775,11 @@ get_msg_defs() ->
        {'SERVICE_UNKNOWN', 3}]},
      {{msg, health_check_request},
       [#{name => service, fnum => 1, rnum => 2,
-	 type => string, occurrence => optional, opts => []}]},
+         type => string, occurrence => optional, opts => []}]},
      {{msg, health_check_response},
       [#{name => status, fnum => 1, rnum => 2,
-	 type => {enum, 'health_check_response.ServingStatus'},
-	 occurrence => optional, opts => []}]}].
+         type => {enum, 'health_check_response.ServingStatus'},
+         occurrence => optional, opts => []}]}].
 
 
 get_msg_names() ->
@@ -799,15 +799,15 @@ get_enum_names() ->
 
 fetch_msg_def(MsgName) ->
     case find_msg_def(MsgName) of
-      Fs when is_list(Fs) -> Fs;
-      error -> erlang:error({no_such_msg, MsgName})
+        Fs when is_list(Fs) -> Fs;
+        error -> erlang:error({no_such_msg, MsgName})
     end.
 
 
 fetch_enum_def(EnumName) ->
     case find_enum_def(EnumName) of
-      Es when is_list(Es) -> Es;
-      error -> erlang:error({no_such_enum, EnumName})
+        Es when is_list(Es) -> Es;
+        error -> erlang:error({no_such_enum, EnumName})
     end.
 
 
@@ -828,12 +828,12 @@ find_enum_def(_) -> error.
 
 
 enum_symbol_by_value('health_check_response.ServingStatus',
-		     Value) ->
+                     Value) ->
     'enum_symbol_by_value_health_check_response.ServingStatus'(Value).
 
 
 enum_value_by_symbol('health_check_response.ServingStatus',
-		     Sym) ->
+                     Sym) ->
     'enum_value_by_symbol_health_check_response.ServingStatus'(Sym).
 
 
@@ -863,11 +863,11 @@ get_service_names() -> ['grpc.health.v1.Health'].
 get_service_def('grpc.health.v1.Health') ->
     {{service, 'grpc.health.v1.Health'},
      [#{name => 'Check', input => health_check_request,
-	output => health_check_response, input_stream => false,
-	output_stream => false, opts => []},
+        output => health_check_response, input_stream => false,
+        output_stream => false, opts => []},
       #{name => 'Watch', input => health_check_request,
-	output => health_check_response, input_stream => false,
-	output_stream => true, opts => []}]};
+        output => health_check_response, input_stream => false,
+        output_stream => true, opts => []}]};
 get_service_def(_) -> error.
 
 
@@ -894,9 +894,9 @@ find_rpc_def(_, _) -> error.
 
 fetch_rpc_def(ServiceName, RpcName) ->
     case find_rpc_def(ServiceName, RpcName) of
-      Def when is_map(Def) -> Def;
-      error ->
-	  erlang:error({no_such_rpc, ServiceName, RpcName})
+        Def when is_map(Def) -> Def;
+        error ->
+            erlang:error({no_such_rpc, ServiceName, RpcName})
     end.
 
 
@@ -931,10 +931,10 @@ fqbins_to_service_and_rpc_name(S, R) ->
 %% to a fully qualified (ie with package name) service name and
 %% an rpc name as binaries.
 service_and_rpc_name_to_fqbins('grpc.health.v1.Health',
-			       'Check') ->
+                               'Check') ->
     {<<"grpc.health.v1.Health">>, <<"Check">>};
 service_and_rpc_name_to_fqbins('grpc.health.v1.Health',
-			       'Watch') ->
+                               'Watch') ->
     {<<"grpc.health.v1.Health">>, <<"Watch">>};
 service_and_rpc_name_to_fqbins(S, R) ->
     error({gpb_error, {badservice_or_rpc, {S, R}}}).

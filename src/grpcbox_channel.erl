@@ -127,15 +127,7 @@ insert_stream_interceptor(Name, _Type, Interceptors) ->
     case maps:get(stream_interceptor, Interceptors, undefined) of
         undefined ->
             ok;
-        {Interceptor, Arg} ->
-            ets:insert(?CHANNELS_TAB, {{Name, stream}, Interceptor(Arg)});
-        Interceptor when is_atom(Interceptor) ->
-            ets:insert(?CHANNELS_TAB, {{Name, stream}, #{new_stream => fun Interceptor:new_stream/6,
-                                                         send_msg => fun Interceptor:send_msg/3,
-                                                         recv_msg => fun Interceptor:recv_msg/3}});
-        Interceptor=#{new_stream := _,
-                      send_msg := _,
-                      recv_msg := _} ->
+        Interceptor0 ->
+            Interceptor = grpcbox_client_stream_interceptor:new(Interceptor0),
             ets:insert(?CHANNELS_TAB, {{Name, stream}, Interceptor})
     end.
-

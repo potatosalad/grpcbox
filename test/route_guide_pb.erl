@@ -52,31 +52,31 @@
 
 %% message types
 -type point() ::
-      #{latitude                => integer(),       % = 1, 32 bits
-        longitude               => integer()        % = 2, 32 bits
-       }.
+        #{latitude                => integer(),       % = 1, 32 bits
+          longitude               => integer()        % = 2, 32 bits
+         }.
 
 -type rectangle() ::
-      #{lo                      => point(),         % = 1
-        hi                      => point()          % = 2
-       }.
+        #{lo                      => point(),         % = 1
+          hi                      => point()          % = 2
+         }.
 
 -type feature() ::
-      #{name                    => iodata(),        % = 1
-        location                => point()          % = 2
-       }.
+        #{name                    => iodata(),        % = 1
+          location                => point()          % = 2
+         }.
 
 -type route_note() ::
-      #{location                => point(),         % = 1
-        message                 => iodata()         % = 2
-       }.
+        #{location                => point(),         % = 1
+          message                 => iodata()         % = 2
+         }.
 
 -type route_summary() ::
-      #{point_count             => integer(),       % = 1, 32 bits
-        feature_count           => integer(),       % = 2, 32 bits
-        distance                => integer(),       % = 3, 32 bits
-        elapsed_time            => integer()        % = 4, 32 bits
-       }.
+        #{point_count             => integer(),       % = 1, 32 bits
+          feature_count           => integer(),       % = 2, 32 bits
+          distance                => integer(),       % = 3, 32 bits
+          elapsed_time            => integer()        % = 4, 32 bits
+         }.
 
 -export_type(['point'/0, 'rectangle'/0, 'feature'/0, 'route_note'/0, 'route_summary'/0]).
 
@@ -87,22 +87,22 @@ encode_msg(Msg, MsgName) when is_atom(MsgName) ->
 -spec encode_msg(point() | rectangle() | feature() | route_note() | route_summary(), atom(), list()) -> binary().
 encode_msg(Msg, MsgName, Opts) ->
     case proplists:get_bool(verify, Opts) of
-      true -> verify_msg(Msg, MsgName, Opts);
-      false -> ok
+        true -> verify_msg(Msg, MsgName, Opts);
+        false -> ok
     end,
     TrUserData = proplists:get_value(user_data, Opts),
     case MsgName of
-      point ->
-	  encode_msg_point(id(Msg, TrUserData), TrUserData);
-      rectangle ->
-	  encode_msg_rectangle(id(Msg, TrUserData), TrUserData);
-      feature ->
-	  encode_msg_feature(id(Msg, TrUserData), TrUserData);
-      route_note ->
-	  encode_msg_route_note(id(Msg, TrUserData), TrUserData);
-      route_summary ->
-	  encode_msg_route_summary(id(Msg, TrUserData),
-				   TrUserData)
+        point ->
+            encode_msg_point(id(Msg, TrUserData), TrUserData);
+        rectangle ->
+            encode_msg_rectangle(id(Msg, TrUserData), TrUserData);
+        feature ->
+            encode_msg_feature(id(Msg, TrUserData), TrUserData);
+        route_note ->
+            encode_msg_route_note(id(Msg, TrUserData), TrUserData);
+        route_summary ->
+            encode_msg_route_summary(id(Msg, TrUserData),
+                                     TrUserData)
     end.
 
 
@@ -112,26 +112,26 @@ encode_msg_point(Msg, TrUserData) ->
 
 encode_msg_point(#{} = M, Bin, TrUserData) ->
     B1 = case M of
-	   #{latitude := F1} ->
-	       begin
-		 TrF1 = id(F1, TrUserData),
-		 if TrF1 =:= 0 -> Bin;
-		    true ->
-			e_type_int32(TrF1, <<Bin/binary, 8>>, TrUserData)
-		 end
-	       end;
-	   _ -> Bin
-	 end,
+             #{latitude := F1} ->
+                 begin
+                     TrF1 = id(F1, TrUserData),
+                     if TrF1 =:= 0 -> Bin;
+                        true ->
+                             e_type_int32(TrF1, <<Bin/binary, 8>>, TrUserData)
+                     end
+                 end;
+             _ -> Bin
+         end,
     case M of
-      #{longitude := F2} ->
-	  begin
-	    TrF2 = id(F2, TrUserData),
-	    if TrF2 =:= 0 -> B1;
-	       true ->
-		   e_type_int32(TrF2, <<B1/binary, 16>>, TrUserData)
-	    end
-	  end;
-      _ -> B1
+        #{longitude := F2} ->
+            begin
+                TrF2 = id(F2, TrUserData),
+                if TrF2 =:= 0 -> B1;
+                   true ->
+                        e_type_int32(TrF2, <<B1/binary, 16>>, TrUserData)
+                end
+            end;
+        _ -> B1
     end.
 
 encode_msg_rectangle(Msg, TrUserData) ->
@@ -140,28 +140,28 @@ encode_msg_rectangle(Msg, TrUserData) ->
 
 encode_msg_rectangle(#{} = M, Bin, TrUserData) ->
     B1 = case M of
-	   #{lo := F1} ->
-	       begin
-		 TrF1 = id(F1, TrUserData),
-		 if TrF1 =:= undefined -> Bin;
-		    true ->
-			e_mfield_rectangle_lo(TrF1, <<Bin/binary, 10>>,
-					      TrUserData)
-		 end
-	       end;
-	   _ -> Bin
-	 end,
+             #{lo := F1} ->
+                 begin
+                     TrF1 = id(F1, TrUserData),
+                     if TrF1 =:= undefined -> Bin;
+                        true ->
+                             e_mfield_rectangle_lo(TrF1, <<Bin/binary, 10>>,
+                                                   TrUserData)
+                     end
+                 end;
+             _ -> Bin
+         end,
     case M of
-      #{hi := F2} ->
-	  begin
-	    TrF2 = id(F2, TrUserData),
-	    if TrF2 =:= undefined -> B1;
-	       true ->
-		   e_mfield_rectangle_hi(TrF2, <<B1/binary, 18>>,
-					 TrUserData)
-	    end
-	  end;
-      _ -> B1
+        #{hi := F2} ->
+            begin
+                TrF2 = id(F2, TrUserData),
+                if TrF2 =:= undefined -> B1;
+                   true ->
+                        e_mfield_rectangle_hi(TrF2, <<B1/binary, 18>>,
+                                              TrUserData)
+                end
+            end;
+        _ -> B1
     end.
 
 encode_msg_feature(Msg, TrUserData) ->
@@ -170,28 +170,28 @@ encode_msg_feature(Msg, TrUserData) ->
 
 encode_msg_feature(#{} = M, Bin, TrUserData) ->
     B1 = case M of
-	   #{name := F1} ->
-	       begin
-		 TrF1 = id(F1, TrUserData),
-		 case is_empty_string(TrF1) of
-		   true -> Bin;
-		   false ->
-		       e_type_string(TrF1, <<Bin/binary, 10>>, TrUserData)
-		 end
-	       end;
-	   _ -> Bin
-	 end,
+             #{name := F1} ->
+                 begin
+                     TrF1 = id(F1, TrUserData),
+                     case is_empty_string(TrF1) of
+                         true -> Bin;
+                         false ->
+                             e_type_string(TrF1, <<Bin/binary, 10>>, TrUserData)
+                     end
+                 end;
+             _ -> Bin
+         end,
     case M of
-      #{location := F2} ->
-	  begin
-	    TrF2 = id(F2, TrUserData),
-	    if TrF2 =:= undefined -> B1;
-	       true ->
-		   e_mfield_feature_location(TrF2, <<B1/binary, 18>>,
-					     TrUserData)
-	    end
-	  end;
-      _ -> B1
+        #{location := F2} ->
+            begin
+                TrF2 = id(F2, TrUserData),
+                if TrF2 =:= undefined -> B1;
+                   true ->
+                        e_mfield_feature_location(TrF2, <<B1/binary, 18>>,
+                                                  TrUserData)
+                end
+            end;
+        _ -> B1
     end.
 
 encode_msg_route_note(Msg, TrUserData) ->
@@ -200,28 +200,28 @@ encode_msg_route_note(Msg, TrUserData) ->
 
 encode_msg_route_note(#{} = M, Bin, TrUserData) ->
     B1 = case M of
-	   #{location := F1} ->
-	       begin
-		 TrF1 = id(F1, TrUserData),
-		 if TrF1 =:= undefined -> Bin;
-		    true ->
-			e_mfield_route_note_location(TrF1, <<Bin/binary, 10>>,
-						     TrUserData)
-		 end
-	       end;
-	   _ -> Bin
-	 end,
+             #{location := F1} ->
+                 begin
+                     TrF1 = id(F1, TrUserData),
+                     if TrF1 =:= undefined -> Bin;
+                        true ->
+                             e_mfield_route_note_location(TrF1, <<Bin/binary, 10>>,
+                                                          TrUserData)
+                     end
+                 end;
+             _ -> Bin
+         end,
     case M of
-      #{message := F2} ->
-	  begin
-	    TrF2 = id(F2, TrUserData),
-	    case is_empty_string(TrF2) of
-	      true -> B1;
-	      false ->
-		  e_type_string(TrF2, <<B1/binary, 18>>, TrUserData)
-	    end
-	  end;
-      _ -> B1
+        #{message := F2} ->
+            begin
+                TrF2 = id(F2, TrUserData),
+                case is_empty_string(TrF2) of
+                    true -> B1;
+                    false ->
+                        e_type_string(TrF2, <<B1/binary, 18>>, TrUserData)
+                end
+            end;
+        _ -> B1
     end.
 
 encode_msg_route_summary(Msg, TrUserData) ->
@@ -230,48 +230,48 @@ encode_msg_route_summary(Msg, TrUserData) ->
 
 encode_msg_route_summary(#{} = M, Bin, TrUserData) ->
     B1 = case M of
-	   #{point_count := F1} ->
-	       begin
-		 TrF1 = id(F1, TrUserData),
-		 if TrF1 =:= 0 -> Bin;
-		    true ->
-			e_type_int32(TrF1, <<Bin/binary, 8>>, TrUserData)
-		 end
-	       end;
-	   _ -> Bin
-	 end,
+             #{point_count := F1} ->
+                 begin
+                     TrF1 = id(F1, TrUserData),
+                     if TrF1 =:= 0 -> Bin;
+                        true ->
+                             e_type_int32(TrF1, <<Bin/binary, 8>>, TrUserData)
+                     end
+                 end;
+             _ -> Bin
+         end,
     B2 = case M of
-	   #{feature_count := F2} ->
-	       begin
-		 TrF2 = id(F2, TrUserData),
-		 if TrF2 =:= 0 -> B1;
-		    true ->
-			e_type_int32(TrF2, <<B1/binary, 16>>, TrUserData)
-		 end
-	       end;
-	   _ -> B1
-	 end,
+             #{feature_count := F2} ->
+                 begin
+                     TrF2 = id(F2, TrUserData),
+                     if TrF2 =:= 0 -> B1;
+                        true ->
+                             e_type_int32(TrF2, <<B1/binary, 16>>, TrUserData)
+                     end
+                 end;
+             _ -> B1
+         end,
     B3 = case M of
-	   #{distance := F3} ->
-	       begin
-		 TrF3 = id(F3, TrUserData),
-		 if TrF3 =:= 0 -> B2;
-		    true ->
-			e_type_int32(TrF3, <<B2/binary, 24>>, TrUserData)
-		 end
-	       end;
-	   _ -> B2
-	 end,
+             #{distance := F3} ->
+                 begin
+                     TrF3 = id(F3, TrUserData),
+                     if TrF3 =:= 0 -> B2;
+                        true ->
+                             e_type_int32(TrF3, <<B2/binary, 24>>, TrUserData)
+                     end
+                 end;
+             _ -> B2
+         end,
     case M of
-      #{elapsed_time := F4} ->
-	  begin
-	    TrF4 = id(F4, TrUserData),
-	    if TrF4 =:= 0 -> B3;
-	       true ->
-		   e_type_int32(TrF4, <<B3/binary, 32>>, TrUserData)
-	    end
-	  end;
-      _ -> B3
+        #{elapsed_time := F4} ->
+            begin
+                TrF4 = id(F4, TrUserData),
+                if TrF4 =:= 0 -> B3;
+                   true ->
+                        e_type_int32(TrF4, <<B3/binary, 32>>, TrUserData)
+                end
+            end;
+        _ -> B3
     end.
 
 e_mfield_rectangle_lo(Msg, Bin, TrUserData) ->
@@ -302,7 +302,7 @@ e_type_sint(Value, Bin, _TrUserData) ->
 
 -compile({nowarn_unused_function,e_type_int32/3}).
 e_type_int32(Value, Bin, _TrUserData)
-    when 0 =< Value, Value =< 127 ->
+  when 0 =< Value, Value =< 127 ->
     <<Bin/binary, Value>>;
 e_type_int32(Value, Bin, _TrUserData) ->
     <<N:64/unsigned-native>> = <<Value:64/signed-native>>,
@@ -310,7 +310,7 @@ e_type_int32(Value, Bin, _TrUserData) ->
 
 -compile({nowarn_unused_function,e_type_int64/3}).
 e_type_int64(Value, Bin, _TrUserData)
-    when 0 =< Value, Value =< 127 ->
+  when 0 =< Value, Value =< 127 ->
     <<Bin/binary, Value>>;
 e_type_int64(Value, Bin, _TrUserData) ->
     <<N:64/unsigned-native>> = <<Value:64/signed-native>>,
@@ -332,11 +332,11 @@ e_type_string(S, Bin, _TrUserData) ->
 
 -compile({nowarn_unused_function,e_type_bytes/3}).
 e_type_bytes(Bytes, Bin, _TrUserData)
-    when is_binary(Bytes) ->
+  when is_binary(Bytes) ->
     Bin2 = e_varint(byte_size(Bytes), Bin),
     <<Bin2/binary, Bytes/binary>>;
 e_type_bytes(Bytes, Bin, _TrUserData)
-    when is_list(Bytes) ->
+  when is_list(Bytes) ->
     BytesBin = iolist_to_binary(Bytes),
     Bin2 = e_varint(byte_size(BytesBin), Bin),
     <<Bin2/binary, BytesBin/binary>>.
@@ -395,11 +395,11 @@ is_empty_string(B) when is_binary(B) -> false.
 string_has_chars([C | _]) when is_integer(C) -> true;
 string_has_chars([H | T]) ->
     case string_has_chars(H) of
-      true -> true;
-      false -> string_has_chars(T)
+        true -> true;
+        false -> string_has_chars(T)
     end;
 string_has_chars(B)
-    when is_binary(B), byte_size(B) =/= 0 ->
+  when is_binary(B), byte_size(B) =/= 0 ->
     true;
 string_has_chars(C) when is_integer(C) -> true;
 string_has_chars(<<>>) -> false;
@@ -422,8 +422,8 @@ decode_msg_1_catch(Bin, MsgName, TrUserData) ->
 decode_msg_1_catch(Bin, MsgName, TrUserData) ->
     try decode_msg_2_doit(MsgName, Bin, TrUserData)
     catch Class:Reason ->
-        StackTrace = erlang:get_stacktrace(),
-        error({gpb_error,{decoding_failure, {Bin, MsgName, {Class, Reason, StackTrace}}}})
+            StackTrace = erlang:get_stacktrace(),
+            error({gpb_error,{decoding_failure, {Bin, MsgName, {Class, Reason, StackTrace}}}})
     end.
 -endif.
 
@@ -443,325 +443,325 @@ decode_msg_2_doit(route_summary, Bin, TrUserData) ->
 
 decode_msg_point(Bin, TrUserData) ->
     dfp_read_field_def_point(Bin, 0, 0, id(0, TrUserData),
-			     id(0, TrUserData), TrUserData).
+                             id(0, TrUserData), TrUserData).
 
 dfp_read_field_def_point(<<8, Rest/binary>>, Z1, Z2,
-			 F@_1, F@_2, TrUserData) ->
+                         F@_1, F@_2, TrUserData) ->
     d_field_point_latitude(Rest, Z1, Z2, F@_1, F@_2,
-			   TrUserData);
+                           TrUserData);
 dfp_read_field_def_point(<<16, Rest/binary>>, Z1, Z2,
-			 F@_1, F@_2, TrUserData) ->
+                         F@_1, F@_2, TrUserData) ->
     d_field_point_longitude(Rest, Z1, Z2, F@_1, F@_2,
-			    TrUserData);
+                            TrUserData);
 dfp_read_field_def_point(<<>>, 0, 0, F@_1, F@_2, _) ->
     #{latitude => F@_1, longitude => F@_2};
 dfp_read_field_def_point(Other, Z1, Z2, F@_1, F@_2,
-			 TrUserData) ->
+                         TrUserData) ->
     dg_read_field_def_point(Other, Z1, Z2, F@_1, F@_2,
-			    TrUserData).
+                            TrUserData).
 
 dg_read_field_def_point(<<1:1, X:7, Rest/binary>>, N,
-			Acc, F@_1, F@_2, TrUserData)
-    when N < 32 - 7 ->
+                        Acc, F@_1, F@_2, TrUserData)
+  when N < 32 - 7 ->
     dg_read_field_def_point(Rest, N + 7, X bsl N + Acc,
-			    F@_1, F@_2, TrUserData);
+                            F@_1, F@_2, TrUserData);
 dg_read_field_def_point(<<0:1, X:7, Rest/binary>>, N,
-			Acc, F@_1, F@_2, TrUserData) ->
+                        Acc, F@_1, F@_2, TrUserData) ->
     Key = X bsl N + Acc,
     case Key of
-      8 ->
-	  d_field_point_latitude(Rest, 0, 0, F@_1, F@_2,
-				 TrUserData);
-      16 ->
-	  d_field_point_longitude(Rest, 0, 0, F@_1, F@_2,
-				  TrUserData);
-      _ ->
-	  case Key band 7 of
-	    0 ->
-		skip_varint_point(Rest, 0, 0, F@_1, F@_2, TrUserData);
-	    1 -> skip_64_point(Rest, 0, 0, F@_1, F@_2, TrUserData);
-	    2 ->
-		skip_length_delimited_point(Rest, 0, 0, F@_1, F@_2,
-					    TrUserData);
-	    3 ->
-		skip_group_point(Rest, Key bsr 3, 0, F@_1, F@_2,
-				 TrUserData);
-	    5 -> skip_32_point(Rest, 0, 0, F@_1, F@_2, TrUserData)
-	  end
+        8 ->
+            d_field_point_latitude(Rest, 0, 0, F@_1, F@_2,
+                                   TrUserData);
+        16 ->
+            d_field_point_longitude(Rest, 0, 0, F@_1, F@_2,
+                                    TrUserData);
+        _ ->
+            case Key band 7 of
+                0 ->
+                    skip_varint_point(Rest, 0, 0, F@_1, F@_2, TrUserData);
+                1 -> skip_64_point(Rest, 0, 0, F@_1, F@_2, TrUserData);
+                2 ->
+                    skip_length_delimited_point(Rest, 0, 0, F@_1, F@_2,
+                                                TrUserData);
+                3 ->
+                    skip_group_point(Rest, Key bsr 3, 0, F@_1, F@_2,
+                                     TrUserData);
+                5 -> skip_32_point(Rest, 0, 0, F@_1, F@_2, TrUserData)
+            end
     end;
 dg_read_field_def_point(<<>>, 0, 0, F@_1, F@_2, _) ->
     #{latitude => F@_1, longitude => F@_2}.
 
 d_field_point_latitude(<<1:1, X:7, Rest/binary>>, N,
-		       Acc, F@_1, F@_2, TrUserData)
-    when N < 57 ->
+                       Acc, F@_1, F@_2, TrUserData)
+  when N < 57 ->
     d_field_point_latitude(Rest, N + 7, X bsl N + Acc, F@_1,
-			   F@_2, TrUserData);
+                           F@_2, TrUserData);
 d_field_point_latitude(<<0:1, X:7, Rest/binary>>, N,
-		       Acc, _, F@_2, TrUserData) ->
+                       Acc, _, F@_2, TrUserData) ->
     {NewFValue, RestF} = {begin
-			    <<Res:32/signed-native>> = <<(X bsl N +
-							    Acc):32/unsigned-native>>,
-			    id(Res, TrUserData)
-			  end,
-			  Rest},
+                              <<Res:32/signed-native>> = <<(X bsl N +
+                                                                Acc):32/unsigned-native>>,
+                              id(Res, TrUserData)
+                          end,
+                          Rest},
     dfp_read_field_def_point(RestF, 0, 0, NewFValue, F@_2,
-			     TrUserData).
+                             TrUserData).
 
 d_field_point_longitude(<<1:1, X:7, Rest/binary>>, N,
-			Acc, F@_1, F@_2, TrUserData)
-    when N < 57 ->
+                        Acc, F@_1, F@_2, TrUserData)
+  when N < 57 ->
     d_field_point_longitude(Rest, N + 7, X bsl N + Acc,
-			    F@_1, F@_2, TrUserData);
+                            F@_1, F@_2, TrUserData);
 d_field_point_longitude(<<0:1, X:7, Rest/binary>>, N,
-			Acc, F@_1, _, TrUserData) ->
+                        Acc, F@_1, _, TrUserData) ->
     {NewFValue, RestF} = {begin
-			    <<Res:32/signed-native>> = <<(X bsl N +
-							    Acc):32/unsigned-native>>,
-			    id(Res, TrUserData)
-			  end,
-			  Rest},
+                              <<Res:32/signed-native>> = <<(X bsl N +
+                                                                Acc):32/unsigned-native>>,
+                              id(Res, TrUserData)
+                          end,
+                          Rest},
     dfp_read_field_def_point(RestF, 0, 0, F@_1, NewFValue,
-			     TrUserData).
+                             TrUserData).
 
 skip_varint_point(<<1:1, _:7, Rest/binary>>, Z1, Z2,
-		  F@_1, F@_2, TrUserData) ->
+                  F@_1, F@_2, TrUserData) ->
     skip_varint_point(Rest, Z1, Z2, F@_1, F@_2, TrUserData);
 skip_varint_point(<<0:1, _:7, Rest/binary>>, Z1, Z2,
-		  F@_1, F@_2, TrUserData) ->
+                  F@_1, F@_2, TrUserData) ->
     dfp_read_field_def_point(Rest, Z1, Z2, F@_1, F@_2,
-			     TrUserData).
+                             TrUserData).
 
 skip_length_delimited_point(<<1:1, X:7, Rest/binary>>,
-			    N, Acc, F@_1, F@_2, TrUserData)
-    when N < 57 ->
+                            N, Acc, F@_1, F@_2, TrUserData)
+  when N < 57 ->
     skip_length_delimited_point(Rest, N + 7, X bsl N + Acc,
-				F@_1, F@_2, TrUserData);
+                                F@_1, F@_2, TrUserData);
 skip_length_delimited_point(<<0:1, X:7, Rest/binary>>,
-			    N, Acc, F@_1, F@_2, TrUserData) ->
+                            N, Acc, F@_1, F@_2, TrUserData) ->
     Length = X bsl N + Acc,
     <<_:Length/binary, Rest2/binary>> = Rest,
     dfp_read_field_def_point(Rest2, 0, 0, F@_1, F@_2,
-			     TrUserData).
+                             TrUserData).
 
 skip_group_point(Bin, FNum, Z2, F@_1, F@_2,
-		 TrUserData) ->
+                 TrUserData) ->
     {_, Rest} = read_group(Bin, FNum),
     dfp_read_field_def_point(Rest, 0, Z2, F@_1, F@_2,
-			     TrUserData).
+                             TrUserData).
 
 skip_32_point(<<_:32, Rest/binary>>, Z1, Z2, F@_1, F@_2,
-	      TrUserData) ->
+              TrUserData) ->
     dfp_read_field_def_point(Rest, Z1, Z2, F@_1, F@_2,
-			     TrUserData).
+                             TrUserData).
 
 skip_64_point(<<_:64, Rest/binary>>, Z1, Z2, F@_1, F@_2,
-	      TrUserData) ->
+              TrUserData) ->
     dfp_read_field_def_point(Rest, Z1, Z2, F@_1, F@_2,
-			     TrUserData).
+                             TrUserData).
 
 decode_msg_rectangle(Bin, TrUserData) ->
     dfp_read_field_def_rectangle(Bin, 0, 0,
-				 id('$undef', TrUserData),
-				 id('$undef', TrUserData), TrUserData).
+                                 id('$undef', TrUserData),
+                                 id('$undef', TrUserData), TrUserData).
 
 dfp_read_field_def_rectangle(<<10, Rest/binary>>, Z1,
-			     Z2, F@_1, F@_2, TrUserData) ->
+                             Z2, F@_1, F@_2, TrUserData) ->
     d_field_rectangle_lo(Rest, Z1, Z2, F@_1, F@_2,
-			 TrUserData);
+                         TrUserData);
 dfp_read_field_def_rectangle(<<18, Rest/binary>>, Z1,
-			     Z2, F@_1, F@_2, TrUserData) ->
+                             Z2, F@_1, F@_2, TrUserData) ->
     d_field_rectangle_hi(Rest, Z1, Z2, F@_1, F@_2,
-			 TrUserData);
+                         TrUserData);
 dfp_read_field_def_rectangle(<<>>, 0, 0, F@_1, F@_2,
-			     _) ->
+                             _) ->
     S1 = #{},
     S2 = if F@_1 == '$undef' -> S1;
-	    true -> S1#{lo => F@_1}
-	 end,
+            true -> S1#{lo => F@_1}
+         end,
     if F@_2 == '$undef' -> S2;
        true -> S2#{hi => F@_2}
     end;
 dfp_read_field_def_rectangle(Other, Z1, Z2, F@_1, F@_2,
-			     TrUserData) ->
+                             TrUserData) ->
     dg_read_field_def_rectangle(Other, Z1, Z2, F@_1, F@_2,
-				TrUserData).
+                                TrUserData).
 
 dg_read_field_def_rectangle(<<1:1, X:7, Rest/binary>>,
-			    N, Acc, F@_1, F@_2, TrUserData)
-    when N < 32 - 7 ->
+                            N, Acc, F@_1, F@_2, TrUserData)
+  when N < 32 - 7 ->
     dg_read_field_def_rectangle(Rest, N + 7, X bsl N + Acc,
-				F@_1, F@_2, TrUserData);
+                                F@_1, F@_2, TrUserData);
 dg_read_field_def_rectangle(<<0:1, X:7, Rest/binary>>,
-			    N, Acc, F@_1, F@_2, TrUserData) ->
+                            N, Acc, F@_1, F@_2, TrUserData) ->
     Key = X bsl N + Acc,
     case Key of
-      10 ->
-	  d_field_rectangle_lo(Rest, 0, 0, F@_1, F@_2,
-			       TrUserData);
-      18 ->
-	  d_field_rectangle_hi(Rest, 0, 0, F@_1, F@_2,
-			       TrUserData);
-      _ ->
-	  case Key band 7 of
-	    0 ->
-		skip_varint_rectangle(Rest, 0, 0, F@_1, F@_2,
-				      TrUserData);
-	    1 ->
-		skip_64_rectangle(Rest, 0, 0, F@_1, F@_2, TrUserData);
-	    2 ->
-		skip_length_delimited_rectangle(Rest, 0, 0, F@_1, F@_2,
-						TrUserData);
-	    3 ->
-		skip_group_rectangle(Rest, Key bsr 3, 0, F@_1, F@_2,
-				     TrUserData);
-	    5 ->
-		skip_32_rectangle(Rest, 0, 0, F@_1, F@_2, TrUserData)
-	  end
+        10 ->
+            d_field_rectangle_lo(Rest, 0, 0, F@_1, F@_2,
+                                 TrUserData);
+        18 ->
+            d_field_rectangle_hi(Rest, 0, 0, F@_1, F@_2,
+                                 TrUserData);
+        _ ->
+            case Key band 7 of
+                0 ->
+                    skip_varint_rectangle(Rest, 0, 0, F@_1, F@_2,
+                                          TrUserData);
+                1 ->
+                    skip_64_rectangle(Rest, 0, 0, F@_1, F@_2, TrUserData);
+                2 ->
+                    skip_length_delimited_rectangle(Rest, 0, 0, F@_1, F@_2,
+                                                    TrUserData);
+                3 ->
+                    skip_group_rectangle(Rest, Key bsr 3, 0, F@_1, F@_2,
+                                         TrUserData);
+                5 ->
+                    skip_32_rectangle(Rest, 0, 0, F@_1, F@_2, TrUserData)
+            end
     end;
 dg_read_field_def_rectangle(<<>>, 0, 0, F@_1, F@_2,
-			    _) ->
+                            _) ->
     S1 = #{},
     S2 = if F@_1 == '$undef' -> S1;
-	    true -> S1#{lo => F@_1}
-	 end,
+            true -> S1#{lo => F@_1}
+         end,
     if F@_2 == '$undef' -> S2;
        true -> S2#{hi => F@_2}
     end.
 
 d_field_rectangle_lo(<<1:1, X:7, Rest/binary>>, N, Acc,
-		     F@_1, F@_2, TrUserData)
-    when N < 57 ->
+                     F@_1, F@_2, TrUserData)
+  when N < 57 ->
     d_field_rectangle_lo(Rest, N + 7, X bsl N + Acc, F@_1,
-			 F@_2, TrUserData);
+                         F@_2, TrUserData);
 d_field_rectangle_lo(<<0:1, X:7, Rest/binary>>, N, Acc,
-		     Prev, F@_2, TrUserData) ->
+                     Prev, F@_2, TrUserData) ->
     {NewFValue, RestF} = begin
-			   Len = X bsl N + Acc,
-			   <<Bs:Len/binary, Rest2/binary>> = Rest,
-			   {id(decode_msg_point(Bs, TrUserData), TrUserData),
-			    Rest2}
-			 end,
+                             Len = X bsl N + Acc,
+                             <<Bs:Len/binary, Rest2/binary>> = Rest,
+                             {id(decode_msg_point(Bs, TrUserData), TrUserData),
+                              Rest2}
+                         end,
     dfp_read_field_def_rectangle(RestF, 0, 0,
-				 if Prev == '$undef' -> NewFValue;
-				    true ->
-					merge_msg_point(Prev, NewFValue,
-							TrUserData)
-				 end,
-				 F@_2, TrUserData).
+                                 if Prev == '$undef' -> NewFValue;
+                                    true ->
+                                         merge_msg_point(Prev, NewFValue,
+                                                         TrUserData)
+                                 end,
+                                 F@_2, TrUserData).
 
 d_field_rectangle_hi(<<1:1, X:7, Rest/binary>>, N, Acc,
-		     F@_1, F@_2, TrUserData)
-    when N < 57 ->
+                     F@_1, F@_2, TrUserData)
+  when N < 57 ->
     d_field_rectangle_hi(Rest, N + 7, X bsl N + Acc, F@_1,
-			 F@_2, TrUserData);
+                         F@_2, TrUserData);
 d_field_rectangle_hi(<<0:1, X:7, Rest/binary>>, N, Acc,
-		     F@_1, Prev, TrUserData) ->
+                     F@_1, Prev, TrUserData) ->
     {NewFValue, RestF} = begin
-			   Len = X bsl N + Acc,
-			   <<Bs:Len/binary, Rest2/binary>> = Rest,
-			   {id(decode_msg_point(Bs, TrUserData), TrUserData),
-			    Rest2}
-			 end,
+                             Len = X bsl N + Acc,
+                             <<Bs:Len/binary, Rest2/binary>> = Rest,
+                             {id(decode_msg_point(Bs, TrUserData), TrUserData),
+                              Rest2}
+                         end,
     dfp_read_field_def_rectangle(RestF, 0, 0, F@_1,
-				 if Prev == '$undef' -> NewFValue;
-				    true ->
-					merge_msg_point(Prev, NewFValue,
-							TrUserData)
-				 end,
-				 TrUserData).
+                                 if Prev == '$undef' -> NewFValue;
+                                    true ->
+                                         merge_msg_point(Prev, NewFValue,
+                                                         TrUserData)
+                                 end,
+                                 TrUserData).
 
 skip_varint_rectangle(<<1:1, _:7, Rest/binary>>, Z1, Z2,
-		      F@_1, F@_2, TrUserData) ->
+                      F@_1, F@_2, TrUserData) ->
     skip_varint_rectangle(Rest, Z1, Z2, F@_1, F@_2,
-			  TrUserData);
+                          TrUserData);
 skip_varint_rectangle(<<0:1, _:7, Rest/binary>>, Z1, Z2,
-		      F@_1, F@_2, TrUserData) ->
+                      F@_1, F@_2, TrUserData) ->
     dfp_read_field_def_rectangle(Rest, Z1, Z2, F@_1, F@_2,
-				 TrUserData).
+                                 TrUserData).
 
 skip_length_delimited_rectangle(<<1:1, X:7,
-				  Rest/binary>>,
-				N, Acc, F@_1, F@_2, TrUserData)
-    when N < 57 ->
+                                  Rest/binary>>,
+                                N, Acc, F@_1, F@_2, TrUserData)
+  when N < 57 ->
     skip_length_delimited_rectangle(Rest, N + 7,
-				    X bsl N + Acc, F@_1, F@_2, TrUserData);
+                                    X bsl N + Acc, F@_1, F@_2, TrUserData);
 skip_length_delimited_rectangle(<<0:1, X:7,
-				  Rest/binary>>,
-				N, Acc, F@_1, F@_2, TrUserData) ->
+                                  Rest/binary>>,
+                                N, Acc, F@_1, F@_2, TrUserData) ->
     Length = X bsl N + Acc,
     <<_:Length/binary, Rest2/binary>> = Rest,
     dfp_read_field_def_rectangle(Rest2, 0, 0, F@_1, F@_2,
-				 TrUserData).
+                                 TrUserData).
 
 skip_group_rectangle(Bin, FNum, Z2, F@_1, F@_2,
-		     TrUserData) ->
+                     TrUserData) ->
     {_, Rest} = read_group(Bin, FNum),
     dfp_read_field_def_rectangle(Rest, 0, Z2, F@_1, F@_2,
-				 TrUserData).
+                                 TrUserData).
 
 skip_32_rectangle(<<_:32, Rest/binary>>, Z1, Z2, F@_1,
-		  F@_2, TrUserData) ->
+                  F@_2, TrUserData) ->
     dfp_read_field_def_rectangle(Rest, Z1, Z2, F@_1, F@_2,
-				 TrUserData).
+                                 TrUserData).
 
 skip_64_rectangle(<<_:64, Rest/binary>>, Z1, Z2, F@_1,
-		  F@_2, TrUserData) ->
+                  F@_2, TrUserData) ->
     dfp_read_field_def_rectangle(Rest, Z1, Z2, F@_1, F@_2,
-				 TrUserData).
+                                 TrUserData).
 
 decode_msg_feature(Bin, TrUserData) ->
     dfp_read_field_def_feature(Bin, 0, 0,
-			       id(<<>>, TrUserData), id('$undef', TrUserData),
-			       TrUserData).
+                               id(<<>>, TrUserData), id('$undef', TrUserData),
+                               TrUserData).
 
 dfp_read_field_def_feature(<<10, Rest/binary>>, Z1, Z2,
-			   F@_1, F@_2, TrUserData) ->
+                           F@_1, F@_2, TrUserData) ->
     d_field_feature_name(Rest, Z1, Z2, F@_1, F@_2,
-			 TrUserData);
+                         TrUserData);
 dfp_read_field_def_feature(<<18, Rest/binary>>, Z1, Z2,
-			   F@_1, F@_2, TrUserData) ->
+                           F@_1, F@_2, TrUserData) ->
     d_field_feature_location(Rest, Z1, Z2, F@_1, F@_2,
-			     TrUserData);
+                             TrUserData);
 dfp_read_field_def_feature(<<>>, 0, 0, F@_1, F@_2, _) ->
     S1 = #{name => F@_1},
     if F@_2 == '$undef' -> S1;
        true -> S1#{location => F@_2}
     end;
 dfp_read_field_def_feature(Other, Z1, Z2, F@_1, F@_2,
-			   TrUserData) ->
+                           TrUserData) ->
     dg_read_field_def_feature(Other, Z1, Z2, F@_1, F@_2,
-			      TrUserData).
+                              TrUserData).
 
 dg_read_field_def_feature(<<1:1, X:7, Rest/binary>>, N,
-			  Acc, F@_1, F@_2, TrUserData)
-    when N < 32 - 7 ->
+                          Acc, F@_1, F@_2, TrUserData)
+  when N < 32 - 7 ->
     dg_read_field_def_feature(Rest, N + 7, X bsl N + Acc,
-			      F@_1, F@_2, TrUserData);
+                              F@_1, F@_2, TrUserData);
 dg_read_field_def_feature(<<0:1, X:7, Rest/binary>>, N,
-			  Acc, F@_1, F@_2, TrUserData) ->
+                          Acc, F@_1, F@_2, TrUserData) ->
     Key = X bsl N + Acc,
     case Key of
-      10 ->
-	  d_field_feature_name(Rest, 0, 0, F@_1, F@_2,
-			       TrUserData);
-      18 ->
-	  d_field_feature_location(Rest, 0, 0, F@_1, F@_2,
-				   TrUserData);
-      _ ->
-	  case Key band 7 of
-	    0 ->
-		skip_varint_feature(Rest, 0, 0, F@_1, F@_2, TrUserData);
-	    1 ->
-		skip_64_feature(Rest, 0, 0, F@_1, F@_2, TrUserData);
-	    2 ->
-		skip_length_delimited_feature(Rest, 0, 0, F@_1, F@_2,
-					      TrUserData);
-	    3 ->
-		skip_group_feature(Rest, Key bsr 3, 0, F@_1, F@_2,
-				   TrUserData);
-	    5 -> skip_32_feature(Rest, 0, 0, F@_1, F@_2, TrUserData)
-	  end
+        10 ->
+            d_field_feature_name(Rest, 0, 0, F@_1, F@_2,
+                                 TrUserData);
+        18 ->
+            d_field_feature_location(Rest, 0, 0, F@_1, F@_2,
+                                     TrUserData);
+        _ ->
+            case Key band 7 of
+                0 ->
+                    skip_varint_feature(Rest, 0, 0, F@_1, F@_2, TrUserData);
+                1 ->
+                    skip_64_feature(Rest, 0, 0, F@_1, F@_2, TrUserData);
+                2 ->
+                    skip_length_delimited_feature(Rest, 0, 0, F@_1, F@_2,
+                                                  TrUserData);
+                3 ->
+                    skip_group_feature(Rest, Key bsr 3, 0, F@_1, F@_2,
+                                       TrUserData);
+                5 -> skip_32_feature(Rest, 0, 0, F@_1, F@_2, TrUserData)
+            end
     end;
 dg_read_field_def_feature(<<>>, 0, 0, F@_1, F@_2, _) ->
     S1 = #{name => F@_1},
@@ -770,412 +770,412 @@ dg_read_field_def_feature(<<>>, 0, 0, F@_1, F@_2, _) ->
     end.
 
 d_field_feature_name(<<1:1, X:7, Rest/binary>>, N, Acc,
-		     F@_1, F@_2, TrUserData)
-    when N < 57 ->
+                     F@_1, F@_2, TrUserData)
+  when N < 57 ->
     d_field_feature_name(Rest, N + 7, X bsl N + Acc, F@_1,
-			 F@_2, TrUserData);
+                         F@_2, TrUserData);
 d_field_feature_name(<<0:1, X:7, Rest/binary>>, N, Acc,
-		     _, F@_2, TrUserData) ->
+                     _, F@_2, TrUserData) ->
     {NewFValue, RestF} = begin
-			   Len = X bsl N + Acc,
-			   <<Bytes:Len/binary, Rest2/binary>> = Rest,
-			   {id(binary:copy(Bytes), TrUserData), Rest2}
-			 end,
+                             Len = X bsl N + Acc,
+                             <<Bytes:Len/binary, Rest2/binary>> = Rest,
+                             {id(binary:copy(Bytes), TrUserData), Rest2}
+                         end,
     dfp_read_field_def_feature(RestF, 0, 0, NewFValue, F@_2,
-			       TrUserData).
+                               TrUserData).
 
 d_field_feature_location(<<1:1, X:7, Rest/binary>>, N,
-			 Acc, F@_1, F@_2, TrUserData)
-    when N < 57 ->
+                         Acc, F@_1, F@_2, TrUserData)
+  when N < 57 ->
     d_field_feature_location(Rest, N + 7, X bsl N + Acc,
-			     F@_1, F@_2, TrUserData);
+                             F@_1, F@_2, TrUserData);
 d_field_feature_location(<<0:1, X:7, Rest/binary>>, N,
-			 Acc, F@_1, Prev, TrUserData) ->
+                         Acc, F@_1, Prev, TrUserData) ->
     {NewFValue, RestF} = begin
-			   Len = X bsl N + Acc,
-			   <<Bs:Len/binary, Rest2/binary>> = Rest,
-			   {id(decode_msg_point(Bs, TrUserData), TrUserData),
-			    Rest2}
-			 end,
+                             Len = X bsl N + Acc,
+                             <<Bs:Len/binary, Rest2/binary>> = Rest,
+                             {id(decode_msg_point(Bs, TrUserData), TrUserData),
+                              Rest2}
+                         end,
     dfp_read_field_def_feature(RestF, 0, 0, F@_1,
-			       if Prev == '$undef' -> NewFValue;
-				  true ->
-				      merge_msg_point(Prev, NewFValue,
-						      TrUserData)
-			       end,
-			       TrUserData).
+                               if Prev == '$undef' -> NewFValue;
+                                  true ->
+                                       merge_msg_point(Prev, NewFValue,
+                                                       TrUserData)
+                               end,
+                               TrUserData).
 
 skip_varint_feature(<<1:1, _:7, Rest/binary>>, Z1, Z2,
-		    F@_1, F@_2, TrUserData) ->
+                    F@_1, F@_2, TrUserData) ->
     skip_varint_feature(Rest, Z1, Z2, F@_1, F@_2,
-			TrUserData);
+                        TrUserData);
 skip_varint_feature(<<0:1, _:7, Rest/binary>>, Z1, Z2,
-		    F@_1, F@_2, TrUserData) ->
+                    F@_1, F@_2, TrUserData) ->
     dfp_read_field_def_feature(Rest, Z1, Z2, F@_1, F@_2,
-			       TrUserData).
+                               TrUserData).
 
 skip_length_delimited_feature(<<1:1, X:7, Rest/binary>>,
-			      N, Acc, F@_1, F@_2, TrUserData)
-    when N < 57 ->
+                              N, Acc, F@_1, F@_2, TrUserData)
+  when N < 57 ->
     skip_length_delimited_feature(Rest, N + 7,
-				  X bsl N + Acc, F@_1, F@_2, TrUserData);
+                                  X bsl N + Acc, F@_1, F@_2, TrUserData);
 skip_length_delimited_feature(<<0:1, X:7, Rest/binary>>,
-			      N, Acc, F@_1, F@_2, TrUserData) ->
+                              N, Acc, F@_1, F@_2, TrUserData) ->
     Length = X bsl N + Acc,
     <<_:Length/binary, Rest2/binary>> = Rest,
     dfp_read_field_def_feature(Rest2, 0, 0, F@_1, F@_2,
-			       TrUserData).
+                               TrUserData).
 
 skip_group_feature(Bin, FNum, Z2, F@_1, F@_2,
-		   TrUserData) ->
+                   TrUserData) ->
     {_, Rest} = read_group(Bin, FNum),
     dfp_read_field_def_feature(Rest, 0, Z2, F@_1, F@_2,
-			       TrUserData).
+                               TrUserData).
 
 skip_32_feature(<<_:32, Rest/binary>>, Z1, Z2, F@_1,
-		F@_2, TrUserData) ->
+                F@_2, TrUserData) ->
     dfp_read_field_def_feature(Rest, Z1, Z2, F@_1, F@_2,
-			       TrUserData).
+                               TrUserData).
 
 skip_64_feature(<<_:64, Rest/binary>>, Z1, Z2, F@_1,
-		F@_2, TrUserData) ->
+                F@_2, TrUserData) ->
     dfp_read_field_def_feature(Rest, Z1, Z2, F@_1, F@_2,
-			       TrUserData).
+                               TrUserData).
 
 decode_msg_route_note(Bin, TrUserData) ->
     dfp_read_field_def_route_note(Bin, 0, 0,
-				  id('$undef', TrUserData),
-				  id(<<>>, TrUserData), TrUserData).
+                                  id('$undef', TrUserData),
+                                  id(<<>>, TrUserData), TrUserData).
 
 dfp_read_field_def_route_note(<<10, Rest/binary>>, Z1,
-			      Z2, F@_1, F@_2, TrUserData) ->
+                              Z2, F@_1, F@_2, TrUserData) ->
     d_field_route_note_location(Rest, Z1, Z2, F@_1, F@_2,
-				TrUserData);
+                                TrUserData);
 dfp_read_field_def_route_note(<<18, Rest/binary>>, Z1,
-			      Z2, F@_1, F@_2, TrUserData) ->
+                              Z2, F@_1, F@_2, TrUserData) ->
     d_field_route_note_message(Rest, Z1, Z2, F@_1, F@_2,
-			       TrUserData);
+                               TrUserData);
 dfp_read_field_def_route_note(<<>>, 0, 0, F@_1, F@_2,
-			      _) ->
+                              _) ->
     S1 = #{message => F@_2},
     if F@_1 == '$undef' -> S1;
        true -> S1#{location => F@_1}
     end;
 dfp_read_field_def_route_note(Other, Z1, Z2, F@_1, F@_2,
-			      TrUserData) ->
+                              TrUserData) ->
     dg_read_field_def_route_note(Other, Z1, Z2, F@_1, F@_2,
-				 TrUserData).
+                                 TrUserData).
 
 dg_read_field_def_route_note(<<1:1, X:7, Rest/binary>>,
-			     N, Acc, F@_1, F@_2, TrUserData)
-    when N < 32 - 7 ->
+                             N, Acc, F@_1, F@_2, TrUserData)
+  when N < 32 - 7 ->
     dg_read_field_def_route_note(Rest, N + 7, X bsl N + Acc,
-				 F@_1, F@_2, TrUserData);
+                                 F@_1, F@_2, TrUserData);
 dg_read_field_def_route_note(<<0:1, X:7, Rest/binary>>,
-			     N, Acc, F@_1, F@_2, TrUserData) ->
+                             N, Acc, F@_1, F@_2, TrUserData) ->
     Key = X bsl N + Acc,
     case Key of
-      10 ->
-	  d_field_route_note_location(Rest, 0, 0, F@_1, F@_2,
-				      TrUserData);
-      18 ->
-	  d_field_route_note_message(Rest, 0, 0, F@_1, F@_2,
-				     TrUserData);
-      _ ->
-	  case Key band 7 of
-	    0 ->
-		skip_varint_route_note(Rest, 0, 0, F@_1, F@_2,
-				       TrUserData);
-	    1 ->
-		skip_64_route_note(Rest, 0, 0, F@_1, F@_2, TrUserData);
-	    2 ->
-		skip_length_delimited_route_note(Rest, 0, 0, F@_1, F@_2,
-						 TrUserData);
-	    3 ->
-		skip_group_route_note(Rest, Key bsr 3, 0, F@_1, F@_2,
-				      TrUserData);
-	    5 ->
-		skip_32_route_note(Rest, 0, 0, F@_1, F@_2, TrUserData)
-	  end
+        10 ->
+            d_field_route_note_location(Rest, 0, 0, F@_1, F@_2,
+                                        TrUserData);
+        18 ->
+            d_field_route_note_message(Rest, 0, 0, F@_1, F@_2,
+                                       TrUserData);
+        _ ->
+            case Key band 7 of
+                0 ->
+                    skip_varint_route_note(Rest, 0, 0, F@_1, F@_2,
+                                           TrUserData);
+                1 ->
+                    skip_64_route_note(Rest, 0, 0, F@_1, F@_2, TrUserData);
+                2 ->
+                    skip_length_delimited_route_note(Rest, 0, 0, F@_1, F@_2,
+                                                     TrUserData);
+                3 ->
+                    skip_group_route_note(Rest, Key bsr 3, 0, F@_1, F@_2,
+                                          TrUserData);
+                5 ->
+                    skip_32_route_note(Rest, 0, 0, F@_1, F@_2, TrUserData)
+            end
     end;
 dg_read_field_def_route_note(<<>>, 0, 0, F@_1, F@_2,
-			     _) ->
+                             _) ->
     S1 = #{message => F@_2},
     if F@_1 == '$undef' -> S1;
        true -> S1#{location => F@_1}
     end.
 
 d_field_route_note_location(<<1:1, X:7, Rest/binary>>,
-			    N, Acc, F@_1, F@_2, TrUserData)
-    when N < 57 ->
+                            N, Acc, F@_1, F@_2, TrUserData)
+  when N < 57 ->
     d_field_route_note_location(Rest, N + 7, X bsl N + Acc,
-				F@_1, F@_2, TrUserData);
+                                F@_1, F@_2, TrUserData);
 d_field_route_note_location(<<0:1, X:7, Rest/binary>>,
-			    N, Acc, Prev, F@_2, TrUserData) ->
+                            N, Acc, Prev, F@_2, TrUserData) ->
     {NewFValue, RestF} = begin
-			   Len = X bsl N + Acc,
-			   <<Bs:Len/binary, Rest2/binary>> = Rest,
-			   {id(decode_msg_point(Bs, TrUserData), TrUserData),
-			    Rest2}
-			 end,
+                             Len = X bsl N + Acc,
+                             <<Bs:Len/binary, Rest2/binary>> = Rest,
+                             {id(decode_msg_point(Bs, TrUserData), TrUserData),
+                              Rest2}
+                         end,
     dfp_read_field_def_route_note(RestF, 0, 0,
-				  if Prev == '$undef' -> NewFValue;
-				     true ->
-					 merge_msg_point(Prev, NewFValue,
-							 TrUserData)
-				  end,
-				  F@_2, TrUserData).
+                                  if Prev == '$undef' -> NewFValue;
+                                     true ->
+                                          merge_msg_point(Prev, NewFValue,
+                                                          TrUserData)
+                                  end,
+                                  F@_2, TrUserData).
 
 d_field_route_note_message(<<1:1, X:7, Rest/binary>>, N,
-			   Acc, F@_1, F@_2, TrUserData)
-    when N < 57 ->
+                           Acc, F@_1, F@_2, TrUserData)
+  when N < 57 ->
     d_field_route_note_message(Rest, N + 7, X bsl N + Acc,
-			       F@_1, F@_2, TrUserData);
+                               F@_1, F@_2, TrUserData);
 d_field_route_note_message(<<0:1, X:7, Rest/binary>>, N,
-			   Acc, F@_1, _, TrUserData) ->
+                           Acc, F@_1, _, TrUserData) ->
     {NewFValue, RestF} = begin
-			   Len = X bsl N + Acc,
-			   <<Bytes:Len/binary, Rest2/binary>> = Rest,
-			   {id(binary:copy(Bytes), TrUserData), Rest2}
-			 end,
+                             Len = X bsl N + Acc,
+                             <<Bytes:Len/binary, Rest2/binary>> = Rest,
+                             {id(binary:copy(Bytes), TrUserData), Rest2}
+                         end,
     dfp_read_field_def_route_note(RestF, 0, 0, F@_1,
-				  NewFValue, TrUserData).
+                                  NewFValue, TrUserData).
 
 skip_varint_route_note(<<1:1, _:7, Rest/binary>>, Z1,
-		       Z2, F@_1, F@_2, TrUserData) ->
+                       Z2, F@_1, F@_2, TrUserData) ->
     skip_varint_route_note(Rest, Z1, Z2, F@_1, F@_2,
-			   TrUserData);
+                           TrUserData);
 skip_varint_route_note(<<0:1, _:7, Rest/binary>>, Z1,
-		       Z2, F@_1, F@_2, TrUserData) ->
+                       Z2, F@_1, F@_2, TrUserData) ->
     dfp_read_field_def_route_note(Rest, Z1, Z2, F@_1, F@_2,
-				  TrUserData).
+                                  TrUserData).
 
 skip_length_delimited_route_note(<<1:1, X:7,
-				   Rest/binary>>,
-				 N, Acc, F@_1, F@_2, TrUserData)
-    when N < 57 ->
+                                   Rest/binary>>,
+                                 N, Acc, F@_1, F@_2, TrUserData)
+  when N < 57 ->
     skip_length_delimited_route_note(Rest, N + 7,
-				     X bsl N + Acc, F@_1, F@_2, TrUserData);
+                                     X bsl N + Acc, F@_1, F@_2, TrUserData);
 skip_length_delimited_route_note(<<0:1, X:7,
-				   Rest/binary>>,
-				 N, Acc, F@_1, F@_2, TrUserData) ->
+                                   Rest/binary>>,
+                                 N, Acc, F@_1, F@_2, TrUserData) ->
     Length = X bsl N + Acc,
     <<_:Length/binary, Rest2/binary>> = Rest,
     dfp_read_field_def_route_note(Rest2, 0, 0, F@_1, F@_2,
-				  TrUserData).
+                                  TrUserData).
 
 skip_group_route_note(Bin, FNum, Z2, F@_1, F@_2,
-		      TrUserData) ->
+                      TrUserData) ->
     {_, Rest} = read_group(Bin, FNum),
     dfp_read_field_def_route_note(Rest, 0, Z2, F@_1, F@_2,
-				  TrUserData).
+                                  TrUserData).
 
 skip_32_route_note(<<_:32, Rest/binary>>, Z1, Z2, F@_1,
-		   F@_2, TrUserData) ->
+                   F@_2, TrUserData) ->
     dfp_read_field_def_route_note(Rest, Z1, Z2, F@_1, F@_2,
-				  TrUserData).
+                                  TrUserData).
 
 skip_64_route_note(<<_:64, Rest/binary>>, Z1, Z2, F@_1,
-		   F@_2, TrUserData) ->
+                   F@_2, TrUserData) ->
     dfp_read_field_def_route_note(Rest, Z1, Z2, F@_1, F@_2,
-				  TrUserData).
+                                  TrUserData).
 
 decode_msg_route_summary(Bin, TrUserData) ->
     dfp_read_field_def_route_summary(Bin, 0, 0,
-				     id(0, TrUserData), id(0, TrUserData),
-				     id(0, TrUserData), id(0, TrUserData),
-				     TrUserData).
+                                     id(0, TrUserData), id(0, TrUserData),
+                                     id(0, TrUserData), id(0, TrUserData),
+                                     TrUserData).
 
 dfp_read_field_def_route_summary(<<8, Rest/binary>>, Z1,
-				 Z2, F@_1, F@_2, F@_3, F@_4, TrUserData) ->
+                                 Z2, F@_1, F@_2, F@_3, F@_4, TrUserData) ->
     d_field_route_summary_point_count(Rest, Z1, Z2, F@_1,
-				      F@_2, F@_3, F@_4, TrUserData);
+                                      F@_2, F@_3, F@_4, TrUserData);
 dfp_read_field_def_route_summary(<<16, Rest/binary>>,
-				 Z1, Z2, F@_1, F@_2, F@_3, F@_4, TrUserData) ->
+                                 Z1, Z2, F@_1, F@_2, F@_3, F@_4, TrUserData) ->
     d_field_route_summary_feature_count(Rest, Z1, Z2, F@_1,
-					F@_2, F@_3, F@_4, TrUserData);
+                                        F@_2, F@_3, F@_4, TrUserData);
 dfp_read_field_def_route_summary(<<24, Rest/binary>>,
-				 Z1, Z2, F@_1, F@_2, F@_3, F@_4, TrUserData) ->
+                                 Z1, Z2, F@_1, F@_2, F@_3, F@_4, TrUserData) ->
     d_field_route_summary_distance(Rest, Z1, Z2, F@_1, F@_2,
-				   F@_3, F@_4, TrUserData);
+                                   F@_3, F@_4, TrUserData);
 dfp_read_field_def_route_summary(<<32, Rest/binary>>,
-				 Z1, Z2, F@_1, F@_2, F@_3, F@_4, TrUserData) ->
+                                 Z1, Z2, F@_1, F@_2, F@_3, F@_4, TrUserData) ->
     d_field_route_summary_elapsed_time(Rest, Z1, Z2, F@_1,
-				       F@_2, F@_3, F@_4, TrUserData);
+                                       F@_2, F@_3, F@_4, TrUserData);
 dfp_read_field_def_route_summary(<<>>, 0, 0, F@_1, F@_2,
-				 F@_3, F@_4, _) ->
+                                 F@_3, F@_4, _) ->
     #{point_count => F@_1, feature_count => F@_2,
       distance => F@_3, elapsed_time => F@_4};
 dfp_read_field_def_route_summary(Other, Z1, Z2, F@_1,
-				 F@_2, F@_3, F@_4, TrUserData) ->
+                                 F@_2, F@_3, F@_4, TrUserData) ->
     dg_read_field_def_route_summary(Other, Z1, Z2, F@_1,
-				    F@_2, F@_3, F@_4, TrUserData).
+                                    F@_2, F@_3, F@_4, TrUserData).
 
 dg_read_field_def_route_summary(<<1:1, X:7,
-				  Rest/binary>>,
-				N, Acc, F@_1, F@_2, F@_3, F@_4, TrUserData)
-    when N < 32 - 7 ->
+                                  Rest/binary>>,
+                                N, Acc, F@_1, F@_2, F@_3, F@_4, TrUserData)
+  when N < 32 - 7 ->
     dg_read_field_def_route_summary(Rest, N + 7,
-				    X bsl N + Acc, F@_1, F@_2, F@_3, F@_4,
-				    TrUserData);
+                                    X bsl N + Acc, F@_1, F@_2, F@_3, F@_4,
+                                    TrUserData);
 dg_read_field_def_route_summary(<<0:1, X:7,
-				  Rest/binary>>,
-				N, Acc, F@_1, F@_2, F@_3, F@_4, TrUserData) ->
+                                  Rest/binary>>,
+                                N, Acc, F@_1, F@_2, F@_3, F@_4, TrUserData) ->
     Key = X bsl N + Acc,
     case Key of
-      8 ->
-	  d_field_route_summary_point_count(Rest, 0, 0, F@_1,
-					    F@_2, F@_3, F@_4, TrUserData);
-      16 ->
-	  d_field_route_summary_feature_count(Rest, 0, 0, F@_1,
-					      F@_2, F@_3, F@_4, TrUserData);
-      24 ->
-	  d_field_route_summary_distance(Rest, 0, 0, F@_1, F@_2,
-					 F@_3, F@_4, TrUserData);
-      32 ->
-	  d_field_route_summary_elapsed_time(Rest, 0, 0, F@_1,
-					     F@_2, F@_3, F@_4, TrUserData);
-      _ ->
-	  case Key band 7 of
-	    0 ->
-		skip_varint_route_summary(Rest, 0, 0, F@_1, F@_2, F@_3,
-					  F@_4, TrUserData);
-	    1 ->
-		skip_64_route_summary(Rest, 0, 0, F@_1, F@_2, F@_3,
-				      F@_4, TrUserData);
-	    2 ->
-		skip_length_delimited_route_summary(Rest, 0, 0, F@_1,
-						    F@_2, F@_3, F@_4,
-						    TrUserData);
-	    3 ->
-		skip_group_route_summary(Rest, Key bsr 3, 0, F@_1, F@_2,
-					 F@_3, F@_4, TrUserData);
-	    5 ->
-		skip_32_route_summary(Rest, 0, 0, F@_1, F@_2, F@_3,
-				      F@_4, TrUserData)
-	  end
+        8 ->
+            d_field_route_summary_point_count(Rest, 0, 0, F@_1,
+                                              F@_2, F@_3, F@_4, TrUserData);
+        16 ->
+            d_field_route_summary_feature_count(Rest, 0, 0, F@_1,
+                                                F@_2, F@_3, F@_4, TrUserData);
+        24 ->
+            d_field_route_summary_distance(Rest, 0, 0, F@_1, F@_2,
+                                           F@_3, F@_4, TrUserData);
+        32 ->
+            d_field_route_summary_elapsed_time(Rest, 0, 0, F@_1,
+                                               F@_2, F@_3, F@_4, TrUserData);
+        _ ->
+            case Key band 7 of
+                0 ->
+                    skip_varint_route_summary(Rest, 0, 0, F@_1, F@_2, F@_3,
+                                              F@_4, TrUserData);
+                1 ->
+                    skip_64_route_summary(Rest, 0, 0, F@_1, F@_2, F@_3,
+                                          F@_4, TrUserData);
+                2 ->
+                    skip_length_delimited_route_summary(Rest, 0, 0, F@_1,
+                                                        F@_2, F@_3, F@_4,
+                                                        TrUserData);
+                3 ->
+                    skip_group_route_summary(Rest, Key bsr 3, 0, F@_1, F@_2,
+                                             F@_3, F@_4, TrUserData);
+                5 ->
+                    skip_32_route_summary(Rest, 0, 0, F@_1, F@_2, F@_3,
+                                          F@_4, TrUserData)
+            end
     end;
 dg_read_field_def_route_summary(<<>>, 0, 0, F@_1, F@_2,
-				F@_3, F@_4, _) ->
+                                F@_3, F@_4, _) ->
     #{point_count => F@_1, feature_count => F@_2,
       distance => F@_3, elapsed_time => F@_4}.
 
 d_field_route_summary_point_count(<<1:1, X:7,
-				    Rest/binary>>,
-				  N, Acc, F@_1, F@_2, F@_3, F@_4, TrUserData)
-    when N < 57 ->
+                                    Rest/binary>>,
+                                  N, Acc, F@_1, F@_2, F@_3, F@_4, TrUserData)
+  when N < 57 ->
     d_field_route_summary_point_count(Rest, N + 7,
-				      X bsl N + Acc, F@_1, F@_2, F@_3, F@_4,
-				      TrUserData);
+                                      X bsl N + Acc, F@_1, F@_2, F@_3, F@_4,
+                                      TrUserData);
 d_field_route_summary_point_count(<<0:1, X:7,
-				    Rest/binary>>,
-				  N, Acc, _, F@_2, F@_3, F@_4, TrUserData) ->
+                                    Rest/binary>>,
+                                  N, Acc, _, F@_2, F@_3, F@_4, TrUserData) ->
     {NewFValue, RestF} = {begin
-			    <<Res:32/signed-native>> = <<(X bsl N +
-							    Acc):32/unsigned-native>>,
-			    id(Res, TrUserData)
-			  end,
-			  Rest},
+                              <<Res:32/signed-native>> = <<(X bsl N +
+                                                                Acc):32/unsigned-native>>,
+                              id(Res, TrUserData)
+                          end,
+                          Rest},
     dfp_read_field_def_route_summary(RestF, 0, 0, NewFValue,
-				     F@_2, F@_3, F@_4, TrUserData).
+                                     F@_2, F@_3, F@_4, TrUserData).
 
 d_field_route_summary_feature_count(<<1:1, X:7,
-				      Rest/binary>>,
-				    N, Acc, F@_1, F@_2, F@_3, F@_4, TrUserData)
-    when N < 57 ->
+                                      Rest/binary>>,
+                                    N, Acc, F@_1, F@_2, F@_3, F@_4, TrUserData)
+  when N < 57 ->
     d_field_route_summary_feature_count(Rest, N + 7,
-					X bsl N + Acc, F@_1, F@_2, F@_3, F@_4,
-					TrUserData);
+                                        X bsl N + Acc, F@_1, F@_2, F@_3, F@_4,
+                                        TrUserData);
 d_field_route_summary_feature_count(<<0:1, X:7,
-				      Rest/binary>>,
-				    N, Acc, F@_1, _, F@_3, F@_4, TrUserData) ->
+                                      Rest/binary>>,
+                                    N, Acc, F@_1, _, F@_3, F@_4, TrUserData) ->
     {NewFValue, RestF} = {begin
-			    <<Res:32/signed-native>> = <<(X bsl N +
-							    Acc):32/unsigned-native>>,
-			    id(Res, TrUserData)
-			  end,
-			  Rest},
+                              <<Res:32/signed-native>> = <<(X bsl N +
+                                                                Acc):32/unsigned-native>>,
+                              id(Res, TrUserData)
+                          end,
+                          Rest},
     dfp_read_field_def_route_summary(RestF, 0, 0, F@_1,
-				     NewFValue, F@_3, F@_4, TrUserData).
+                                     NewFValue, F@_3, F@_4, TrUserData).
 
 d_field_route_summary_distance(<<1:1, X:7,
-				 Rest/binary>>,
-			       N, Acc, F@_1, F@_2, F@_3, F@_4, TrUserData)
-    when N < 57 ->
+                                 Rest/binary>>,
+                               N, Acc, F@_1, F@_2, F@_3, F@_4, TrUserData)
+  when N < 57 ->
     d_field_route_summary_distance(Rest, N + 7,
-				   X bsl N + Acc, F@_1, F@_2, F@_3, F@_4,
-				   TrUserData);
+                                   X bsl N + Acc, F@_1, F@_2, F@_3, F@_4,
+                                   TrUserData);
 d_field_route_summary_distance(<<0:1, X:7,
-				 Rest/binary>>,
-			       N, Acc, F@_1, F@_2, _, F@_4, TrUserData) ->
+                                 Rest/binary>>,
+                               N, Acc, F@_1, F@_2, _, F@_4, TrUserData) ->
     {NewFValue, RestF} = {begin
-			    <<Res:32/signed-native>> = <<(X bsl N +
-							    Acc):32/unsigned-native>>,
-			    id(Res, TrUserData)
-			  end,
-			  Rest},
+                              <<Res:32/signed-native>> = <<(X bsl N +
+                                                                Acc):32/unsigned-native>>,
+                              id(Res, TrUserData)
+                          end,
+                          Rest},
     dfp_read_field_def_route_summary(RestF, 0, 0, F@_1,
-				     F@_2, NewFValue, F@_4, TrUserData).
+                                     F@_2, NewFValue, F@_4, TrUserData).
 
 d_field_route_summary_elapsed_time(<<1:1, X:7,
-				     Rest/binary>>,
-				   N, Acc, F@_1, F@_2, F@_3, F@_4, TrUserData)
-    when N < 57 ->
+                                     Rest/binary>>,
+                                   N, Acc, F@_1, F@_2, F@_3, F@_4, TrUserData)
+  when N < 57 ->
     d_field_route_summary_elapsed_time(Rest, N + 7,
-				       X bsl N + Acc, F@_1, F@_2, F@_3, F@_4,
-				       TrUserData);
+                                       X bsl N + Acc, F@_1, F@_2, F@_3, F@_4,
+                                       TrUserData);
 d_field_route_summary_elapsed_time(<<0:1, X:7,
-				     Rest/binary>>,
-				   N, Acc, F@_1, F@_2, F@_3, _, TrUserData) ->
+                                     Rest/binary>>,
+                                   N, Acc, F@_1, F@_2, F@_3, _, TrUserData) ->
     {NewFValue, RestF} = {begin
-			    <<Res:32/signed-native>> = <<(X bsl N +
-							    Acc):32/unsigned-native>>,
-			    id(Res, TrUserData)
-			  end,
-			  Rest},
+                              <<Res:32/signed-native>> = <<(X bsl N +
+                                                                Acc):32/unsigned-native>>,
+                              id(Res, TrUserData)
+                          end,
+                          Rest},
     dfp_read_field_def_route_summary(RestF, 0, 0, F@_1,
-				     F@_2, F@_3, NewFValue, TrUserData).
+                                     F@_2, F@_3, NewFValue, TrUserData).
 
 skip_varint_route_summary(<<1:1, _:7, Rest/binary>>, Z1,
-			  Z2, F@_1, F@_2, F@_3, F@_4, TrUserData) ->
+                          Z2, F@_1, F@_2, F@_3, F@_4, TrUserData) ->
     skip_varint_route_summary(Rest, Z1, Z2, F@_1, F@_2,
-			      F@_3, F@_4, TrUserData);
+                              F@_3, F@_4, TrUserData);
 skip_varint_route_summary(<<0:1, _:7, Rest/binary>>, Z1,
-			  Z2, F@_1, F@_2, F@_3, F@_4, TrUserData) ->
+                          Z2, F@_1, F@_2, F@_3, F@_4, TrUserData) ->
     dfp_read_field_def_route_summary(Rest, Z1, Z2, F@_1,
-				     F@_2, F@_3, F@_4, TrUserData).
+                                     F@_2, F@_3, F@_4, TrUserData).
 
 skip_length_delimited_route_summary(<<1:1, X:7,
-				      Rest/binary>>,
-				    N, Acc, F@_1, F@_2, F@_3, F@_4, TrUserData)
-    when N < 57 ->
+                                      Rest/binary>>,
+                                    N, Acc, F@_1, F@_2, F@_3, F@_4, TrUserData)
+  when N < 57 ->
     skip_length_delimited_route_summary(Rest, N + 7,
-					X bsl N + Acc, F@_1, F@_2, F@_3, F@_4,
-					TrUserData);
+                                        X bsl N + Acc, F@_1, F@_2, F@_3, F@_4,
+                                        TrUserData);
 skip_length_delimited_route_summary(<<0:1, X:7,
-				      Rest/binary>>,
-				    N, Acc, F@_1, F@_2, F@_3, F@_4,
-				    TrUserData) ->
+                                      Rest/binary>>,
+                                    N, Acc, F@_1, F@_2, F@_3, F@_4,
+                                    TrUserData) ->
     Length = X bsl N + Acc,
     <<_:Length/binary, Rest2/binary>> = Rest,
     dfp_read_field_def_route_summary(Rest2, 0, 0, F@_1,
-				     F@_2, F@_3, F@_4, TrUserData).
+                                     F@_2, F@_3, F@_4, TrUserData).
 
 skip_group_route_summary(Bin, FNum, Z2, F@_1, F@_2,
-			 F@_3, F@_4, TrUserData) ->
+                         F@_3, F@_4, TrUserData) ->
     {_, Rest} = read_group(Bin, FNum),
     dfp_read_field_def_route_summary(Rest, 0, Z2, F@_1,
-				     F@_2, F@_3, F@_4, TrUserData).
+                                     F@_2, F@_3, F@_4, TrUserData).
 
 skip_32_route_summary(<<_:32, Rest/binary>>, Z1, Z2,
-		      F@_1, F@_2, F@_3, F@_4, TrUserData) ->
+                      F@_1, F@_2, F@_3, F@_4, TrUserData) ->
     dfp_read_field_def_route_summary(Rest, Z1, Z2, F@_1,
-				     F@_2, F@_3, F@_4, TrUserData).
+                                     F@_2, F@_3, F@_4, TrUserData).
 
 skip_64_route_summary(<<_:64, Rest/binary>>, Z1, Z2,
-		      F@_1, F@_2, F@_3, F@_4, TrUserData) ->
+                      F@_1, F@_2, F@_3, F@_4, TrUserData) ->
     dfp_read_field_def_route_summary(Rest, Z1, Z2, F@_1,
-				     F@_2, F@_3, F@_4, TrUserData).
+                                     F@_2, F@_3, F@_4, TrUserData).
 
 read_group(Bin, FieldNum) ->
     {NumBytes, EndTagLen} = read_gr_b(Bin, 0, 0, 0, 0, FieldNum),
@@ -1241,123 +1241,123 @@ merge_msgs(Prev, New, MsgName) when is_atom(MsgName) ->
 merge_msgs(Prev, New, MsgName, Opts) ->
     TrUserData = proplists:get_value(user_data, Opts),
     case MsgName of
-      point -> merge_msg_point(Prev, New, TrUserData);
-      rectangle -> merge_msg_rectangle(Prev, New, TrUserData);
-      feature -> merge_msg_feature(Prev, New, TrUserData);
-      route_note ->
-	  merge_msg_route_note(Prev, New, TrUserData);
-      route_summary ->
-	  merge_msg_route_summary(Prev, New, TrUserData)
+        point -> merge_msg_point(Prev, New, TrUserData);
+        rectangle -> merge_msg_rectangle(Prev, New, TrUserData);
+        feature -> merge_msg_feature(Prev, New, TrUserData);
+        route_note ->
+            merge_msg_route_note(Prev, New, TrUserData);
+        route_summary ->
+            merge_msg_route_summary(Prev, New, TrUserData)
     end.
 
 -compile({nowarn_unused_function,merge_msg_point/3}).
 merge_msg_point(PMsg, NMsg, _) ->
     S1 = #{},
     S2 = case {PMsg, NMsg} of
-	   {_, #{latitude := NFlatitude}} ->
-	       S1#{latitude => NFlatitude};
-	   {#{latitude := PFlatitude}, _} ->
-	       S1#{latitude => PFlatitude};
-	   _ -> S1
-	 end,
+             {_, #{latitude := NFlatitude}} ->
+                 S1#{latitude => NFlatitude};
+             {#{latitude := PFlatitude}, _} ->
+                 S1#{latitude => PFlatitude};
+             _ -> S1
+         end,
     case {PMsg, NMsg} of
-      {_, #{longitude := NFlongitude}} ->
-	  S2#{longitude => NFlongitude};
-      {#{longitude := PFlongitude}, _} ->
-	  S2#{longitude => PFlongitude};
-      _ -> S2
+        {_, #{longitude := NFlongitude}} ->
+            S2#{longitude => NFlongitude};
+        {#{longitude := PFlongitude}, _} ->
+            S2#{longitude => PFlongitude};
+        _ -> S2
     end.
 
 -compile({nowarn_unused_function,merge_msg_rectangle/3}).
 merge_msg_rectangle(PMsg, NMsg, TrUserData) ->
     S1 = #{},
     S2 = case {PMsg, NMsg} of
-	   {#{lo := PFlo}, #{lo := NFlo}} ->
-	       S1#{lo => merge_msg_point(PFlo, NFlo, TrUserData)};
-	   {_, #{lo := NFlo}} -> S1#{lo => NFlo};
-	   {#{lo := PFlo}, _} -> S1#{lo => PFlo};
-	   {_, _} -> S1
-	 end,
+             {#{lo := PFlo}, #{lo := NFlo}} ->
+                 S1#{lo => merge_msg_point(PFlo, NFlo, TrUserData)};
+             {_, #{lo := NFlo}} -> S1#{lo => NFlo};
+             {#{lo := PFlo}, _} -> S1#{lo => PFlo};
+             {_, _} -> S1
+         end,
     case {PMsg, NMsg} of
-      {#{hi := PFhi}, #{hi := NFhi}} ->
-	  S2#{hi => merge_msg_point(PFhi, NFhi, TrUserData)};
-      {_, #{hi := NFhi}} -> S2#{hi => NFhi};
-      {#{hi := PFhi}, _} -> S2#{hi => PFhi};
-      {_, _} -> S2
+        {#{hi := PFhi}, #{hi := NFhi}} ->
+            S2#{hi => merge_msg_point(PFhi, NFhi, TrUserData)};
+        {_, #{hi := NFhi}} -> S2#{hi => NFhi};
+        {#{hi := PFhi}, _} -> S2#{hi => PFhi};
+        {_, _} -> S2
     end.
 
 -compile({nowarn_unused_function,merge_msg_feature/3}).
 merge_msg_feature(PMsg, NMsg, TrUserData) ->
     S1 = #{},
     S2 = case {PMsg, NMsg} of
-	   {_, #{name := NFname}} -> S1#{name => NFname};
-	   {#{name := PFname}, _} -> S1#{name => PFname};
-	   _ -> S1
-	 end,
+             {_, #{name := NFname}} -> S1#{name => NFname};
+             {#{name := PFname}, _} -> S1#{name => PFname};
+             _ -> S1
+         end,
     case {PMsg, NMsg} of
-      {#{location := PFlocation},
-       #{location := NFlocation}} ->
-	  S2#{location =>
-		  merge_msg_point(PFlocation, NFlocation, TrUserData)};
-      {_, #{location := NFlocation}} ->
-	  S2#{location => NFlocation};
-      {#{location := PFlocation}, _} ->
-	  S2#{location => PFlocation};
-      {_, _} -> S2
+        {#{location := PFlocation},
+         #{location := NFlocation}} ->
+            S2#{location =>
+                    merge_msg_point(PFlocation, NFlocation, TrUserData)};
+        {_, #{location := NFlocation}} ->
+            S2#{location => NFlocation};
+        {#{location := PFlocation}, _} ->
+            S2#{location => PFlocation};
+        {_, _} -> S2
     end.
 
 -compile({nowarn_unused_function,merge_msg_route_note/3}).
 merge_msg_route_note(PMsg, NMsg, TrUserData) ->
     S1 = #{},
     S2 = case {PMsg, NMsg} of
-	   {#{location := PFlocation},
-	    #{location := NFlocation}} ->
-	       S1#{location =>
-		       merge_msg_point(PFlocation, NFlocation, TrUserData)};
-	   {_, #{location := NFlocation}} ->
-	       S1#{location => NFlocation};
-	   {#{location := PFlocation}, _} ->
-	       S1#{location => PFlocation};
-	   {_, _} -> S1
-	 end,
+             {#{location := PFlocation},
+              #{location := NFlocation}} ->
+                 S1#{location =>
+                         merge_msg_point(PFlocation, NFlocation, TrUserData)};
+             {_, #{location := NFlocation}} ->
+                 S1#{location => NFlocation};
+             {#{location := PFlocation}, _} ->
+                 S1#{location => PFlocation};
+             {_, _} -> S1
+         end,
     case {PMsg, NMsg} of
-      {_, #{message := NFmessage}} ->
-	  S2#{message => NFmessage};
-      {#{message := PFmessage}, _} ->
-	  S2#{message => PFmessage};
-      _ -> S2
+        {_, #{message := NFmessage}} ->
+            S2#{message => NFmessage};
+        {#{message := PFmessage}, _} ->
+            S2#{message => PFmessage};
+        _ -> S2
     end.
 
 -compile({nowarn_unused_function,merge_msg_route_summary/3}).
 merge_msg_route_summary(PMsg, NMsg, _) ->
     S1 = #{},
     S2 = case {PMsg, NMsg} of
-	   {_, #{point_count := NFpoint_count}} ->
-	       S1#{point_count => NFpoint_count};
-	   {#{point_count := PFpoint_count}, _} ->
-	       S1#{point_count => PFpoint_count};
-	   _ -> S1
-	 end,
+             {_, #{point_count := NFpoint_count}} ->
+                 S1#{point_count => NFpoint_count};
+             {#{point_count := PFpoint_count}, _} ->
+                 S1#{point_count => PFpoint_count};
+             _ -> S1
+         end,
     S3 = case {PMsg, NMsg} of
-	   {_, #{feature_count := NFfeature_count}} ->
-	       S2#{feature_count => NFfeature_count};
-	   {#{feature_count := PFfeature_count}, _} ->
-	       S2#{feature_count => PFfeature_count};
-	   _ -> S2
-	 end,
+             {_, #{feature_count := NFfeature_count}} ->
+                 S2#{feature_count => NFfeature_count};
+             {#{feature_count := PFfeature_count}, _} ->
+                 S2#{feature_count => PFfeature_count};
+             _ -> S2
+         end,
     S4 = case {PMsg, NMsg} of
-	   {_, #{distance := NFdistance}} ->
-	       S3#{distance => NFdistance};
-	   {#{distance := PFdistance}, _} ->
-	       S3#{distance => PFdistance};
-	   _ -> S3
-	 end,
+             {_, #{distance := NFdistance}} ->
+                 S3#{distance => NFdistance};
+             {#{distance := PFdistance}, _} ->
+                 S3#{distance => PFdistance};
+             _ -> S3
+         end,
     case {PMsg, NMsg} of
-      {_, #{elapsed_time := NFelapsed_time}} ->
-	  S4#{elapsed_time => NFelapsed_time};
-      {#{elapsed_time := PFelapsed_time}, _} ->
-	  S4#{elapsed_time => PFelapsed_time};
-      _ -> S4
+        {_, #{elapsed_time := NFelapsed_time}} ->
+            S4#{elapsed_time => NFelapsed_time};
+        {#{elapsed_time := PFelapsed_time}, _} ->
+            S4#{elapsed_time => PFelapsed_time};
+        _ -> S4
     end.
 
 
@@ -1367,15 +1367,15 @@ verify_msg(Msg, MsgName) when is_atom(MsgName) ->
 verify_msg(Msg, MsgName, Opts) ->
     TrUserData = proplists:get_value(user_data, Opts),
     case MsgName of
-      point -> v_msg_point(Msg, [MsgName], TrUserData);
-      rectangle ->
-	  v_msg_rectangle(Msg, [MsgName], TrUserData);
-      feature -> v_msg_feature(Msg, [MsgName], TrUserData);
-      route_note ->
-	  v_msg_route_note(Msg, [MsgName], TrUserData);
-      route_summary ->
-	  v_msg_route_summary(Msg, [MsgName], TrUserData);
-      _ -> mk_type_error(not_a_known_message, Msg, [])
+        point -> v_msg_point(Msg, [MsgName], TrUserData);
+        rectangle ->
+            v_msg_rectangle(Msg, [MsgName], TrUserData);
+        feature -> v_msg_feature(Msg, [MsgName], TrUserData);
+        route_note ->
+            v_msg_route_note(Msg, [MsgName], TrUserData);
+        route_summary ->
+            v_msg_route_summary(Msg, [MsgName], TrUserData);
+        _ -> mk_type_error(not_a_known_message, Msg, [])
     end.
 
 
@@ -1383,26 +1383,26 @@ verify_msg(Msg, MsgName, Opts) ->
 -dialyzer({nowarn_function,v_msg_point/3}).
 v_msg_point(#{} = M, Path, TrUserData) ->
     case M of
-      #{latitude := F1} ->
-	  v_type_int32(F1, [latitude | Path], TrUserData);
-      _ -> ok
+        #{latitude := F1} ->
+            v_type_int32(F1, [latitude | Path], TrUserData);
+        _ -> ok
     end,
     case M of
-      #{longitude := F2} ->
-	  v_type_int32(F2, [longitude | Path], TrUserData);
-      _ -> ok
+        #{longitude := F2} ->
+            v_type_int32(F2, [longitude | Path], TrUserData);
+        _ -> ok
     end,
     lists:foreach(fun (latitude) -> ok;
-		      (longitude) -> ok;
-		      (OtherKey) ->
-			  mk_type_error({extraneous_key, OtherKey}, M, Path)
-		  end,
-		  maps:keys(M)),
+                      (longitude) -> ok;
+                      (OtherKey) ->
+                          mk_type_error({extraneous_key, OtherKey}, M, Path)
+                  end,
+                  maps:keys(M)),
     ok;
 v_msg_point(M, Path, _TrUserData) when is_map(M) ->
     mk_type_error({missing_fields, [] -- maps:keys(M),
-		   point},
-		  M, Path);
+                   point},
+                  M, Path);
 v_msg_point(X, Path, _TrUserData) ->
     mk_type_error({expected_msg, point}, X, Path).
 
@@ -1410,24 +1410,24 @@ v_msg_point(X, Path, _TrUserData) ->
 -dialyzer({nowarn_function,v_msg_rectangle/3}).
 v_msg_rectangle(#{} = M, Path, TrUserData) ->
     case M of
-      #{lo := F1} -> v_msg_point(F1, [lo | Path], TrUserData);
-      _ -> ok
+        #{lo := F1} -> v_msg_point(F1, [lo | Path], TrUserData);
+        _ -> ok
     end,
     case M of
-      #{hi := F2} -> v_msg_point(F2, [hi | Path], TrUserData);
-      _ -> ok
+        #{hi := F2} -> v_msg_point(F2, [hi | Path], TrUserData);
+        _ -> ok
     end,
     lists:foreach(fun (lo) -> ok;
-		      (hi) -> ok;
-		      (OtherKey) ->
-			  mk_type_error({extraneous_key, OtherKey}, M, Path)
-		  end,
-		  maps:keys(M)),
+                      (hi) -> ok;
+                      (OtherKey) ->
+                          mk_type_error({extraneous_key, OtherKey}, M, Path)
+                  end,
+                  maps:keys(M)),
     ok;
 v_msg_rectangle(M, Path, _TrUserData) when is_map(M) ->
     mk_type_error({missing_fields, [] -- maps:keys(M),
-		   rectangle},
-		  M, Path);
+                   rectangle},
+                  M, Path);
 v_msg_rectangle(X, Path, _TrUserData) ->
     mk_type_error({expected_msg, rectangle}, X, Path).
 
@@ -1435,26 +1435,26 @@ v_msg_rectangle(X, Path, _TrUserData) ->
 -dialyzer({nowarn_function,v_msg_feature/3}).
 v_msg_feature(#{} = M, Path, TrUserData) ->
     case M of
-      #{name := F1} ->
-	  v_type_string(F1, [name | Path], TrUserData);
-      _ -> ok
+        #{name := F1} ->
+            v_type_string(F1, [name | Path], TrUserData);
+        _ -> ok
     end,
     case M of
-      #{location := F2} ->
-	  v_msg_point(F2, [location | Path], TrUserData);
-      _ -> ok
+        #{location := F2} ->
+            v_msg_point(F2, [location | Path], TrUserData);
+        _ -> ok
     end,
     lists:foreach(fun (name) -> ok;
-		      (location) -> ok;
-		      (OtherKey) ->
-			  mk_type_error({extraneous_key, OtherKey}, M, Path)
-		  end,
-		  maps:keys(M)),
+                      (location) -> ok;
+                      (OtherKey) ->
+                          mk_type_error({extraneous_key, OtherKey}, M, Path)
+                  end,
+                  maps:keys(M)),
     ok;
 v_msg_feature(M, Path, _TrUserData) when is_map(M) ->
     mk_type_error({missing_fields, [] -- maps:keys(M),
-		   feature},
-		  M, Path);
+                   feature},
+                  M, Path);
 v_msg_feature(X, Path, _TrUserData) ->
     mk_type_error({expected_msg, feature}, X, Path).
 
@@ -1462,26 +1462,26 @@ v_msg_feature(X, Path, _TrUserData) ->
 -dialyzer({nowarn_function,v_msg_route_note/3}).
 v_msg_route_note(#{} = M, Path, TrUserData) ->
     case M of
-      #{location := F1} ->
-	  v_msg_point(F1, [location | Path], TrUserData);
-      _ -> ok
+        #{location := F1} ->
+            v_msg_point(F1, [location | Path], TrUserData);
+        _ -> ok
     end,
     case M of
-      #{message := F2} ->
-	  v_type_string(F2, [message | Path], TrUserData);
-      _ -> ok
+        #{message := F2} ->
+            v_type_string(F2, [message | Path], TrUserData);
+        _ -> ok
     end,
     lists:foreach(fun (location) -> ok;
-		      (message) -> ok;
-		      (OtherKey) ->
-			  mk_type_error({extraneous_key, OtherKey}, M, Path)
-		  end,
-		  maps:keys(M)),
+                      (message) -> ok;
+                      (OtherKey) ->
+                          mk_type_error({extraneous_key, OtherKey}, M, Path)
+                  end,
+                  maps:keys(M)),
     ok;
 v_msg_route_note(M, Path, _TrUserData) when is_map(M) ->
     mk_type_error({missing_fields, [] -- maps:keys(M),
-		   route_note},
-		  M, Path);
+                   route_note},
+                  M, Path);
 v_msg_route_note(X, Path, _TrUserData) ->
     mk_type_error({expected_msg, route_note}, X, Path).
 
@@ -1489,65 +1489,65 @@ v_msg_route_note(X, Path, _TrUserData) ->
 -dialyzer({nowarn_function,v_msg_route_summary/3}).
 v_msg_route_summary(#{} = M, Path, TrUserData) ->
     case M of
-      #{point_count := F1} ->
-	  v_type_int32(F1, [point_count | Path], TrUserData);
-      _ -> ok
+        #{point_count := F1} ->
+            v_type_int32(F1, [point_count | Path], TrUserData);
+        _ -> ok
     end,
     case M of
-      #{feature_count := F2} ->
-	  v_type_int32(F2, [feature_count | Path], TrUserData);
-      _ -> ok
+        #{feature_count := F2} ->
+            v_type_int32(F2, [feature_count | Path], TrUserData);
+        _ -> ok
     end,
     case M of
-      #{distance := F3} ->
-	  v_type_int32(F3, [distance | Path], TrUserData);
-      _ -> ok
+        #{distance := F3} ->
+            v_type_int32(F3, [distance | Path], TrUserData);
+        _ -> ok
     end,
     case M of
-      #{elapsed_time := F4} ->
-	  v_type_int32(F4, [elapsed_time | Path], TrUserData);
-      _ -> ok
+        #{elapsed_time := F4} ->
+            v_type_int32(F4, [elapsed_time | Path], TrUserData);
+        _ -> ok
     end,
     lists:foreach(fun (point_count) -> ok;
-		      (feature_count) -> ok;
-		      (distance) -> ok;
-		      (elapsed_time) -> ok;
-		      (OtherKey) ->
-			  mk_type_error({extraneous_key, OtherKey}, M, Path)
-		  end,
-		  maps:keys(M)),
+                      (feature_count) -> ok;
+                      (distance) -> ok;
+                      (elapsed_time) -> ok;
+                      (OtherKey) ->
+                          mk_type_error({extraneous_key, OtherKey}, M, Path)
+                  end,
+                  maps:keys(M)),
     ok;
 v_msg_route_summary(M, Path, _TrUserData)
-    when is_map(M) ->
+  when is_map(M) ->
     mk_type_error({missing_fields, [] -- maps:keys(M),
-		   route_summary},
-		  M, Path);
+                   route_summary},
+                  M, Path);
 v_msg_route_summary(X, Path, _TrUserData) ->
     mk_type_error({expected_msg, route_summary}, X, Path).
 
 -compile({nowarn_unused_function,v_type_int32/3}).
 -dialyzer({nowarn_function,v_type_int32/3}).
 v_type_int32(N, _Path, _TrUserData)
-    when -2147483648 =< N, N =< 2147483647 ->
+  when -2147483648 =< N, N =< 2147483647 ->
     ok;
 v_type_int32(N, Path, _TrUserData) when is_integer(N) ->
     mk_type_error({value_out_of_range, int32, signed, 32},
-		  N, Path);
+                  N, Path);
 v_type_int32(X, Path, _TrUserData) ->
     mk_type_error({bad_integer, int32, signed, 32}, X,
-		  Path).
+                  Path).
 
 -compile({nowarn_unused_function,v_type_string/3}).
 -dialyzer({nowarn_function,v_type_string/3}).
 v_type_string(S, Path, _TrUserData)
-    when is_list(S); is_binary(S) ->
+  when is_list(S); is_binary(S) ->
     try unicode:characters_to_binary(S) of
-      B when is_binary(B) -> ok;
-      {error, _, _} ->
-	  mk_type_error(bad_unicode_string, S, Path)
+        B when is_binary(B) -> ok;
+        {error, _, _} ->
+            mk_type_error(bad_unicode_string, S, Path)
     catch
-      error:badarg ->
-	  mk_type_error(bad_unicode_string, S, Path)
+        error:badarg ->
+            mk_type_error(bad_unicode_string, S, Path)
     end;
 v_type_string(X, Path, _TrUserData) ->
     mk_type_error(bad_unicode_string, X, Path).
@@ -1557,7 +1557,7 @@ v_type_string(X, Path, _TrUserData) ->
 mk_type_error(Error, ValueSeen, Path) ->
     Path2 = prettify_path(Path),
     erlang:error({gpb_type_error,
-		  {Error, [{value, ValueSeen}, {path, Path2}]}}).
+                  {Error, [{value, ValueSeen}, {path, Path2}]}}).
 
 
 -compile({nowarn_unused_function,prettify_path/1}).
@@ -1565,8 +1565,8 @@ mk_type_error(Error, ValueSeen, Path) ->
 prettify_path([]) -> top_level;
 prettify_path(PathR) ->
     list_to_atom(lists:append(lists:join(".",
-					 lists:map(fun atom_to_list/1,
-						   lists:reverse(PathR))))).
+                                         lists:map(fun atom_to_list/1,
+                                                   lists:reverse(PathR))))).
 
 
 -compile({nowarn_unused_function,id/2}).
@@ -1595,37 +1595,37 @@ cons(Elem, Acc, _TrUserData) -> [Elem | Acc].
 get_msg_defs() ->
     [{{msg, point},
       [#{name => latitude, fnum => 1, rnum => 2,
-	 type => int32, occurrence => optional, opts => []},
+         type => int32, occurrence => optional, opts => []},
        #{name => longitude, fnum => 2, rnum => 3,
-	 type => int32, occurrence => optional, opts => []}]},
+         type => int32, occurrence => optional, opts => []}]},
      {{msg, rectangle},
       [#{name => lo, fnum => 1, rnum => 2,
-	 type => {msg, point}, occurrence => optional,
-	 opts => []},
+         type => {msg, point}, occurrence => optional,
+         opts => []},
        #{name => hi, fnum => 2, rnum => 3,
-	 type => {msg, point}, occurrence => optional,
-	 opts => []}]},
+         type => {msg, point}, occurrence => optional,
+         opts => []}]},
      {{msg, feature},
       [#{name => name, fnum => 1, rnum => 2, type => string,
-	 occurrence => optional, opts => []},
+         occurrence => optional, opts => []},
        #{name => location, fnum => 2, rnum => 3,
-	 type => {msg, point}, occurrence => optional,
-	 opts => []}]},
+         type => {msg, point}, occurrence => optional,
+         opts => []}]},
      {{msg, route_note},
       [#{name => location, fnum => 1, rnum => 2,
-	 type => {msg, point}, occurrence => optional,
-	 opts => []},
+         type => {msg, point}, occurrence => optional,
+         opts => []},
        #{name => message, fnum => 2, rnum => 3, type => string,
-	 occurrence => optional, opts => []}]},
+         occurrence => optional, opts => []}]},
      {{msg, route_summary},
       [#{name => point_count, fnum => 1, rnum => 2,
-	 type => int32, occurrence => optional, opts => []},
+         type => int32, occurrence => optional, opts => []},
        #{name => feature_count, fnum => 2, rnum => 3,
-	 type => int32, occurrence => optional, opts => []},
+         type => int32, occurrence => optional, opts => []},
        #{name => distance, fnum => 3, rnum => 4, type => int32,
-	 occurrence => optional, opts => []},
+         occurrence => optional, opts => []},
        #{name => elapsed_time, fnum => 4, rnum => 5,
-	 type => int32, occurrence => optional, opts => []}]}].
+         type => int32, occurrence => optional, opts => []}]}].
 
 
 get_msg_names() ->
@@ -1644,8 +1644,8 @@ get_enum_names() -> [].
 
 fetch_msg_def(MsgName) ->
     case find_msg_def(MsgName) of
-      Fs when is_list(Fs) -> Fs;
-      error -> erlang:error({no_such_msg, MsgName})
+        Fs when is_list(Fs) -> Fs;
+        error -> erlang:error({no_such_msg, MsgName})
     end.
 
 
@@ -1710,17 +1710,17 @@ get_service_names() -> ['routeguide.RouteGuide'].
 get_service_def('routeguide.RouteGuide') ->
     {{service, 'routeguide.RouteGuide'},
      [#{name => 'GetFeature', input => point,
-	output => feature, input_stream => false,
-	output_stream => false, opts => []},
+        output => feature, input_stream => false,
+        output_stream => false, opts => []},
       #{name => 'ListFeatures', input => rectangle,
-	output => feature, input_stream => false,
-	output_stream => true, opts => []},
+        output => feature, input_stream => false,
+        output_stream => true, opts => []},
       #{name => 'RecordRoute', input => point,
-	output => route_summary, input_stream => true,
-	output_stream => false, opts => []},
+        output => route_summary, input_stream => true,
+        output_stream => false, opts => []},
       #{name => 'RouteChat', input => route_note,
-	output => route_note, input_stream => true,
-	output_stream => true, opts => []}]};
+        output => route_note, input_stream => true,
+        output_stream => true, opts => []}]};
 get_service_def(_) -> error.
 
 
@@ -1756,9 +1756,9 @@ find_rpc_def(_, _) -> error.
 
 fetch_rpc_def(ServiceName, RpcName) ->
     case find_rpc_def(ServiceName, RpcName) of
-      Def when is_map(Def) -> Def;
-      error ->
-	  erlang:error({no_such_rpc, ServiceName, RpcName})
+        Def when is_map(Def) -> Def;
+        error ->
+            erlang:error({no_such_rpc, ServiceName, RpcName})
     end.
 
 
@@ -1797,16 +1797,16 @@ fqbins_to_service_and_rpc_name(S, R) ->
 %% to a fully qualified (ie with package name) service name and
 %% an rpc name as binaries.
 service_and_rpc_name_to_fqbins('routeguide.RouteGuide',
-			       'GetFeature') ->
+                               'GetFeature') ->
     {<<"routeguide.RouteGuide">>, <<"GetFeature">>};
 service_and_rpc_name_to_fqbins('routeguide.RouteGuide',
-			       'ListFeatures') ->
+                               'ListFeatures') ->
     {<<"routeguide.RouteGuide">>, <<"ListFeatures">>};
 service_and_rpc_name_to_fqbins('routeguide.RouteGuide',
-			       'RecordRoute') ->
+                               'RecordRoute') ->
     {<<"routeguide.RouteGuide">>, <<"RecordRoute">>};
 service_and_rpc_name_to_fqbins('routeguide.RouteGuide',
-			       'RouteChat') ->
+                               'RouteChat') ->
     {<<"routeguide.RouteGuide">>, <<"RouteChat">>};
 service_and_rpc_name_to_fqbins(S, R) ->
     error({gpb_error, {badservice_or_rpc, {S, R}}}).

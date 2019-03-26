@@ -319,7 +319,7 @@ closed_stream(_Config) ->
 
     ?assertMatch({ok, #{point_count := 2}}, grpcbox_client:recv_data(S)),
     ?assertMatch({ok, _}, grpcbox_client:recv_trailers(S)),
-    ?assertMatch(stream_finished, grpcbox_client:recv_data(S)),
+    ?assertMatch({error, closed}, grpcbox_client:recv_data(S)),
 
     %% verify you get stream finished also when not having received the trailers
     {ok, S1} = routeguide_route_guide_client:record_route(ctx:new()),
@@ -327,7 +327,7 @@ closed_stream(_Config) ->
     ok = grpcbox_client:send(S1, #{latitude => 234818903, longitude => -823423910}),
     ?assertMatch(ok, grpcbox_client:close_send(S1)),
     ?assertMatch({ok, #{point_count := 2}}, grpcbox_client:recv_data(S1)),
-    ?assertMatch(stream_finished, grpcbox_client:recv_data(S1)).
+    ?assertMatch({error, closed}, grpcbox_client:recv_data(S1)).
 
 compression(_Config) ->
     Point = #{latitude => 409146138, longitude => -746188906},

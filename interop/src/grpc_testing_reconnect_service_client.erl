@@ -25,37 +25,37 @@
 
 %% @doc Unary RPC
 -spec start(test_pb:reconnect_params()) ->
-    {ok, test_pb:empty(), grpcbox:metadata()} | grpcbox_stream:grpc_error_response().
+                   {ok, test_pb:empty(), grpcbox:metadata()} | grpcbox_stream:grpc_error_response().
 start(Input) ->
     start(ctx:new(), Input, #{}).
 
 -spec start(ctx:t() | test_pb:reconnect_params(), test_pb:reconnect_params() | grpcbox_client:options()) ->
-    {ok, test_pb:empty(), grpcbox:metadata()} | grpcbox_stream:grpc_error_response().
+                   {ok, test_pb:empty(), grpcbox:metadata()} | grpcbox_stream:grpc_error_response().
 start(Ctx, Input) when ?is_ctx(Ctx) ->
     start(Ctx, Input, #{});
 start(Input, Options) ->
     start(ctx:new(), Input, Options).
 
 -spec start(ctx:t(), test_pb:reconnect_params(), grpcbox_client:options()) ->
-    {ok, test_pb:empty(), grpcbox:metadata()} | grpcbox_stream:grpc_error_response().
+                   {ok, test_pb:empty(), grpcbox:metadata()} | grpcbox_stream:grpc_error_response().
 start(Ctx, Input, Options) ->
     grpcbox_client:unary(Ctx, <<"/grpc.testing.ReconnectService/Start">>, Input, ?DEF(reconnect_params, empty, <<"grpc.testing.ReconnectParams">>), Options).
 
 %% @doc Unary RPC
 -spec stop(test_pb:empty()) ->
-    {ok, test_pb:reconnect_info(), grpcbox:metadata()} | grpcbox_stream:grpc_error_response().
+                  {ok, test_pb:reconnect_info(), grpcbox:metadata()} | grpcbox_stream:grpc_error_response().
 stop(Input) ->
     stop(ctx:new(), Input, #{}).
 
 -spec stop(ctx:t() | test_pb:empty(), test_pb:empty() | grpcbox_client:options()) ->
-    {ok, test_pb:reconnect_info(), grpcbox:metadata()} | grpcbox_stream:grpc_error_response().
+                  {ok, test_pb:reconnect_info(), grpcbox:metadata()} | grpcbox_stream:grpc_error_response().
 stop(Ctx, Input) when ?is_ctx(Ctx) ->
     stop(Ctx, Input, #{});
 stop(Input, Options) ->
     stop(ctx:new(), Input, Options).
 
 -spec stop(ctx:t(), test_pb:empty(), grpcbox_client:options()) ->
-    {ok, test_pb:reconnect_info(), grpcbox:metadata()} | grpcbox_stream:grpc_error_response().
+                  {ok, test_pb:reconnect_info(), grpcbox:metadata()} | grpcbox_stream:grpc_error_response().
 stop(Ctx, Input, Options) ->
     grpcbox_client:unary(Ctx, <<"/grpc.testing.ReconnectService/Stop">>, Input, ?DEF(empty, reconnect_info, <<"grpc.testing.Empty">>), Options).
 

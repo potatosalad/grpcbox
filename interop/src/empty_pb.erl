@@ -52,8 +52,8 @@
 
 %% message types
 -type empty() ::
-      #{
-       }.
+        #{
+         }.
 
 -export_type(['empty'/0]).
 
@@ -64,13 +64,13 @@ encode_msg(Msg, MsgName) when is_atom(MsgName) ->
 -spec encode_msg(empty(), atom(), list()) -> binary().
 encode_msg(Msg, MsgName, Opts) ->
     case proplists:get_bool(verify, Opts) of
-      true -> verify_msg(Msg, MsgName, Opts);
-      false -> ok
+        true -> verify_msg(Msg, MsgName, Opts);
+        false -> ok
     end,
     TrUserData = proplists:get_value(user_data, Opts),
     case MsgName of
-      empty ->
-	  encode_msg_empty(id(Msg, TrUserData), TrUserData)
+        empty ->
+            encode_msg_empty(id(Msg, TrUserData), TrUserData)
     end.
 
 
@@ -84,7 +84,7 @@ e_type_sint(Value, Bin, _TrUserData) ->
 
 -compile({nowarn_unused_function,e_type_int32/3}).
 e_type_int32(Value, Bin, _TrUserData)
-    when 0 =< Value, Value =< 127 ->
+  when 0 =< Value, Value =< 127 ->
     <<Bin/binary, Value>>;
 e_type_int32(Value, Bin, _TrUserData) ->
     <<N:64/unsigned-native>> = <<Value:64/signed-native>>,
@@ -92,7 +92,7 @@ e_type_int32(Value, Bin, _TrUserData) ->
 
 -compile({nowarn_unused_function,e_type_int64/3}).
 e_type_int64(Value, Bin, _TrUserData)
-    when 0 =< Value, Value =< 127 ->
+  when 0 =< Value, Value =< 127 ->
     <<Bin/binary, Value>>;
 e_type_int64(Value, Bin, _TrUserData) ->
     <<N:64/unsigned-native>> = <<Value:64/signed-native>>,
@@ -114,11 +114,11 @@ e_type_string(S, Bin, _TrUserData) ->
 
 -compile({nowarn_unused_function,e_type_bytes/3}).
 e_type_bytes(Bytes, Bin, _TrUserData)
-    when is_binary(Bytes) ->
+  when is_binary(Bytes) ->
     Bin2 = e_varint(byte_size(Bytes), Bin),
     <<Bin2/binary, Bytes/binary>>;
 e_type_bytes(Bytes, Bin, _TrUserData)
-    when is_list(Bytes) ->
+  when is_list(Bytes) ->
     BytesBin = iolist_to_binary(Bytes),
     Bin2 = e_varint(byte_size(BytesBin), Bin),
     <<Bin2/binary, BytesBin/binary>>.
@@ -185,8 +185,8 @@ decode_msg_1_catch(Bin, MsgName, TrUserData) ->
 decode_msg_1_catch(Bin, MsgName, TrUserData) ->
     try decode_msg_2_doit(MsgName, Bin, TrUserData)
     catch Class:Reason ->
-        StackTrace = erlang:get_stacktrace(),
-        error({gpb_error,{decoding_failure, {Bin, MsgName, {Class, Reason, StackTrace}}}})
+            StackTrace = erlang:get_stacktrace(),
+            error({gpb_error,{decoding_failure, {Bin, MsgName, {Class, Reason, StackTrace}}}})
     end.
 -endif.
 
@@ -203,37 +203,37 @@ dfp_read_field_def_empty(Other, Z1, Z2, TrUserData) ->
     dg_read_field_def_empty(Other, Z1, Z2, TrUserData).
 
 dg_read_field_def_empty(<<1:1, X:7, Rest/binary>>, N,
-			Acc, TrUserData)
-    when N < 32 - 7 ->
+                        Acc, TrUserData)
+  when N < 32 - 7 ->
     dg_read_field_def_empty(Rest, N + 7, X bsl N + Acc,
-			    TrUserData);
+                            TrUserData);
 dg_read_field_def_empty(<<0:1, X:7, Rest/binary>>, N,
-			Acc, TrUserData) ->
+                        Acc, TrUserData) ->
     Key = X bsl N + Acc,
     case Key band 7 of
-      0 -> skip_varint_empty(Rest, 0, 0, TrUserData);
-      1 -> skip_64_empty(Rest, 0, 0, TrUserData);
-      2 ->
-	  skip_length_delimited_empty(Rest, 0, 0, TrUserData);
-      3 -> skip_group_empty(Rest, Key bsr 3, 0, TrUserData);
-      5 -> skip_32_empty(Rest, 0, 0, TrUserData)
+        0 -> skip_varint_empty(Rest, 0, 0, TrUserData);
+        1 -> skip_64_empty(Rest, 0, 0, TrUserData);
+        2 ->
+            skip_length_delimited_empty(Rest, 0, 0, TrUserData);
+        3 -> skip_group_empty(Rest, Key bsr 3, 0, TrUserData);
+        5 -> skip_32_empty(Rest, 0, 0, TrUserData)
     end;
 dg_read_field_def_empty(<<>>, 0, 0, _) -> #{}.
 
 skip_varint_empty(<<1:1, _:7, Rest/binary>>, Z1, Z2,
-		  TrUserData) ->
+                  TrUserData) ->
     skip_varint_empty(Rest, Z1, Z2, TrUserData);
 skip_varint_empty(<<0:1, _:7, Rest/binary>>, Z1, Z2,
-		  TrUserData) ->
+                  TrUserData) ->
     dfp_read_field_def_empty(Rest, Z1, Z2, TrUserData).
 
 skip_length_delimited_empty(<<1:1, X:7, Rest/binary>>,
-			    N, Acc, TrUserData)
-    when N < 57 ->
+                            N, Acc, TrUserData)
+  when N < 57 ->
     skip_length_delimited_empty(Rest, N + 7, X bsl N + Acc,
-				TrUserData);
+                                TrUserData);
 skip_length_delimited_empty(<<0:1, X:7, Rest/binary>>,
-			    N, Acc, TrUserData) ->
+                            N, Acc, TrUserData) ->
     Length = X bsl N + Acc,
     <<_:Length/binary, Rest2/binary>> = Rest,
     dfp_read_field_def_empty(Rest2, 0, 0, TrUserData).
@@ -243,11 +243,11 @@ skip_group_empty(Bin, FNum, Z2, TrUserData) ->
     dfp_read_field_def_empty(Rest, 0, Z2, TrUserData).
 
 skip_32_empty(<<_:32, Rest/binary>>, Z1, Z2,
-	      TrUserData) ->
+              TrUserData) ->
     dfp_read_field_def_empty(Rest, Z1, Z2, TrUserData).
 
 skip_64_empty(<<_:64, Rest/binary>>, Z1, Z2,
-	      TrUserData) ->
+              TrUserData) ->
     dfp_read_field_def_empty(Rest, Z1, Z2, TrUserData).
 
 read_group(Bin, FieldNum) ->
@@ -314,7 +314,7 @@ merge_msgs(Prev, New, MsgName) when is_atom(MsgName) ->
 merge_msgs(Prev, New, MsgName, Opts) ->
     TrUserData = proplists:get_value(user_data, Opts),
     case MsgName of
-      empty -> merge_msg_empty(Prev, New, TrUserData)
+        empty -> merge_msg_empty(Prev, New, TrUserData)
     end.
 
 -compile({nowarn_unused_function,merge_msg_empty/3}).
@@ -327,8 +327,8 @@ verify_msg(Msg, MsgName) when is_atom(MsgName) ->
 verify_msg(Msg, MsgName, Opts) ->
     TrUserData = proplists:get_value(user_data, Opts),
     case MsgName of
-      empty -> v_msg_empty(Msg, [MsgName], TrUserData);
-      _ -> mk_type_error(not_a_known_message, Msg, [])
+        empty -> v_msg_empty(Msg, [MsgName], TrUserData);
+        _ -> mk_type_error(not_a_known_message, Msg, [])
     end.
 
 
@@ -336,14 +336,14 @@ verify_msg(Msg, MsgName, Opts) ->
 -dialyzer({nowarn_function,v_msg_empty/3}).
 v_msg_empty(#{} = M, Path, _) ->
     lists:foreach(fun (OtherKey) ->
-			  mk_type_error({extraneous_key, OtherKey}, M, Path)
-		  end,
-		  maps:keys(M)),
+                          mk_type_error({extraneous_key, OtherKey}, M, Path)
+                  end,
+                  maps:keys(M)),
     ok;
 v_msg_empty(M, Path, _TrUserData) when is_map(M) ->
     mk_type_error({missing_fields, [] -- maps:keys(M),
-		   empty},
-		  M, Path);
+                   empty},
+                  M, Path);
 v_msg_empty(X, Path, _TrUserData) ->
     mk_type_error({expected_msg, empty}, X, Path).
 
@@ -352,7 +352,7 @@ v_msg_empty(X, Path, _TrUserData) ->
 mk_type_error(Error, ValueSeen, Path) ->
     Path2 = prettify_path(Path),
     erlang:error({gpb_type_error,
-		  {Error, [{value, ValueSeen}, {path, Path2}]}}).
+                  {Error, [{value, ValueSeen}, {path, Path2}]}}).
 
 
 -compile({nowarn_unused_function,prettify_path/1}).
@@ -360,8 +360,8 @@ mk_type_error(Error, ValueSeen, Path) ->
 prettify_path([]) -> top_level;
 prettify_path(PathR) ->
     list_to_atom(lists:append(lists:join(".",
-					 lists:map(fun atom_to_list/1,
-						   lists:reverse(PathR))))).
+                                         lists:map(fun atom_to_list/1,
+                                                   lists:reverse(PathR))))).
 
 
 -compile({nowarn_unused_function,id/2}).
@@ -404,8 +404,8 @@ get_enum_names() -> [].
 
 fetch_msg_def(MsgName) ->
     case find_msg_def(MsgName) of
-      Fs when is_list(Fs) -> Fs;
-      error -> erlang:error({no_such_msg, MsgName})
+        Fs when is_list(Fs) -> Fs;
+        error -> erlang:error({no_such_msg, MsgName})
     end.
 
 

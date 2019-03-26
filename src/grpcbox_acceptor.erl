@@ -7,7 +7,7 @@
          acceptor_terminate/2]).
 
 acceptor_init(_, LSocket, {Transport, ServerOpts, ChatterboxOpts, SslOpts}) ->
-    % monitor listen socket to gracefully close when it closes
+                                                % monitor listen socket to gracefully close when it closes
     MRef = monitor(port, LSocket),
     {ok, {Transport, MRef, ServerOpts, ChatterboxOpts, SslOpts}}.
 
@@ -23,6 +23,6 @@ acceptor_continue(_PeerName, Socket, {gen_tcp, _MRef, ServerOpts, ChatterboxOpts
     h2_connection:become({gen_tcp, Socket}, ServerOpts, ChatterboxOpts).
 
 acceptor_terminate(Reason, _) ->
-    % Something went wrong. Either the acceptor_pool is terminating or the
-    % accept failed.
+                                                % Something went wrong. Either the acceptor_pool is terminating or the
+                                                % accept failed.
     exit(Reason).

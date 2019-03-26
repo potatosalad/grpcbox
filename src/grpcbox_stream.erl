@@ -83,11 +83,11 @@ on_receive_headers(Headers, State=#state{ctx=_Ctx}) ->
     %% proplists:get_value(<<":method">>, Headers) =:= <<"POST">>,
     Metadata = grpcbox_utils:headers_to_metadata(Headers),
     Ctx = case parse_options(<<"grpc-timeout">>, Headers) of
-               infinity ->
-                   grpcbox_metadata:new_incoming_ctx(Metadata);
-               D ->
-                   ctx:with_deadline_after(grpcbox_metadata:new_incoming_ctx(Metadata), D, nanosecond)
-           end,
+              infinity ->
+                  grpcbox_metadata:new_incoming_ctx(Metadata);
+              D ->
+                  ctx:with_deadline_after(grpcbox_metadata:new_incoming_ctx(Metadata), D, nanosecond)
+          end,
 
     FullPath = proplists:get_value(<<":path">>, Headers),
     %% wait to rpc_begin here since we need to know the method
@@ -99,7 +99,7 @@ on_receive_headers(Headers, State=#state{ctx=_Ctx}) ->
     ContentType = parse_options(<<"content-type">>, Headers),
 
     RespHeaders = [{<<":status">>, <<"200">>},
-                   {<<"user-agent">>, <<"grpc-erlang/0.1.0">>},
+                   {<<"user-agent">>, grpcbox:user_agent()},
                    {<<"content-type">>, content_type(ContentType)}
                    | response_encoding(ResponseEncoding)],
 
@@ -121,7 +121,7 @@ handle_service_lookup(Ctx, [Service, Method], State=#state{services_table=Servic
     end;
 handle_service_lookup(_, _, State) ->
     State1 = State#state{resp_headers=[{<<":status">>, <<"200">>},
-                                       {<<"user-agent">>, <<"grpc-erlang/0.1.0">>}]},
+                                       {<<"user-agent">>, grpcbox:user_agent()}]},
     end_stream(?GRPC_STATUS_UNIMPLEMENTED, <<"failed parsing path">>, State1),
     {ok, State1}.
 
