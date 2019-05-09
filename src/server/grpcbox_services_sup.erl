@@ -21,6 +21,20 @@ start_link(ServerOpts, GrpcOpts, ListenOpts, PoolOpts, TransportOpts) ->
     ServicesSupName = services_sup_name(ListenOpts),
     supervisor:start_link({local, ServicesSupName}, ?MODULE, [ServerOpts, GrpcOpts, ListenOpts,
                                                               PoolOpts, TransportOpts, ServicesSupName]).
+
+interceptor(Type=interceptor, Opts) ->
+    case maps:get(Type, Opts, undefined) of
+        undefined ->
+            undefined;
+        Module when is_atom(Module) ->
+            grpcbox_interceptor:new(Module);
+        [] ->
+            undefined;
+        List = [_ | _] ->
+            grpcbox_interceptor:chain(List);
+        Map when is_map(Map) ->
+            grpcbox_interceptor:new(Map)
+    end;
 interceptor(Type, Opts) ->
     case maps:get(Type, Opts, undefined) of
         {Module, Function} ->
@@ -36,15 +50,24 @@ init([ServerOpts, GrpcOpts, ListenOpts, PoolOpts, TransportOpts, ServiceSupName]
                                    {read_concurrency, true}, {keypos, 2}]),
     ServicePbModules = maps:get(service_protos, GrpcOpts),
     Services = maps:get(services, GrpcOpts, #{}),
-    load_services(ServicePbModules, Services, Tid),
+    ok = load_services(ServicePbModules, Services, Tid),
 
     AuthFun = get_authfun(maps:get(ssl, TransportOpts, false), GrpcOpts),
+    Interceptor = interceptor(interceptor, GrpcOpts),
     UnaryInterceptor = interceptor(unary_interceptor, GrpcOpts),
     StreamInterceptor = interceptor(stream_interceptor, GrpcOpts),
-    StatsHandler = maps:get(stats_handler, GrpcOpts, undefined),
-    ChatterboxOpts = #{stream_callback_mod => grpcbox_stream,
-                       stream_callback_opts => [Tid, AuthFun, UnaryInterceptor,
-                                                StreamInterceptor, StatsHandler]},
+    % StatsHandler = maps:get(stats_handler, GrpcOpts, undefined),
+    % ChatterboxOpts = #{stream_callback_mod => grpcbox_stream,
+    %                    stream_callback_opts => [Tid, AuthFun, UnaryInterceptor,
+    %                                             StreamInterceptor, StatsHandler]},
+    Stream = grpcbox_stream:new_server(#{transport => grpcbox_h2_transport,
+                                         interceptor => Interceptor}),
+    Options = #{services_table => Tid,
+                auth_fun => AuthFun,
+                unary_interceptor => UnaryInterceptor,
+                stream_interceptor => StreamInterceptor},
+    ChatterboxOpts = #{stream_callback_mod => grpcbox_h2_stream,
+                       stream_callback_opts => [Stream, Options]},
 
     %% unique name for pool based on the ip and port it will listen on
     Name = pool_name(ListenOpts),

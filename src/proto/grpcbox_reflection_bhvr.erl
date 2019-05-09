@@ -1,9 +1,9 @@
 %%%-------------------------------------------------------------------
-%% @doc Behaviour to implement for grpc service grpc.reflection.v1alpha.ServerReflection.
+%% @doc Behaviour to implement for grpc service grpc.reflection.v1.ServerReflection.
 %% @end
 %%%-------------------------------------------------------------------
 
-%% this module was generated on 2019-03-09T00:28:46+00:00 and should not be modified manually
+%% this module was generated on 2019-04-22T18:03:35+00:00 and should not be modified manually
 
 -module(grpcbox_reflection_bhvr).
 

@@ -60,9 +60,9 @@
     maps:fold(fun validate_and_update/3, '__struct__'(), maps:remove('__struct__', Map)).
 
 -spec new(Interceptor) -> Interceptor when Interceptor :: t()
-                                                          ; ({Function, Arg}) -> Interceptor when Interceptor :: t(), Function :: function(), Arg :: term()
-                                                                                                                                                     ; (Module) -> Interceptor when Interceptor :: t(), Module :: module()
-                                                                                                                                                                                                                  ; (Map) -> Interceptor when Interceptor :: t(), Map :: map().
+       ; ({Function, Arg}) -> Interceptor when Interceptor :: t(), Function :: function(), Arg :: term()
+       ; (Module) -> Interceptor when Interceptor :: t(), Module :: module()
+       ; (Map) -> Interceptor when Interceptor :: t(), Map :: map().
 new(Interceptor=#{'__struct__' := ?MODULE}) ->
     Interceptor;
 new({Function, Arg}) when is_function(Function, 1) ->

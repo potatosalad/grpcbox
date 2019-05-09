@@ -5,7 +5,9 @@
          decode_header/1,
          encode_headers/1,
          is_reserved_header/1,
-         status_to_string/1]).
+         status_to_string/1,
+         take_option/3,
+         take_options/2]).
 
 -include("grpcbox.hrl").
 
@@ -96,3 +98,21 @@ status_to_string(?GRPC_STATUS_UNAUTHENTICATED) ->
     <<"UNAUTHENTICATED">>;
 status_to_string(Code) ->
     <<"CODE_", Code/binary>>.
+
+take_option(Key, Options0, Default) when is_map(Options0) ->
+    case maps:take(Key, Options0) of
+        {Value, Options1} ->
+            {Value, Options1};
+        error ->
+            {Default, Options0}
+    end.
+
+take_options(KeysWithDefaults, Options) when is_list(KeysWithDefaults) andalso is_map(Options) ->
+    take_options(KeysWithDefaults, Options, []).
+
+%% @private
+take_options([{Key, Default} | Rest], Options0, Acc) ->
+    {Value, Options1} = take_option(Key, Options0, Default),
+    take_options(Rest, Options1, [Value | Acc]);
+take_options([], Options, Acc) ->
+    {lists:reverse(Acc), Options}.

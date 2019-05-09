@@ -11,6 +11,8 @@
          stream/5,
 
          send/2,
+         cancel/1,
+         end_stream/1,
          send_data/2,
          send_data_end_stream/2,
          send_trailers_end_stream/2,
@@ -56,51 +58,56 @@ get_channel(Options, Type) ->
     Channel = maps:get(channel, Options, default_channel),
     grpcbox_channel:pick(Channel, Type).
 
-unary(Ctx, Service, Method, Input, Def, Options) ->
-    unary(Ctx, filename:join([<<>>, Service, Method]), Input, Def, Options).
+unary(Ctx, Service, Method, Input, Definition, Options) ->
+    unary(Ctx, filename:join([<<>>, Service, Method]), Input, Definition, Options).
 
-unary(Ctx, Path, Input, Def, Options) ->
+%% Unary RPC
+unary(Ctx, Path, Input, Definition, Options) ->
     case get_channel(Options, unary) of
         {ok, {Channel, Interceptor}} ->
-            Handler = fun(Ctx1, Input1) ->
-                              unary_init(Ctx1, Channel, Path, Input1, Def, Options)
-                      end,
-            case Interceptor of
-                undefined ->
-                    Handler(Ctx, Input);
-                _ ->
-                    Interceptor(Ctx, Channel, Handler, Path, Input, Def, Options)
-            end;
+            Context = grpcbox_client_context:new(#{lifecycle => unary,
+                                                   ctx => Ctx,
+                                                   channel => Channel,
+                                                   interceptor => Interceptor,
+                                                   method => Path,
+                                                   definition => Definition}),
+            NextFun = fun grpcbox_client_statem:unary/3,
+            grpcbox_client_interceptor:unary(Context, NextFun, Input, Options);
+            % grpcbox_client_context:new(unary, Ctx, Channel, Interceptor)
+            % Handler = fun(Ctx1, Input1) ->
+            %                   unary_init(Ctx1, Channel, Path, Input1, Def, Options)
+            %           end,
+            % case Interceptor of
+            %     undefined ->
+            %         Handler(Ctx, Input);
+            %     _ ->
+            %         Interceptor(Ctx, Channel, Handler, Path, Input, Def, Options)
+            % end;
         {error, _Reason}=Error ->
             Error
     end.
 
-%% no input: bidrectional
-stream(Ctx, Path, Def, Options) ->
+%% Bidirectional streaming RPC
+%% Client streaming RPC
+stream(Ctx, Path, Definition, Options) ->
     case get_channel(Options, stream) of
         {ok, {Channel, Interceptor}} ->
-            grpcbox_client_stream_interceptor:new_stream(Ctx, Channel, Interceptor, Path, Def, fun grpcbox_client_stream:new_stream/5, Options);
-                                                % case Interceptor of
-                                                %     undefined ->
-                                                %         grpcbox_client_stream:new_stream(Ctx, Channel, Path, Def, Options);
-                                                %     #{new_stream := NewStream} ->
-                                                %         case NewStream(Ctx, Channel, Path, Def, fun grpcbox_client_stream:new_stream/5, Options) of
-                                                %             {ok, Stream0} ->
-                                                %                 Stream = Stream0#{stream_interceptor := Interceptor},
-                                                %                 {ok, Stream};
-                                                %             Error = {error, _Reason} ->
-                                                %                 Error
-                                                %         end
-                                                % end;
+            Stream = grpcbox_client_stream:new(#{ctx => Ctx,
+                                                 channel => Channel,
+                                                 interceptor => Interceptor,
+                                                 method => Path,
+                                                 definition => Definition}),
+            grpcbox_client_stream:open(Stream, Options);
         Error = {error, _Reason} ->
             Error
     end.
 
-%% input given, stream response
-stream(Ctx, Path, Input, Def, Options) ->
-    case stream(Ctx, Path, Def, Options) of
+%% Server streaming RPC
+stream(Ctx, Path, Input, Definition, Options) ->
+    case stream(Ctx, Path, Definition, Options) of
         {ok, Stream} ->
-            ok = send_data_end_stream(Stream, Input),
+            _ = ?MODULE:send(Stream, Input),
+            _ = ?MODULE:end_stream(Stream),
             {ok, Stream};
         Error = {error, _Reason} ->
             Error
@@ -116,8 +123,17 @@ stream(Ctx, Path, Input, Def, Options) ->
                                                 % send_msg(Stream, Streamer, Input) when is_function(Streamer, 2) ->
                                                 %     Streamer(Stream, Input).
 
-send(Stream, Input) ->
-    send_data(Stream, Input).
+send(Stream, Message) ->
+    grpcbox_client_stream:send(Stream, Message).
+
+cancel(Stream) ->
+    grpcbox_client_stream:cancel(Stream).
+
+end_stream(Stream) ->
+    grpcbox_client_stream:end_stream(Stream).
+
+% send(Stream, Input) ->
+%     send_data(Stream, Input).
 
 send_data(Stream, Input) ->
     grpcbox_client_stream_interceptor:send_msg(Stream, fun grpcbox_client_stream:send_data/2, Input).

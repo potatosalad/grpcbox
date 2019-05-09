@@ -1,7 +1,8 @@
 -module(grpcbox_status).
 
 -export([encode/1,
-         decode/1]).
+         decode/1,
+         safe_decode/1]).
 
 -include("grpcbox.hrl").
 
@@ -26,23 +27,23 @@
 -export_type([code/0]).
 
 -spec encode(code()) -> binary().
-encode(ok) -> ?GRPC_STATUS_OK;
-encode(cancelled) -> ?GRPC_STATUS_CANCELLED;
-encode(unknown) -> ?GRPC_STATUS_UNKNOWN;
-encode(invalid_argument) -> ?GRPC_STATUS_INVALID_ARGUMENT;
-encode(deadline_exceeded) -> ?GRPC_STATUS_DEADLINE_EXCEEDED;
-encode(not_found) -> ?GRPC_STATUS_NOT_FOUND;
-encode(already_exists) -> ?GRPC_STATUS_ALREADY_EXISTS ;
-encode(permission_denied) -> ?GRPC_STATUS_PERMISSION_DENIED;
-encode(resource_exhausted) -> ?GRPC_STATUS_RESOURCE_EXHAUSTED;
-encode(failed_precondition) -> ?GRPC_STATUS_FAILED_PRECONDITION;
-encode(aborted) -> ?GRPC_STATUS_ABORTED;
-encode(out_of_range) -> ?GRPC_STATUS_OUT_OF_RANGE;
-encode(unimplemented) -> ?GRPC_STATUS_UNIMPLEMENTED;
-encode(internal) -> ?GRPC_STATUS_INTERNAL;
-encode(unavailable) -> ?GRPC_STATUS_UNAVAILABLE;
-encode(data_loss) -> ?GRPC_STATUS_DATA_LOSS;
-encode(unauthenticated) -> ?GRPC_STATUS_UNAUTHENTICATED.
+encode('OK') -> ?GRPC_STATUS_OK;
+encode('CANCELLED') -> ?GRPC_STATUS_CANCELLED;
+encode('UNKNOWN') -> ?GRPC_STATUS_UNKNOWN;
+encode('INVALID_ARGUMENT') -> ?GRPC_STATUS_INVALID_ARGUMENT;
+encode('DEADLINE_EXCEEDED') -> ?GRPC_STATUS_DEADLINE_EXCEEDED;
+encode('NOT_FOUND') -> ?GRPC_STATUS_NOT_FOUND;
+encode('ALREADY_EXISTS') -> ?GRPC_STATUS_ALREADY_EXISTS;
+encode('PERMISSION_DENIED') -> ?GRPC_STATUS_PERMISSION_DENIED;
+encode('RESOURCE_EXHAUSTED') -> ?GRPC_STATUS_RESOURCE_EXHAUSTED;
+encode('FAILED_PRECONDITION') -> ?GRPC_STATUS_FAILED_PRECONDITION;
+encode('ABORTED') -> ?GRPC_STATUS_ABORTED;
+encode('OUT_OF_RANGE') -> ?GRPC_STATUS_OUT_OF_RANGE;
+encode('UNIMPLEMENTED') -> ?GRPC_STATUS_UNIMPLEMENTED;
+encode('INTERNAL') -> ?GRPC_STATUS_INTERNAL;
+encode('UNAVAILABLE') -> ?GRPC_STATUS_UNAVAILABLE;
+encode('DATA_LOSS') -> ?GRPC_STATUS_DATA_LOSS;
+encode('UNAUTHENTICATED') -> ?GRPC_STATUS_UNAUTHENTICATED.
 
 -spec decode(binary()) -> code().
 decode(?GRPC_STATUS_OK) -> ok;
@@ -62,3 +63,11 @@ decode(?GRPC_STATUS_INTERNAL) -> internal;
 decode(?GRPC_STATUS_UNAVAILABLE) -> unavailable;
 decode(?GRPC_STATUS_DATA_LOSS) -> data_loss;
 decode(?GRPC_STATUS_UNAUTHENTICATED) -> unauthenticated.
+
+-spec safe_decode(binary()) -> {ok, code()} | error.
+safe_decode(Code) ->
+    try {ok, decode(Code)}
+    catch
+        error:function_clause ->
+            error
+    end.

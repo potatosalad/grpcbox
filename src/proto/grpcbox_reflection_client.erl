@@ -1,9 +1,9 @@
 %%%-------------------------------------------------------------------
-%% @doc Client module for grpc service grpc.reflection.v1alpha.ServerReflection.
+%% @doc Client module for grpc service grpc.reflection.v1.ServerReflection.
 %% @end
 %%%-------------------------------------------------------------------
 
-%% this module was generated on 2019-03-09T00:28:46+00:00 and should not be modified manually
+%% this module was generated on 2019-04-22T18:03:35+00:00 and should not be modified manually
 
 -module(grpcbox_reflection_client).
 
@@ -14,7 +14,7 @@
 
 -define(is_ctx(Ctx), is_tuple(Ctx) andalso element(1, Ctx) =:= ctx).
 
--define(SERVICE, 'grpc.reflection.v1alpha.ServerReflection').
+-define(SERVICE, 'grpc.reflection.v1.ServerReflection').
 -define(PROTO_MODULE, 'grpcbox_reflection_pb').
 -define(MARSHAL_FUN(T), fun(I) -> ?PROTO_MODULE:encode_msg(I, T) end).
 -define(UNMARSHAL_FUN(T), fun(I) -> ?PROTO_MODULE:decode_msg(I, T) end).
@@ -25,19 +25,19 @@
 
 %% @doc 
 -spec server_reflection_info() ->
-                                    {ok, grpcbox_client:stream()} | grpcbox_stream:grpc_error_response().
+    {ok, grpcbox_client:stream()} | grpcbox_stream:grpc_error_response().
 server_reflection_info() ->
     server_reflection_info(ctx:new(), #{}).
 
 -spec server_reflection_info(ctx:t() | grpcbox_client:options()) ->
-                                    {ok, grpcbox_client:stream()} | grpcbox_stream:grpc_error_response().
+    {ok, grpcbox_client:stream()} | grpcbox_stream:grpc_error_response().
 server_reflection_info(Ctx) when ?is_ctx(Ctx) ->
     server_reflection_info(Ctx, #{});
 server_reflection_info(Options) ->
     server_reflection_info(ctx:new(), Options).
 
 -spec server_reflection_info(ctx:t(), grpcbox_client:options()) ->
-                                    {ok, grpcbox_client:stream()} | grpcbox_stream:grpc_error_response().
+    {ok, grpcbox_client:stream()} | grpcbox_stream:grpc_error_response().
 server_reflection_info(Ctx, Options) ->
-    grpcbox_client:stream(Ctx, <<"/grpc.reflection.v1alpha.ServerReflection/ServerReflectionInfo">>, ?DEF(server_reflection_request, server_reflection_response, <<"grpc.reflection.v1alpha.ServerReflectionRequest">>), Options).
+    grpcbox_client:stream(Ctx, <<"/grpc.reflection.v1.ServerReflection/ServerReflectionInfo">>, ?DEF(server_reflection_request, server_reflection_response, <<"grpc.reflection.v1.ServerReflectionRequest">>), Options).
 
